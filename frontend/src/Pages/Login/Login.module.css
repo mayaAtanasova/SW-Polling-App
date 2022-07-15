@@ -1,0 +1,179 @@
+.form {
+  max-width: 30rem;
+  margin: 0 auto;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(230, 230, 230, 0.5);
+  background-color: rgba(27, 27, 27, 0.5);
+  opacity: 0.9;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.formTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+.formGroupError {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.inputGroup {
+  display: flex;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+}
+
+.inputGroup .formField,
+.formGroupError .formField {
+  width: 90%;
+  border: none;
+  background-color: aliceblue;
+  border-radius: 0.5rem 0 0 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.formGroupError .formField {
+  background-color: #ffdbe3;
+}
+
+.formGroupError .faIcon {
+  background-color: #ff7391;
+}
+
+.faIcon {
+  width: 10%;
+  height: 100%;
+  padding: 0.5rem;
+  background-color: var(--color-accent);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: white;
+  text-align: center;
+}
+
+.faIcon:hover {
+    cursor: pointer;
+  }
+
+.formLabel {
+  margin-bottom: 0.25rem;
+}
+
+.formField {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: aliceblue;
+}
+
+.formFieldError {
+  background-color: #ffdbe3;
+}
+
+.formFieldErrorMessage {
+  color: #e11d48;
+  margin: 0;
+}
+
+.formActions {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.formActions * {
+  margin: 0;
+}
+.formActions .or {
+  position: relative;
+  margin: 1rem 0;
+}
+
+.formActions .or::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 45%;
+  height: 1px;
+  opacity: 0.5;
+  background-color:var(--color-accent);
+  margin-bottom: 0.5rem;
+}
+
+.formActions .or::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 45%;
+  height: 1px;
+  opacity: 0.5;
+  background-color:var(--color-accent);
+  margin-bottom: 0.5rem;
+}
+
+.formSubmitBtn {
+  min-width: 5rem;
+  width: 100%;
+  background-color: var(--color-accent);
+  color: white;
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 00.5rem;
+  padding: 1rem 0;
+  margin: 0.5rem 0;
+}
+
+.formSubmitBtn:hover {
+  opacity: 0.9;
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.formSubmitBtn:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor:not-allowed;
+}
+
+.googleBtn {
+  background-color: var(--color-accent);
+  color: white;
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 00.5rem;
+  padding: 0.5rem 0;
+  margin: 0.5rem 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.googleBtn:hover {
+  cursor: pointer;
+  opacity: 0.9;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.googleBtn img {
+  width: 30px;
+  aspect-ratio: 1/1;
+  margin-right: 1rem;
+}

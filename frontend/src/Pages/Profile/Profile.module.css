@@ -1,0 +1,24 @@
+.profileContainer {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.profileLogo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgb(130, 159, 202);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profileLogo h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+}

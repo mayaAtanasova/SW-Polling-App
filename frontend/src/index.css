@@ -1,0 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap");
+
+:root {
+--color-text: #eeeeef;
+--color-text-secondary: #aeafae;
+--color-accent: #71caeb;
+--color-darkbkg: #1e485f;
+--color-bkg: #1b1b1b;
+}
+
+body {
+  margin: 0;
+  font-family: Poppin, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+
+    background-color: var(--color-bkg);
+    color: rgb(238, 238, 239)
+}
+
