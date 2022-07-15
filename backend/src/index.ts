@@ -13,6 +13,8 @@ import {
     userLeave,
     getRoomUsers
 } from './utils/usersManager'
+import { msgRouter } from "./routes/message";
+import { eventRouter } from "./routes/event";
 
 
 //init
@@ -94,6 +96,8 @@ app.use(cors(
 ));
 
 app.use('/auth', authRouter);
+app.use('/messages', msgRouter);
+app.use('/events', eventRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello World');
