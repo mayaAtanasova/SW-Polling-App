@@ -3,12 +3,14 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import UserInterface from '../utils/userInterface';
 import { issueJwt } from '../utils/jwt';
+import { validationResult } from 'express-validator';
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password, firstName, lastName, role } = req.body; //voting points to be added later
-    if(!email || !password || !firstName || !lastName) {
-        console.log('body missing');
-        return res.status(401).send({ message: 'Missing required fields' });
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        console.log(errors);
+        return res.status(401).send({ message: 'Invalid fields sent' });
     }
     const displayName = firstName + ' ' + lastName;
     const hashedp = bcrypt.hashSync(password, 10);
@@ -44,7 +46,11 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
 const login = (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body; //voting points to be added later
-
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        console.log(errors);
+        return res.status(401).send({ message: 'Invalid fields sent' });
+    }
     User.findOne({ email }, (err: Error, user: UserInterface) => {
         if (err) {
             console.log('Error finding user: ', err);
