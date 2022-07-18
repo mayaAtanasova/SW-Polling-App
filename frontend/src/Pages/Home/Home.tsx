@@ -1,25 +1,41 @@
+import { useEffect, useState } from 'react';
 import styles from './Home.module.css';
-import { useMySelector } from '../../hooks/useReduxHooks';
+
+import { useMySelector, useMyDispatch } from '../../hooks/useReduxHooks';
+import { setMessage, clearMessage } from '../../store/messageSlice';
+import { joinEvent } from '../../store/eventSlice';
+import Welcome from '../../Components/Welcome/Welcome';
+import Chat from '../../Components/Chat/Chat';
+import { Navigate } from 'react-router-dom';
+
 
 const Home = () => {
 
+    const dispatch = useMyDispatch();
     const { user, isAuthenticated, isAdmin } = useMySelector((state: any) => state.auth);
+    const { loggedInChat } = useMySelector((state: any) => state.event);
+    const userId = user?.id;
+
+    const handleJoinEvent = (title: string) => (event: any) => {
+        event.preventDefault();
+        console.log(title, ' + ', userId);
+        dispatch(joinEvent({ title, userId }));
+    }
+
+    if (!user) {
+        return <Navigate to='/login' replace />
+    }
+
     return (
-        <div>
+        <>
             <div className={styles.heroContainer}>
                 <img src="/assets/hero_bkg.png" alt="" />
+            <div className={styles.homeContainer}>
+                {isAuthenticated && !loggedInChat && <Welcome user={user} onJoinEvent={handleJoinEvent} />}
+                {isAuthenticated && loggedInChat && < Chat />}
             </div>
-            <div className={styles.homeText}>
-                <h1 className={styles.title}>Welcome to the StreamWorks Poll App</h1>
-                {!isAuthenticated && <p>Please log in to start using it</p>}
-                {isAuthenticated && 
-                <>
-                <p>You are logged in as <span>{user.displayName}</span></p>
-                <p>Please enter your organization id to proceed:</p>
-                <input className={styles.formField} type="text" />
-                </>}
             </div>
-        </div>
+        </>
     );
 };
 
