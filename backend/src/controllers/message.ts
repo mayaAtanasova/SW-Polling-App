@@ -30,7 +30,7 @@ const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
     const { evid, displayName, text, userId, date } = req.body;
     let event;
     try {
-        event = await Event.findById(evid);
+        event = await Event.findById(evid).populate('attendees messages');
     } catch (err) {
         return next(new Error('[Could not find event by id: ' + err));
     }
@@ -43,7 +43,7 @@ const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
         return next(new Error('[Could not find user by id: ' + err));
     }
 
-    const isAttendee = event.attendees.any((attendee: any) => attendee._id === userId);
+    const isAttendee = event.attendees.some((attendee: any) => attendee._id === userId);
     if (!isAttendee) {
         event.attendees.push(user);
     }

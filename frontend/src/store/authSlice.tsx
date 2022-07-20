@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { setMessage } from "./messageSlice";
+import { setEventId } from "./eventSlice";
 
 import AuthService from "../services/authService";
 import { IUser } from "../Interfaces/IUser";

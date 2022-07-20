@@ -10,6 +10,7 @@ import { Provider } from 'react-redux';
 import store from './store/store';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Profile from './Pages/Profile/Profile';
+import Chat from './Components/Chat/Chat';
 
 const clientId: string = process.env.REACT_APP_GOOGLE_CLIENT_ID ?? '';
 
@@ -26,6 +27,7 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/admin" element={<AdminDashboard />} />
       < Route path='/profile' element={<Profile />} />
+      <Route path="/event" element={<Chat />} />
     </Routes>
     </BrowserRouter>
     </Provider>

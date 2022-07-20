@@ -1,33 +1,33 @@
 const users: {
-    id: string,
+    sid: string,
     displayName: string,
-    room: string
+    event: string
 }[] = [];
 
-const userJoin = (id:string, displayName:string, room:string) => {
-    const user = { id, displayName, room };
+const userJoin = (sid:string, displayName:string, event:string) => {
+    const user = { sid, displayName, event };
     users.push(user);
     return user;
 };
 
-const getCurrentUser = (id:string) => {
-    return users.find(user => user.id === id);
+const getCurrentUser = (sid:string) => {
+    return users.find(user => user.sid === sid);
 };
 
-const userLeave = (id:string) => {
-    const index = users.findIndex(user => user.id === id);
+const userLeave = (sid:string) => {
+    const index = users.findIndex(user => user.sid === sid);
     if (index !== -1) {
         return users.splice(index, 1)[0];
     }
 };
 
-const getRoomUsers = (room:string) => {
-    return users.filter(user => user.room === room);
+const getEventUsers = (event:string) => {
+    return users.filter(user => user.event === event);
 };
 
 export {
     userJoin,
     getCurrentUser,
     userLeave,
-    getRoomUsers
+    getEventUsers
 }

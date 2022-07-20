@@ -11,7 +11,7 @@ import {
     userJoin,
     getCurrentUser,
     userLeave,
-    getRoomUsers
+    getEventUsers
 } from './utils/usersManager'
 import { msgRouter } from "./routes/message";
 import { eventRouter } from "./routes/event";
@@ -38,25 +38,25 @@ io.on('connection', socket => {
     console.log(`Usesr with id ${socket.id} connected`);
 
     //When user joins
-    socket.on('joinRoom', ({ displayName, room }) => {
-        const user = userJoin(socket.id, displayName, room);
-        socket.join(user.room);
+    socket.on('joinEvent', ({ displayName, event }) => {
+        const user = userJoin(socket.id, displayName, event);
+        socket.join(user.event);
         
         // Welcome user
         socket.emit('message', formatMessage(chatAdmin, `Welcome to the StreamWorks chat system!`))
 
         //Broadcast that user joined
         socket.broadcast
-            .to(user.room)
+            .to(user.event)
             .emit(
                 'message',
                 formatMessage(chatAdmin, `User ${user.displayName} has joined this chat.`)
             );
         
             //Send users and room info
-            io.in(user.room).emit('roomUsers', {
-                room: user.room,
-                users: getRoomUsers(user.room),
+            io.in(user.event).emit('roomUsers', {
+                event: user.event,
+                users: getEventUsers(user.event),
             });
     });
 
@@ -65,7 +65,7 @@ io.on('connection', socket => {
 
         const user = getCurrentUser(socket.id);
 
-        io.in(user.room).emit('message', formatMessage(user.displayName, msg));
+        io.in(user.event).emit('message', formatMessage(user.displayName, msg));
     });
 
     //Runs when client disconnects
@@ -74,13 +74,13 @@ io.on('connection', socket => {
         const user = userLeave(socket.id);
 
         if (user) {
-            io.in(user.room)
+            io.in(user.event)
             .emit('message', formatMessage(chatAdmin, `User ${user.displayName} has left the chat`));
 
             //resend users and room info
-            io.in(user.room).emit('roomUsers', {
-                room: user.room,
-                users: getRoomUsers(user.room),
+            io.in(user.event).emit('roomUsers', {
+                room: user.event,
+                users: getEventUsers(user.event),
             })
         }
     });

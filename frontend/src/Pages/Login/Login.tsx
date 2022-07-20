@@ -29,7 +29,6 @@ const LoginForm = () => {
     const { message } = useMySelector((state: any) => state.message);
     const dispatch = useMyDispatch();
 
-
     const {
         errors,
         validateForm,
@@ -115,9 +114,8 @@ const LoginForm = () => {
     if (isAuthenticated) {
         if (isAdmin) {
             return <Navigate to="/admin" />
-        } else {
-            return <Navigate to="/" /> //or a user dashboard
         }
+        return <Navigate to="/" replace /> //or a user dashboard
     }
 
     return (

@@ -5,14 +5,17 @@ import styles from './Navbar.module.css';
 
 import { useMyDispatch, useMySelector } from '../../hooks/useReduxHooks';
 import { logout } from '../../store/authSlice';
+import { leaveEvent } from '../../store/eventSlice';
 import { clearMessage } from '../../store/messageSlice';
 
 const Navbar = () => {
     const [showMessage, setShowMessage] = useState(false);
 
-    const { loading, isAuthenticated, isAdmin } = useMySelector((state: any) => state.auth);
+    const { loading, isAuthenticated, isAdmin, user } = useMySelector((state: any) => state.auth);
+    const { title } = useMySelector((state: any) => state.event);
     const { message } = useMySelector((state: any) => state.message);
     const dispatch = useMyDispatch();
+    const userId = user?.id;
 
     useEffect(() => {
         if (message) {
@@ -23,7 +26,9 @@ const Navbar = () => {
             }, 5000);
         }
     }, [message]);
+
     const onLogout = () => {
+        dispatch(leaveEvent({ title, userId }));
         dispatch(logout());
     }
 

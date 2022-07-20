@@ -7,6 +7,9 @@
 --color-darkbkg: #1e485f;
 --color-bkg: #1b1b1b;
 }
+html * {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -15,6 +18,6 @@ body {
     sans-serif;
 
     background-color: var(--color-bkg);
-    color: rgb(238, 238, 239)
+    color: rgb(238, 238, 239);
 }
 

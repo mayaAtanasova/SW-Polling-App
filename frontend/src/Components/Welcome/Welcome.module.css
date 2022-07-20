@@ -1,0 +1,74 @@
+
+
+.welcomeText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-text);
+    text-align: center;
+    letter-spacing: 0.1rem;
+    line-height: 1.2;
+    z-index: 1;
+  }
+  
+  .welcomeText p {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .welcomeText span {
+    font-size: 1.2em;
+    text-transform: uppercase;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 2.5rem;
+  }
+
+  .joinForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .formField {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    background-color: aliceblue;
+    text-align: center;
+  }
+  
+  .formSubmitBtn {
+    min-width: 5rem;
+    width: 100%;
+    background-color: var(--color-accent);
+    color: white;
+    text-transform: uppercase;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 00.5rem;
+    padding: 1rem 0;
+    margin: 0.5rem 0;
+  }
+  
+  .formSubmitBtn:hover {
+    opacity: 0.9;
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .formSubmitBtn:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor:not-allowed;
+  }

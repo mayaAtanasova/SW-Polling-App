@@ -109,11 +109,10 @@ const Register = () => {
     };
 
     if (isAuthenticated) {
-        return <Navigate to="/" /> 
-    }
-
-    if (isAdmin) {
-        return <Navigate to="/admin" /> 
+        if (isAdmin) {
+            return <Navigate to="/admin" />
+        }
+        return <Navigate to="/" />
     }
 
     return (
