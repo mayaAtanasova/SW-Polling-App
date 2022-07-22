@@ -21,7 +21,7 @@ const Chat = () => {
   }, []);
   const onLeaveEvent = () => {
     console.log('leaving event');
-    dispatch(leaveEvent({title, userId}));
+    dispatch(leaveEvent({eventId, userId}));
   }
 
   if(!event.title) {

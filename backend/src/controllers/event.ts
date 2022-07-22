@@ -87,9 +87,9 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
 }
 
 const leaveEvent = (req: Request, res: Response, next: NextFunction) => {
-    const { title, userId } = req.body;
-    const event = Event.findOne({ title }, async (err: any, event: any) => {
-        // console.log('event: ', event);
+    const { eventId, userId } = req.body;
+    const event = Event.findById((eventId), async (err: any, event: any) => {
+        console.log('event: ', event);
         if (err) {
             return next(new Error('Could not leave event: ' + err));
         }

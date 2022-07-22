@@ -49,14 +49,14 @@ const fetchEventData = async (eventId: string) => {
     }
 }
 
-const leaveEvent = async (eventCredentials: EventCredentials) => {
+const leaveEvent = async (leaveCredentials: { eventId:string, userId: string}) => {
     try {
         const response = await fetch(`${eventUrl}/leave`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(eventCredentials)
+            body: JSON.stringify(leaveCredentials)
         });
         const data = await response.json();
         localStorage.removeItem('eventId');

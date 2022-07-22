@@ -53,7 +53,7 @@ export const fetchEvent = createAsyncThunk(
 
 export const leaveEvent = createAsyncThunk(
     "event/leaveEvent",
-    async (leaveEventCredentials: { title: string, userId: string }, thunkAPI) => {
+    async (leaveEventCredentials: { eventId: string, userId: string }, thunkAPI) => {
         try {
             const response = await EventService.leaveEvent(leaveEventCredentials);
             thunkAPI.dispatch(setMessage(response.message));

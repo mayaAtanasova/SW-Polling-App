@@ -35,7 +35,6 @@ const Home = () => {
         console.log(title, userId);
         event.preventDefault();
         dispatch(joinEvent({ title, userId }));
-        // dispatch(fetchEvent(eventId));
         socket?.emit('joinEvent', { displayName, title });
     }
 

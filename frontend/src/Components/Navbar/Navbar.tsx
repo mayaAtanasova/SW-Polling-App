@@ -12,7 +12,7 @@ const Navbar = () => {
     const [showMessage, setShowMessage] = useState(false);
 
     const { loading, isAuthenticated, isAdmin, user } = useMySelector((state: any) => state.auth);
-    const { title } = useMySelector((state: any) => state.event);
+    const { eventId } = useMySelector((state: any) => state.event);
     const { message } = useMySelector((state: any) => state.message);
     const dispatch = useMyDispatch();
     const userId = user?.id;
@@ -27,8 +27,10 @@ const Navbar = () => {
         }
     }, [message]);
 
-    const onLogout = () => {
-        dispatch(leaveEvent({ title, userId }));
+    const onLogout = async () => {
+        if (eventId !== '') {
+            const leftEvent = await dispatch(leaveEvent({ eventId, userId }));
+        }
         dispatch(logout());
     }
 
