@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+        ref: 'User',
+    },
     username: {
         type: String,
         required: true,
@@ -17,6 +22,10 @@ const messageSchema = new mongoose.Schema({
     date: {
         type: String,
         required: true,
+    },
+    answered: {
+        type: Boolean,
+        default: false,
     }
 })
 

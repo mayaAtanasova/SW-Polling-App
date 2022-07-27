@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { setMessage } from './messageSlice';
 
 import EventService from '../services/eventService';
+import MessageService from '../services/messageService'
 import { IEvent } from '../Interfaces/IEvent';
 import { IUser } from '../Interfaces/IUser';
 import jwtDecoder from "../hooks/jwtDecoder";
@@ -69,6 +70,24 @@ export const leaveEvent = createAsyncThunk(
     }
 )
 
+export const fetchMessages = createAsyncThunk(
+    "event/fetchMessages",
+    async (eventId: string, thunkAPI) => {
+        try {
+            const response = await MessageService.fetchMessages(eventId);
+            thunkAPI.dispatch(setMessage(response.message));
+            return response;
+        } catch (error: any) {
+            const message =
+                (error.response && error.response.data && error.response.data.message)
+                || error.message
+                || error.toString();
+            thunkAPI.dispatch(setMessage(message));
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
 const initialState = {
     eventId,
     event,
@@ -107,6 +126,9 @@ const eventSlice = createSlice({
                 state.event = emptyEvent;
                 state.eventId = '';
                 state.loggedInChat = false;
+            })
+            .addCase(fetchMessages.fulfilled, (state, action) => {
+                state.event.messages = action.payload.messages;
             })
     }
 });

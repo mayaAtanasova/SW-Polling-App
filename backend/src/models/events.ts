@@ -14,7 +14,12 @@ const eventSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         required: true,
         ref: 'Message'
-    }]
+    }],
+    createdBy: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+        ref:'Users'
+    }
 })
 
 export const Event = mongoose.model('Event', eventSchema);

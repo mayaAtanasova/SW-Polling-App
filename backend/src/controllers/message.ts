@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Message, Event, User } from "../models";
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
+import UserInterface from '../utils/userInterface';
 
 
 const fetchMessages = async (req: Request, res: Response, next: NextFunction) => {
@@ -32,25 +33,20 @@ const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
     try {
         event = await Event.findById(evid).populate('attendees messages');
     } catch (err) {
-        return next(new Error('[Could not find event by id: ' + err));
+        return next(new Error('Could not find event by id: ' + err));
     }
 
-    // add a new attendee
-    let user;
-    try {
-        user = await User.findById(userId);
-    } catch (err) {
-        return next(new Error('[Could not find user by id: ' + err));
-    }
-
-    const isAttendee = event.attendees.some((attendee: any) => attendee._id === userId);
-    if (!isAttendee) {
-        event.attendees.push(user);
+    // check if is attendee
+    console.log('event attendees ' + event.attendees);
+    console.log('attendee id ' + userId);
+    if (!event.attendees.some((user: UserInterface) => user._id.toString() === userId)) {
+        return next(new Error('User is not an attendee'));
     }
 
     //create message
     const newMessage = new Message({
         username: displayName,
+        userId,
         text,
         event: evid,
         date

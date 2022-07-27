@@ -15,6 +15,7 @@ import {
 } from './utils/usersManager'
 import { msgRouter } from "./routes/message";
 import { eventRouter } from "./routes/event";
+import { Message } from "./models/messages";
 
 
 //init
@@ -38,34 +39,41 @@ io.on('connection', socket => {
     console.log(`Usesr with id ${socket.id} connected`);
 
     //When user joins
-    socket.on('joinEvent', ({ displayName, event }) => {
+    socket.on('joinEvent', async ({ displayName, event }) => {
         const user = userJoin(socket.id, displayName, event);
         socket.join(user.event);
-        
+
+        const welcomeMessage = formatMessage(chatAdmin, `Welcome to the SW chat system, ${user.displayName}`);
+        const adminJoinMessage = formatMessage(chatAdmin, `${user.displayName} has joined the chat`);
+
         // Welcome user
-        socket.emit('message', formatMessage(chatAdmin, `Welcome to the StreamWorks chat system!`))
+        socket.emit('welcome message', welcomeMessage);
+
+        //save join message to db
+        const newMessage = new Message({
+            userId: '1',
+            username: chatAdmin,
+            text: adminJoinMessage.text,
+            event,
+            date: adminJoinMessage.time,
+        });
+        await newMessage.save();
 
         //Broadcast that user joined
         socket.broadcast
             .to(user.event)
             .emit(
-                'message',
-                formatMessage(chatAdmin, `User ${user.displayName} has joined this chat.`)
+                'fetch event data',
             );
-        
-            //Send users and room info
-            io.in(user.event).emit('roomUsers', {
-                event: user.event,
-                users: getEventUsers(user.event),
-            });
+
     });
 
     //Listen for chat msgs
-    socket.on('chatMsg', (msg:string) => {
+    socket.on('chatMsg', (msg: string) => {
 
         const user = getCurrentUser(socket.id);
 
-        io.in(user.event).emit('message', formatMessage(user.displayName, msg));
+        io.in(user.event).emit('fetch messages');
     });
 
     //Runs when client disconnects
@@ -75,13 +83,10 @@ io.on('connection', socket => {
 
         if (user) {
             io.in(user.event)
-            .emit('message', formatMessage(chatAdmin, `User ${user.displayName} has left the chat`));
+                .emit('message', formatMessage(chatAdmin, `User ${user.displayName} has left the chat`));
 
             //resend users and room info
-            io.in(user.event).emit('roomUsers', {
-                room: user.event,
-                users: getEventUsers(user.event),
-            })
+            io.in(user.event).emit('fetch event data');
         }
     });
 });
