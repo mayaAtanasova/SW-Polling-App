@@ -28,7 +28,7 @@ const fetchMessages = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
-    const { evid, displayName, text, userId, date } = req.body;
+    const { evid, username, text, userId, date } = req.body;
     let event;
     try {
         event = await Event.findById(evid).populate('attendees messages');
@@ -45,7 +45,7 @@ const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
 
     //create message
     const newMessage = new Message({
-        username: displayName,
+        username,
         userId,
         text,
         event: evid,

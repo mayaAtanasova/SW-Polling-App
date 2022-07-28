@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import socketIoClient, { Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 
 import styles from './Home.module.css';
 
@@ -9,33 +9,38 @@ import Welcome from '../../Components/Welcome/Welcome';
 import { Navigate } from 'react-router-dom';
 import Chat from '../../Components/Chat/Chat';
 
+type componentProps = {
+    socket: Socket | null,
+}
 
-const Home = () => {
-
-    const [socket, setSocket] = useState<Socket | null>(null);
+const Home = ({ socket }: componentProps) => {
 
     const dispatch = useMyDispatch();
     const { user, isAuthenticated, isAdmin } = useMySelector((state: any) => state.auth);
-    const { loggedInChat, eventId } = useMySelector((state: any) => state.event);
+    const { loggedInChat, eventId, event } = useMySelector((state: any) => state.event);
     const userId = user?.id;
     const displayName = user?.displayName;
 
     useEffect(() => {
-        if (loggedInChat) {
-            dispatch(fetchEvent(eventId));
+        const fetchEventData = async () => {
+            await dispatch(fetchEvent(eventId));
+            const title = event.title;
+            console.log(title);
+            socket?.emit('joinEvent', { displayName, title });
         }
+
+        if (loggedInChat) {
+            fetchEventData();
+        } 
+
     }, []);
 
-    useEffect(() => {
-        const socket = socketIoClient(process.env.REACT_APP_MAIN_URL!);
-        setSocket(socket);
-    }, []);
-
-    const handleJoinEvent = (title: string) => (event: any) => {
+    const handleJoinEvent = (title: string) => async (event: any) => {
         console.log(title, userId);
         event.preventDefault();
-        dispatch(joinEvent({ title, userId }));
         socket?.emit('joinEvent', { displayName, title });
+        console.log('after emit event and user ' + displayName + ' ' + title);
+        await dispatch(joinEvent({ title, userId }));
     }
 
     if (!user) {
@@ -55,11 +60,12 @@ const Home = () => {
                             onJoinEvent={handleJoinEvent}
                         />}
 
-                    {isAuthenticated && loggedInChat && <Chat />}
+                    {isAuthenticated && loggedInChat && <Chat socket={socket} />}
                 </div>
             </div>
         </>
     );
 };
+
 
 export default Home;

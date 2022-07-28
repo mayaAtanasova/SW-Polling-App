@@ -7,8 +7,13 @@ import { useMyDispatch, useMySelector } from '../../hooks/useReduxHooks';
 import { logout } from '../../store/authSlice';
 import { leaveEvent } from '../../store/eventSlice';
 import { clearMessage } from '../../store/messageSlice';
+import { Socket } from 'socket.io-client';
 
-const Navbar = () => {
+type componentProps = {
+    socket: Socket | null,
+};
+
+const Navbar = ({ socket }: componentProps) => {
     const [showMessage, setShowMessage] = useState(false);
 
     const { loading, isAuthenticated, isAdmin, user } = useMySelector((state: any) => state.auth);
@@ -32,6 +37,7 @@ const Navbar = () => {
             const leftEvent = await dispatch(leaveEvent({ eventId, userId }));
         }
         dispatch(logout());
+        socket?.disconnect();
     }
 
     return (

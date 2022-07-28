@@ -11,7 +11,7 @@ type Message = {
 }
 
 const createEvent = async (req: Request, res: Response, next: NextFunction) => {
-    const { title } = req.body;
+    const { title, userId } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
@@ -21,12 +21,13 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
         title,
         members: [],
         messages: [],
+        createdBy: userId,
     });
 
     try {
         await newEvent.save();
     } catch (err) {
-        return next(new Error('[Could not create event: ' + err));
+        return next(new Error('Could not create event: ' + err));
     }
 
     res.status(200).json({

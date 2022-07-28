@@ -84,6 +84,7 @@ li:hover::after {
   top: 1rem;
   right: 1rem;
   width: 20vw;
+  z-index: 100;
   background: var(--color-darkbkg);
   opacity: 0.9;
   color: var(--color-text);

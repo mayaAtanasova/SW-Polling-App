@@ -1,11 +1,11 @@
 const users: {
     sid: string,
     displayName: string,
-    event: string
+    eventTitle: string
 }[] = [];
 
-const userJoin = (sid:string, displayName:string, event:string) => {
-    const user = { sid, displayName, event };
+const userJoin = (sid:string, displayName:string, eventTitle:string) => {
+    const user = { sid, displayName, eventTitle };
     users.push(user);
     return user;
 };
@@ -21,8 +21,8 @@ const userLeave = (sid:string) => {
     }
 };
 
-const getEventUsers = (event:string) => {
-    return users.filter(user => user.event === event);
+const getEventUsers = (eventTitle:string) => {
+    return users.filter(user => user.eventTitle === eventTitle);
 };
 
 export {
