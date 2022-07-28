@@ -115,9 +115,7 @@ const googleLogin = async (tokenResponse: TokenResponse): Promise<{ message: str
 };
 
 const logout = async () => {
-    localStorage.removeItem('eventId');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.clear();
 }
 
 export default {

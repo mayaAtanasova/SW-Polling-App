@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Socket } from "socket.io-client";
 import { useMySelector, useMyDispatch } from "../../hooks/useReduxHooks";
-import { leaveEvent } from "../../store/eventSlice";
-
+import messageService from '../../services/messageService'
+import { IMessage } from "../../Interfaces/IMessage";
 import styles from "./Chat.module.css";
 
 type componentProps = {
@@ -14,26 +14,32 @@ const Chat = ({ socket }: componentProps) => {
   const dispatch = useMyDispatch();
   const { user } = useMySelector((state: any) => state.auth);
   const userId = user.id;
-  const { event, eventId } = useMySelector((state: any) => state.event);
+  const { loading, event, eventId } = useMySelector((state: any) => state.event);
   const {
     title,
     attendees,
     messages,
   } = event;
 
-  useEffect(() => {
-    console.log("Chat component mounted " + messages[0].text);
-  }, [messages]);
+  // useEffect(() => {
+  //   console.log("Chat component mounted " + messages[0].text);
+  // }, [messages]);
 
-  const onLeaveEvent = () => {
-    console.log('leaving event');
-    socket?.emit('leaveEvent', { eventId, userId });
-    dispatch(leaveEvent({ eventId, userId }));
+  const sendChatMessage = (ev:any) => {
+    ev.preventDefault();
+    const messageInput = document.getElementById("chat-input") as HTMLInputElement;
+    const newMessage: IMessage = {
+      evid: eventId,
+      text: messageInput.value,
+      userId,
+      username: user.displayName,
+      date: new Date().toISOString(),
+    }
+    messageService.sendMessage(newMessage);
+    socket?.emit("chat message", userId, title);
+    messageInput.value = "";
   }
 
-  if (!event.title) {
-    return <div>Loading...</div>
-  }
   return (
     <div className={styles.chatWrapper}>
       <h3>Event '{title}' Chat</h3>
@@ -43,11 +49,15 @@ const Chat = ({ socket }: componentProps) => {
         ))}
       </div>
       <div> Messages:
-        {messages && messages.map((item: any) => {
-          <div key={item.id}> {item.username}</div>
-        })}
+        {messages && 
+        messages.map((message: any) => (
+          <div key={message.id}>{message.text}</div>
+        ))}
       </div>
-      <button onClick={onLeaveEvent}>Leave Event</button>
+      <div>
+        <input id="chat-input" type="text" />
+        <button onClick={sendChatMessage} >Send</button>
+      </div>
     </div>
   )
 }

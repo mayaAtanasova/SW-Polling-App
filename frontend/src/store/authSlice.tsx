@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { setMessage } from "./messageSlice";
-import { setEventId } from "./eventSlice";
+import { clearEventData, setEventId } from "./eventSlice";
 
 import AuthService from "../services/authService";
 import { IUser } from "../Interfaces/IUser";
@@ -75,6 +75,7 @@ export const logout = createAsyncThunk(
     "auth/logout",
     async (_, thunkAPI) => {
         await AuthService.logout();
+        thunkAPI.dispatch(clearEventData());
         thunkAPI.dispatch(setMessage("User logged out"));
     }
 )

@@ -37,14 +37,18 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
+
     const { title, userId } = req.body;
-    console.log(title, ' , ', userId);
+
     Event
     .findOne({ title })
     .then((event: any) => {
+        if (event.attendees.some((attendeeObj: any) => attendeeObj.toString() === userId)) {
+            return res.status(401).json({ message: 'User already attends this event', evid: event._id, eventTitle: event.title });
+        }
         event.attendees.push(userId);
         event.save();
-        return res.status(200).json({ message: 'User joined event successfully', evid: event._id });
+        return res.status(200).json({ message: 'User joined event successfully', evid: event._id, eventtitle: event.title });
     })
     .catch((err: any) => {
         return next(new Error('Could not join event: ' + err));
@@ -87,24 +91,6 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
     });
 }
 
-const leaveEvent = (req: Request, res: Response, next: NextFunction) => {
-    const { eventId, userId } = req.body;
-    const event = Event.findById((eventId), async (err: any, event: any) => {
-        console.log('event: ', event);
-        if (err) {
-            return next(new Error('Could not leave event: ' + err));
-        }
-        if (!event) {
-            return res.status(404).json({ message: 'Event not found' });
-        }
-        event.attendees = event.attendees.filter((item: any) => item.toString() !== userId);
-        // console.log('event after leave', event);
-        await event.save();
-        return res.status(200).json({ message: 'User left event successfully' });
-    });
-
-}
-
 const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
     const { evid } = req.body;
     const errors = validationResult(req);
@@ -127,6 +113,5 @@ export default {
     fetchEventData,
     createEvent,
     joinEvent,
-    leaveEvent,
     deleteEvent,
 }

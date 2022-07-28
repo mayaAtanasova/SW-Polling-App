@@ -4,43 +4,77 @@ import { Socket } from 'socket.io-client';
 import styles from './Home.module.css';
 
 import { useMySelector, useMyDispatch } from '../../hooks/useReduxHooks';
-import { joinEvent, fetchEvent } from '../../store/eventSlice';
+import { joinEvent, fetchEvent, fetchMessages } from '../../store/eventSlice';
 import Welcome from '../../Components/Welcome/Welcome';
 import { Navigate } from 'react-router-dom';
 import Chat from '../../Components/Chat/Chat';
+import { IEvent } from '../../Interfaces/IEvent';
+import { IUser } from '../../Interfaces/IUser';
+
+
+interface IRootState {
+    event: {
+        eventId: string | null,
+        event: IEvent | null,
+        loggedInChat: boolean,
+        voted: boolean,
+        loading: boolean,
+    },
+    auth: {
+        user: IUser | null,
+        isAuthenticated: boolean,
+        isAdmin: boolean | null,
+        loading: boolean,
+    },
+}
 
 type componentProps = {
     socket: Socket | null,
-}
+};
 
 const Home = ({ socket }: componentProps) => {
 
     const dispatch = useMyDispatch();
-    const { user, isAuthenticated, isAdmin } = useMySelector((state: any) => state.auth);
-    const { loggedInChat, eventId, event } = useMySelector((state: any) => state.event);
+    const { user, isAuthenticated, isAdmin } = useMySelector((state: IRootState) => state.auth);
+    const { loading, loggedInChat, eventId, event } = useMySelector((state: IRootState) => state.event);
     const userId = user?.id;
     const displayName = user?.displayName;
+    const title = event?.title;
+    const messages = event?.messages;
 
     useEffect(() => {
-        const fetchEventData = async () => {
-            await dispatch(fetchEvent(eventId));
-            const title = event.title;
-            console.log(title);
-            socket?.emit('joinEvent', { displayName, title });
-        }
+        if(!socket) return;
+        socket.emit('new user', userId, displayName);
+        socket.on('fetch messages', (title:string) => fetchEventMessages(title));
+        socket.on('fetch event data', fetchEventData);
 
         if (loggedInChat) {
-            fetchEventData();
-        } 
+            const title = localStorage.getItem('eventTitle');
+            console.log(title);
+            socket.emit('joinEvent', {userId, displayName, title});
+        }
+        
+        console.log(socket);
+    }, [socket]);
 
-    }, []);
+    const fetchEventData = () => {
+        console.log('fetching event data');
+        dispatch(fetchEvent(eventId!));
+    }
+
+    const fetchEventMessages = (title:string) => {
+        console.log('rcvd order to fetch messages');
+        dispatch(fetchMessages(title));
+    }
 
     const handleJoinEvent = (title: string) => async (event: any) => {
         console.log(title, userId);
         event.preventDefault();
-        socket?.emit('joinEvent', { displayName, title });
+        if (userId) {
+            await dispatch(joinEvent({ title, userId }));
+        }
+        socket?.emit('joinEvent', { userId, displayName, title });
         console.log('after emit event and user ' + displayName + ' ' + title);
-        await dispatch(joinEvent({ title, userId }));
     }
 
     if (!user) {
@@ -59,8 +93,9 @@ const Home = ({ socket }: componentProps) => {
                             isAuthenticated={isAuthenticated}
                             onJoinEvent={handleJoinEvent}
                         />}
+                    {isAuthenticated && loggedInChat && loading && <p>Loading...</p>}
 
-                    {isAuthenticated && loggedInChat && <Chat socket={socket} />}
+                    {isAuthenticated && loggedInChat && !loading && <Chat socket={socket} />}
                 </div>
             </div>
         </>

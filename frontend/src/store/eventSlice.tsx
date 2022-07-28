@@ -52,30 +52,11 @@ export const fetchEvent = createAsyncThunk(
         }
     });
 
-export const leaveEvent = createAsyncThunk(
-    "event/leaveEvent",
-    async (leaveEventCredentials: { eventId: string, userId: string }, thunkAPI) => {
-        try {
-            const response = await EventService.leaveEvent(leaveEventCredentials);
-            thunkAPI.dispatch(setMessage(response.message));
-            return;
-        } catch (error: any) {
-            const message =
-                (error.response && error.response.data && error.response.data.message)
-                || error.message
-                || error.toString();
-            thunkAPI.dispatch(setMessage(message));
-            return thunkAPI.rejectWithValue(message);
-        }
-    }
-)
-
 export const fetchMessages = createAsyncThunk(
     "event/fetchMessages",
-    async (eventId: string, thunkAPI) => {
+    async (title: string, thunkAPI) => {
         try {
-            const response = await MessageService.fetchMessages(eventId);
-            thunkAPI.dispatch(setMessage(response.message));
+            const response = await MessageService.fetchMessages(title);
             return response;
         } catch (error: any) {
             const message =
@@ -85,14 +66,14 @@ export const fetchMessages = createAsyncThunk(
             thunkAPI.dispatch(setMessage(message));
             return thunkAPI.rejectWithValue(message);
         }
-    }
-)
+    });
 
 const initialState = {
     eventId,
     event,
     loggedInChat: !!eventId,
     voted: false,
+    loading: false,
 }
 
 const eventSlice = createSlice({
@@ -104,7 +85,12 @@ const eventSlice = createSlice({
         },
         setVoted: (state, action) => {
             state.voted = action.payload;
-        }
+        },
+        clearEventData: (state) => {
+            state.event = emptyEvent;
+            state.eventId = '';
+            state.loggedInChat = false;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -112,27 +98,33 @@ const eventSlice = createSlice({
                 state.loggedInChat = true;
                 state.eventId = action.payload.event.id;
                 state.event = action.payload.event;
+                state.loading = false;
             })
             .addCase(joinEvent.pending, (state, action) => {
                 state.loggedInChat = false;
+                state.loading = true;
             })
             .addCase(joinEvent.rejected, (state, action) => {
                 state.loggedInChat = false;
+                state.loading = false;
             })
             .addCase(fetchEvent.fulfilled, (state, action) => {
                 state.event = action.payload.event;
+                state.loading = false;
             })
-            .addCase(leaveEvent.fulfilled, (state, action) => {
-                state.event = emptyEvent;
-                state.eventId = '';
-                state.loggedInChat = false;
+            .addCase(fetchEvent.pending, (state, action) => {
+                state.loading = true;
             })
             .addCase(fetchMessages.fulfilled, (state, action) => {
                 state.event.messages = action.payload.messages;
+                state.loading = false;
+            })
+            .addCase(fetchMessages.pending, (state, action) => {
+                state.loading = true;
             })
     }
 });
 
 const { reducer, actions } = eventSlice;
-export const { setEventId, setVoted } = actions;
+export const { setEventId, setVoted, clearEventData } = actions;
 export default reducer;

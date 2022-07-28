@@ -5,7 +5,6 @@ import styles from './Navbar.module.css';
 
 import { useMyDispatch, useMySelector } from '../../hooks/useReduxHooks';
 import { logout } from '../../store/authSlice';
-import { leaveEvent } from '../../store/eventSlice';
 import { clearMessage } from '../../store/messageSlice';
 import { Socket } from 'socket.io-client';
 
@@ -33,9 +32,6 @@ const Navbar = ({ socket }: componentProps) => {
     }, [message]);
 
     const onLogout = async () => {
-        if (eventId !== '') {
-            const leftEvent = await dispatch(leaveEvent({ eventId, userId }));
-        }
         dispatch(logout());
         socket?.disconnect();
     }

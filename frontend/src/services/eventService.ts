@@ -19,6 +19,7 @@ const joinEvent = async (eventCredentials: EventCredentials) => {
         });
         const data = await response.json();
         localStorage.setItem('eventId', data.evid);
+        localStorage.setItem('eventTitle', data.eventTitle);
         return {
             message: data.message,
             evid: data.evid
@@ -49,31 +50,7 @@ const fetchEventData = async (eventId: string) => {
     }
 }
 
-const leaveEvent = async (leaveCredentials: { eventId:string, userId: string}) => {
-    try {
-        const response = await fetch(`${eventUrl}/leave`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(leaveCredentials)
-        });
-        const data = await response.json();
-        localStorage.removeItem('eventId');
-        return {
-            message: data.message,
-        };
-    } catch (error: any) {
-        const message =
-            (error.response && error.response.data && error.response.data.message)
-            || error.message
-            || error.toString();
-        throw new Error(message);
-    }
-}
-
 export default {
     joinEvent,
     fetchEventData,
-    leaveEvent,
 }

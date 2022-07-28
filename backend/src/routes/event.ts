@@ -15,6 +15,4 @@ eventRouter.post('/join',
 body('title').isLength({ min: 1 }).withMessage('Title is required'),
 event.joinEvent);
 
-eventRouter.post('/leave', event.leaveEvent)
-
 eventRouter.delete('/:evid', event.deleteEvent);

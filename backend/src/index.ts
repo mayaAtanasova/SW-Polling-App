@@ -8,7 +8,8 @@ import './utils/googleAuth';
 import { Server, Socket } from 'socket.io';
 import formatMessage from './utils/messageFormatter';
 import {
-    userJoin,
+    addUser,
+    userJoinEvent,
     getCurrentUser,
     userLeave,
     getEventUsers
@@ -63,99 +64,53 @@ const io = new Server(server, {
 io.sockets.on('connection', socket => {
     console.log(`Client with id ${socket.id} connected`);
 
-    //When user joins
-    socket.on('joinEvent', async ({ displayName, title }) => {
-        const user = userJoin(socket.id, displayName, title);
+    //new user appears
+    socket.on('new user', (userId, displayName) => {
+        console.log(`${displayName} connected to the chat system`);
+        const user = addUser(socket.id, userId, displayName);
+    })
+
+    //When user joins event
+    socket.on('joinEvent', async ({ userId, displayName, title }) => {
+        console.log('received join event ' + title + ' ' + userId + ' ' + displayName);
+        const user = userJoinEvent(socket.id, userId, displayName, title);
         socket.join(user.eventTitle);
 
-        const currentEvent = await Event.findOne({ title }).populate('createdBy');
-        const { _id: adminId, displayName: chatAdmin } = currentEvent.createdBy;
-
-        const welcomeMessage = formatMessage(chatAdmin, `Welcome to the SW chat system, ${user.displayName}`);
-        const adminJoinMessage = formatMessage(chatAdmin, `${user.displayName} has joined the chat`);
-
-        // Welcome user
-        socket.emit('welcome message', welcomeMessage);
-
-        //save join message to db
-        const newAdminMessage = new Message({
-            userId: adminId,
-            username: chatAdmin,
-            text: adminJoinMessage.text,
-            event: currentEvent._id,
-            date: adminJoinMessage.time,
-        });
-        console.log(newAdminMessage);
-        await newAdminMessage.save();
-
-        //Broadcast that user joined
-        socket.broadcast
-            .to(user.eventTitle)
-            .emit(
-                'fetch event data',
-            );
-
-    });
-
-    socket.on('leave event', async ({ eventId, userId }) => {
-        const user = userLeave(socket.id);
-        socket.leave(user.eventTitle);
-
-        const currentEvent = await Event.findById(eventId).populate('createdBy');
-        const { _id: adminId, displayName: chatAdmin } = currentEvent.createdBy;
-
-           //save leave message to db
-        const adminLeaveMessage = formatMessage(chatAdmin, `${user.displayName} has left the chat`);
-        const newAdminMessage = new Message({
-            userId: adminId,
-            username: chatAdmin,
-            text: adminLeaveMessage.text,
-            event: currentEvent._id,
-            date: adminLeaveMessage.time,
-        });
-        await newAdminMessage.save();
-        console.log(newAdminMessage);
-        // broadcast after user left
-        socket.broadcast
-            .to(user.eventTitle)
-            .emit(
-                'fetch event data',
-            );
+        //get users to fetch the event data
+        const users = getEventUsers(title);
+        console.log('current users are ', users)
+        users.forEach(user => {
+            io.to(user.sid).emit('fetch event data', title);
+        })
     });
 
     //Listen for chat msgs
-    socket.on('chatMsg', (msg: string) => {
+    socket.on('chat message', (userId, title) => {
+        console.log('I received a chat message for event ' + title);
+        const users = getEventUsers(title);
+        console.log('current users are ', users)
 
-        const user = getCurrentUser(socket.id);
-
-        io.in(user.eventTitle).emit('fetch messages');
+        //Broadcast to room to get data
+        users.forEach(user => {
+            io.to(user.sid).emit('fetch messages', title);
+        })
     });
 
     //Runs when client disconnects
     socket.on('disconnect', async () => {
-        // console.log(`user id ${socket.id} disconnected`);
-        // const user = userLeave(socket.id);
+        console.log(`user id ${socket.id} disconnected`);
+        const user = userLeave(socket.id);
+        if (user) {
+            const event = user.eventTitle;
 
-        // const chatAdmin = await Event.findById(user.eventTitle).populate('createdBy');
-        // const adminLeaveMessage = formatMessage(chatAdmin, `${user.displayName} has left the chat`);
+            const currentEvent = await Event.findOne({ event }).populate('createdBy');
+            const { _id: adminId, displayName: chatAdmin } = currentEvent.createdBy;
 
-        // //save join message to db
-        // const newAdminMessage = new Message({
-        //     userId: chatAdmin._id,
-        //     username: chatAdmin,
-        //     text: adminLeaveMessage.text,
-        //     event,
-        //     date: adminLeaveMessage.time,
-        // });
-        // await newAdminMessage.save();
+            const adminLeaveMessage = formatMessage(chatAdmin, `${user.displayName} has left the chat`);
 
-        // if (user) {
-        //     io.in(user.eventTitle)
-        //         .emit('message', formatMessage(chatAdmin, `User ${user.displayName} has left the chat`));
-
-        //     //resend users and room info
-        //     io.in(user.eventTitle).emit('fetch event data');
-        // }
+            io.in(user.eventTitle)
+                .emit('leave message', adminLeaveMessage);
+        }
     });
 });
 
