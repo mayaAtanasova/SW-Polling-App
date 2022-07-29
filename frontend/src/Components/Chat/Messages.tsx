@@ -1,28 +1,24 @@
-import { useEffect } from "react";
-import { Socket } from "socket.io-client";
-import { useMySelector, useMyDispatch } from "../../hooks/useReduxHooks";
-import messageService from '../../services/messageService'
+import { useEffect, useRef } from "react";
+
 import { IMessage } from "../../Interfaces/IMessage";
-import styles from "./Messages.module.css";
 import Message from "./Message";
+
+import styles from "./Messages.module.css";
 
 type componentProps = {
   messages: IMessage[],
 };
 
-const Chat = ({ messages }: componentProps) => {
+const Messages = ({ messages }: componentProps) => {
+  const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
-  const dispatch = useMyDispatch();
-  const { user } = useMySelector((state: any) => state.auth);
-  const userId = user.id;
-  const { loading, event, eventId } = useMySelector((state: any) => state.event);
-  const {
-    title,
-    attendees,
-  } = event;
+  const scrollToBottom = () => {
+    if(messagesEndRef.current) {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
-
-
+  useEffect(scrollToBottom, [messages]);
 
   return (
     <div className={styles.chatWrapper}>
@@ -34,9 +30,10 @@ const Chat = ({ messages }: componentProps) => {
           messages.map((message: any) => (
             <Message key={message.id} message={message}/>
           ))}
+          <div ref={messagesEndRef}></div>
       </div>
     </div>
   )
 }
 
-export default Chat
+export default Messages

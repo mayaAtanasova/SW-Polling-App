@@ -1,32 +1,39 @@
-.myMessage {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin: 0 0 0.5rem 0;
-    background-color: hsl(196, 75%, 68%, 0.5);
-    border-radius: 0.5rem;
-    padding: 0.5rem;
-    max-width: 250px;
+.messageWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0 0 0.5rem 0;
+  background-color: hsl(196, 75%, 68%, 0.5);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  width: 75%;
 
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
-.myMessage * {
-    margin: 0;
-}
-
-.secondStyle {
-    border: 2px solid red;
+.messageWrapper * {
+  margin: 0;
 }
 
 .messageWrapper p {
-    font-size: 0.8rem;
-    font-weight: 400;
-    font-style: normal;
+  font-size: 0.8rem;
+  font-weight: 400;
+  font-style: normal;
 }
 
 .msgDate {
-    align-self: flex-end;
+  align-self: flex-end;
+}
+
+.myMessage {
+  background-color: hsl(196, 75%, 68%, 0.5);
+  border-top-right-radius: 0;
+  align-self: flex-end;
+}
+
+.otherMessage {
+  background-color: rgba(81, 140, 161, 0.5);
+  border-top-left-radius: 0;
 }

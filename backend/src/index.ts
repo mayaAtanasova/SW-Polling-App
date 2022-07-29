@@ -16,7 +16,7 @@ import {
 } from './utils/usersManager'
 import { msgRouter } from "./routes/message";
 import { eventRouter } from "./routes/event";
-import { Message } from "./models/messages";
+import { Message } from "./models/message";
 import { Event } from "./models/events";
 import { User } from "./models/users";
 

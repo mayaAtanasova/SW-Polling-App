@@ -8,6 +8,7 @@ type Message = {
     _id: string,
     text: string,
     username: string,
+    userId: string,
     date: string
 }
 
@@ -29,6 +30,7 @@ const fetchMessages = async (req: Request, res: Response, next: NextFunction) =>
                         id: message._id,
                         text: message.text,
                         username: message.username,
+                        userId: message.userId,
                         date: message.date,
                     };
                 });
