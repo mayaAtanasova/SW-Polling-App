@@ -53,7 +53,7 @@ const Navbar = ({ socket }: componentProps) => {
                         <NavLink
                             className={({ isActive }) => isActive ? styles.activeLink : styles.link}
                             to='/'>
-                            Event Room
+                            Event Hall
                         </NavLink>
                     </li>
                     {!isAuthenticated && (
