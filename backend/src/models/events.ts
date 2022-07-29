@@ -5,9 +5,13 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    description: {
+        type: String,
+        required: true,
+    },
     attendees: [{
-        type: mongoose.Types.ObjectId, 
-        required: true, 
+        type: mongoose.Types.ObjectId,
+        required: true,
         ref: 'User'
     }],
     messages: [{
@@ -15,14 +19,19 @@ const eventSchema = new mongoose.Schema({
         required: true,
         ref: 'Message'
     }],
+    voted: [{   // voted users
+        type: mongoose.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    }],
     createdBy: {
         type: mongoose.Types.ObjectId,
         required: true,
-        ref:'User'
+        ref: 'User'
     },
     createdAt: {
         type: Date,
-        default: Date.now,
+        default: new Date().toISOString(),
     }
 })
 

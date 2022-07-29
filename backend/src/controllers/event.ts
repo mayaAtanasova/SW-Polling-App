@@ -11,7 +11,7 @@ type Message = {
 }
 
 const createEvent = async (req: Request, res: Response, next: NextFunction) => {
-    const { title, userId } = req.body;
+    const { title, description, userId } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
@@ -19,8 +19,10 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
     }
     const newEvent = new Event({
         title,
+        description,
         members: [],
         messages: [],
+        voted: [],
         createdBy: userId,
     });
 
@@ -59,7 +61,7 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
     const evid = req.params.evid;
     Event
     .findById(evid)
-    .populate("attendees messages")
+    .populate("attendees messages createdBy")
     .exec((err: any, event: any) => {
         if (err) {
             return next(new Error('Could not join event: ' + err));
@@ -67,12 +69,15 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
         }
+        console.log(event);
         const attendees = event.attendees.map((attendee: any) => {
             return {
                 id: attendee._id,
                 displayName: attendee.displayName,
+                vpoints: attendee.vpoints,
             };
         });
+
         const messages = event.messages.map((message: Message) => {
             return {
                 id: message._id,
@@ -84,8 +89,10 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
         const modifiedEvent = {
             id: event._id,
             title: event.title,
+            description: event.description,
             attendees,
             messages,
+            host: event.createdBy.displayName
         }
         return res.status(200).json({ message: 'User joined event successfully', event: modifiedEvent });
     });

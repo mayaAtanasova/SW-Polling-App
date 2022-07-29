@@ -12,7 +12,7 @@ import Login from './Pages/Login/Login';
 import Register from './Pages/Register/Register';
 import AdminDashboard from './Pages/AdminDashboard/AdminDashboard';
 import Profile from './Pages/Profile/Profile';
-import Chat from './Components/Chat/Chat';
+import Chat from './Components/Chat/Messages';
 
 import './App.css';
 

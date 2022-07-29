@@ -53,7 +53,7 @@ const Navbar = ({ socket }: componentProps) => {
                         <NavLink
                             className={({ isActive }) => isActive ? styles.activeLink : styles.link}
                             to='/'>
-                            PollApp
+                            Event Room
                         </NavLink>
                     </li>
                     {!isAuthenticated && (
@@ -81,29 +81,32 @@ const Navbar = ({ socket }: componentProps) => {
                             <NavLink
                                 className={({ isActive }) => isActive ? styles.activeLink : styles.link}
                                 to='/admin'>
-                                Admin
+                                Admin Dashboard
                             </NavLink>
                         </li>
                     )}
-                    {isAuthenticated && (
-                        <>
-                            <li>
-                                <NavLink
-                                    className={({ isActive }) => isActive ? styles.activeLink : styles.link}
-                                    to='/logout'
-                                    onClick={onLogout}>
-                                    Logout
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink
-                                    className={({ isActive }) => isActive ? styles.activeLink : styles.link}
-                                    to='/profile'>
-                                    Profile
-                                </NavLink>
-                            </li>
-                        </>
+                    {isAuthenticated && eventId && (
+                        <li>
+                            <NavLink
+                                className={({ isActive }) => isActive ? styles.activeLink : styles.link}
+                                to='/profile'>
+                                Event Details
+                            </NavLink>
+                        </li>
                     )}
+
+                    {isAuthenticated && (
+                        <li>
+                            <NavLink
+                                className={({ isActive }) => isActive ? styles.activeLink : styles.link}
+                                to='/logout'
+                                onClick={onLogout}>
+                                Logout
+                            </NavLink>
+                        </li>
+                    )}
+
+
 
 
                 </ul>

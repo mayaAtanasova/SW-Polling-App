@@ -1,24 +1,66 @@
 .profileContainer {
     margin: 0 auto;
+    margin-top: 3rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
+.profileContainer * {
+    margin: 0;
+    padding: 0;
+}
+
+.profileContainer h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.profileContainer h3, h4 {
+    font-weight: 400;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.profileContainer p span {
+    font-size: 1.25em;
+    font-style: italic;
+}
+
+.userDetails {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.attendeeList {
+    width: 80%;
+    text-align:center;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 1rem 5rem;
+}
+
+.attendee {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 1rem 0;
+    padding: 0 5rem;
+}
+
 .profileLogo {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background-color: rgb(130, 159, 202);
 
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.profileLogo h2 {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: #fff;
 }

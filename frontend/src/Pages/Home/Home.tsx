@@ -7,7 +7,7 @@ import { useMySelector, useMyDispatch } from '../../hooks/useReduxHooks';
 import { joinEvent, fetchEvent, fetchMessages } from '../../store/eventSlice';
 import Welcome from '../../Components/Welcome/Welcome';
 import { Navigate } from 'react-router-dom';
-import Chat from '../../Components/Chat/Chat';
+import Messages from '../../Components/Chat/Messages';
 import { IEvent } from '../../Interfaces/IEvent';
 import { IUser } from '../../Interfaces/IUser';
 
@@ -95,7 +95,9 @@ const Home = ({ socket }: componentProps) => {
                         />}
                     {isAuthenticated && loggedInChat && loading && <p>Loading...</p>}
 
-                    {isAuthenticated && loggedInChat && !loading && <Chat socket={socket} />}
+                    {isAuthenticated && loggedInChat && !loading && 
+                    <Messages socket={socket} />
+                    }
                 </div>
             </div>
         </>

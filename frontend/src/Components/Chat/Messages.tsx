@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 import { useMySelector, useMyDispatch } from "../../hooks/useReduxHooks";
 import messageService from '../../services/messageService'
 import { IMessage } from "../../Interfaces/IMessage";
-import styles from "./Chat.module.css";
+import styles from "./Messages.module.css";
 
 type componentProps = {
   socket: Socket | null,
@@ -35,6 +35,7 @@ const Chat = ({ socket }: componentProps) => {
       username: user.displayName,
       date: new Date().toISOString(),
     }
+    console.log('new message: ' + newMessage.text);
     messageService.sendMessage(newMessage);
     socket?.emit("chat message", userId, title);
     messageInput.value = "";

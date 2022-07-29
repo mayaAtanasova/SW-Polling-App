@@ -11,8 +11,11 @@ const eventId = localStorage.getItem("eventId");
 const emptyEvent: IEvent = {
     id: '',
     title: '',
+    description:'',
+    host:'',
     attendees: [],
     messages: [],
+    voted:[],
 }
 const event: IEvent = emptyEvent;
 
