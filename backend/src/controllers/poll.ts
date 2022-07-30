@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import { Event, User, Poll } from '../models';
 import PollInterface from '../interfaces/pollInterface';
-import { Vote } from 'src/models/votes';
+import { Vote } from '../models';
 import mongoose from 'mongoose';
 
 const createPoll = async (req: Request, res: Response, next: NextFunction) => {

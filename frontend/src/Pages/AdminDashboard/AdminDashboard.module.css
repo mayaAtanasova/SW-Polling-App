@@ -1,0 +1,55 @@
+.dashboardWrapper {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.adminNav {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 2rem 0 0 0;
+}
+
+.adminNavItem {
+  width: 50%;
+  height: 3rem;
+  background-color: rgba(27, 27, 27, 0.9);
+  border: 1px solid rgba(107, 107, 107, 0.7);
+  border-radius: 1rem 1rem 0 0;
+  overflow: hidden;
+  position:relative;
+  font-size: 1.25rem;
+}
+
+.adminNavItem:hover {
+    color: var(--color-accent);
+}
+
+.adminNavItem:after {
+    cursor:pointer;
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 4px;
+    background: var(--color-accent);
+    transition: width 0.2s ease-in-out;
+}
+
+.adminNavItem:hover:after {
+  width: 100%;
+}
+
+.active {
+    border-bottom: none;
+}
+
+.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 4px;
+}

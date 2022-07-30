@@ -3,6 +3,49 @@ import { validationResult } from 'express-validator';
 import { Event, User } from '../models';
 import Message from '../interfaces/messageInterface'
 
+const getEventsByCreator = async (req: Request, res: Response, next: NextFunction) => {
+    const createdBy = req.params.createdBy;
+    
+    Event
+    .find({ createdBy })
+    .populate("attendees polls createdBy")
+    .exec((err: any, events: any) => {
+        if (err) {
+            return next(err);
+        }
+        if(!events) {
+            return res.status(404).json({ message: 'Events not found' });
+        }
+        const modifiedEvents = events.map((event: any) => {
+            const attendees = event.attendees.map((attendee: any) => {
+                return {
+                    id: attendee._id,
+                    displayName: attendee.displayName,
+                    email: attendee.email,
+                    vpoints: attendee.vpoints,
+                };
+            });
+            const polls = event.polls.map((poll: any) => {
+                return {
+                    id: poll._id,
+                    title: poll.title,
+                    description: poll.description,
+                    options: poll.options,
+                    voted: poll.voted,
+                };
+            });
+            return {
+                id: event._id,
+                title: event.title,
+                description: event.description,
+                attendees,
+                polls,
+                host: event.createdBy.displayName
+            }
+        });
+        res.status(200).json(modifiedEvents);
+    });
+};
 
 const createEvent = async (req: Request, res: Response, next: NextFunction) => {
     const { title, description, userId } = req.body;
@@ -73,7 +116,6 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
                 if (!event) {
                     return res.status(404).json({ message: 'Event not found' });
                 }
-                console.log(event);
                 const attendees = event.attendees.map((attendee: any) => {
                     return {
                         id: attendee._id,
@@ -122,6 +164,7 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     export default {
+        getEventsByCreator,
         fetchEventData,
         createEvent,
         joinEvent,

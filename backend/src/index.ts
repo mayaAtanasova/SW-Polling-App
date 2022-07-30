@@ -37,12 +37,6 @@ app.use(cors(
     }
 ));
 
-// Error Handler
-// app.use((error, req, res, next) => {
-//     console.log('An error occured:', error);
-//     res.json({ message: error.message || 'An unknown error occured.', error: true });
-// });
-
 // const chatAdmin = 'SW admin';
 app.use('/auth', authRouter);
 app.use('/messages', msgRouter);
@@ -74,13 +68,11 @@ io.sockets.on('connection', socket => {
 
     //When user joins event
     socket.on('joinEvent', async ({ userId, displayName, title }) => {
-        console.log('received join event ' + title + ' ' + userId + ' ' + displayName);
         const user = userJoinEvent(socket.id, userId, displayName, title);
         socket.join(user.eventTitle);
 
         //get users to fetch the event data
         const users = getEventUsers(title);
-        console.log('current users are ', users)
         users.forEach(user => {
             io.to(user.sid).emit('fetch event data', title);
         })
@@ -88,9 +80,7 @@ io.sockets.on('connection', socket => {
 
     //Listen for chat msgs
     socket.on('chat message', (userId, title) => {
-        console.log('I received a chat message for event ' + title);
         const users = getEventUsers(title);
-        console.log('current users are ', users)
 
         //Broadcast to room to get data
         users.forEach(user => {

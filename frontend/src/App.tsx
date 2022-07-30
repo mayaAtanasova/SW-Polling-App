@@ -12,7 +12,6 @@ import Login from './Pages/Login/Login';
 import Register from './Pages/Register/Register';
 import AdminDashboard from './Pages/AdminDashboard/AdminDashboard';
 import Profile from './Pages/Profile/Profile';
-import Chat from './Components/Chat/Messages';
 
 import './App.css';
 
@@ -39,8 +38,7 @@ function App() {
             <Route path="/logout" element={<Home socket={socket}/>} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<AdminDashboard />} />
-            < Route path='/profile' element={<Profile />} />
-            {/* <Route path="/event" element={<Chat socket={socket}/>} /> */}
+            <Route path='/profile' element={<Profile />} />
           </Routes>
         </BrowserRouter>
       </Provider>
