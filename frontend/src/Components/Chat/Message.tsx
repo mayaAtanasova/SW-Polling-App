@@ -4,8 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { IMessage } from "../../Interfaces/IMessage"
 import { useMySelector } from "../../hooks/useReduxHooks";
-
-import styles from "./Message.module.css";
+import styles from './Message.module.css';
 import { faCheck, faCheckCircle, faX } from "@fortawesome/free-solid-svg-icons";
 
 type messageComponentProps = {
