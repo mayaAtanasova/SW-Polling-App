@@ -16,9 +16,10 @@ import {
 } from './utils/usersManager'
 import { msgRouter } from "./routes/message";
 import { eventRouter } from "./routes/event";
-import { Message } from "./models/message";
+import { Message } from "./models/messages";
 import { Event } from "./models/events";
 import { User } from "./models/users";
+import { pollsRouter } from "./routes/polls";
 
 
 //init
@@ -46,6 +47,7 @@ app.use(cors(
 app.use('/auth', authRouter);
 app.use('/messages', msgRouter);
 app.use('/events', eventRouter);
+app.use('/polls', pollsRouter);
 
 app.use('/', (req, res) => {
     res.send('Hello World');

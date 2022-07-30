@@ -1,7 +1,7 @@
 import { User } from '../models';
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
-import UserInterface from '../utils/userInterface';
+import UserInterface from '../interfaces/userInterface';
 import { issueJwt } from '../utils/jwt';
 import { validationResult } from 'express-validator';
 

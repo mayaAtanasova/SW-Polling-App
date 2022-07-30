@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Message, Event, User } from "../models";
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
-import UserInterface from '../utils/userInterface';
+import UserInterface from '../interfaces/userInterface';
 
 type Message = {
     _id: string,

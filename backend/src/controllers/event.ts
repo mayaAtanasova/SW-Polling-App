@@ -1,15 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import { Event, User } from '../models';
-import UserInterface from '../utils/userInterface';
+import Message from '../interfaces/messageInterface'
 
-type Message = {
-    _id: string,
-    text: string,
-    username: string,
-    userId: string,
-    date: string
-}
 
 const createEvent = async (req: Request, res: Response, next: NextFunction) => {
     const { title, description, userId } = req.body;
