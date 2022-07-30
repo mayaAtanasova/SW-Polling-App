@@ -37,6 +37,14 @@ const eventSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: new Date().toISOString(),
+    },
+    editedAt: {
+        type: Date,
+        default: new Date().toISOString(),
+    },
+    deleted: {
+        type: Boolean,
+        default: false,
     }
 })
 

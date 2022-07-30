@@ -40,7 +40,7 @@ const editPoll = async (req: Request, res: Response, next: NextFunction) => {
         console.log(errors);
         return res.status(401).send({ message: 'Invalid fields sent' });
     }
-    Poll.findById(pollId, (err: any, poll: any) => {
+    Poll.findById(pollId, async (err: any, poll: any) => {
         if (err) {
             return next(new Error('Could not find poll: ' + err));
         }
@@ -51,7 +51,7 @@ const editPoll = async (req: Request, res: Response, next: NextFunction) => {
         poll.title = title;
         poll.options = options;
         poll.editedAt = new Date().toISOString();
-        poll.save();
+        await poll.save();
         return res.status(200).json({ message: 'Poll edited successfully', poll });
     })
         .catch((err: any) => {
@@ -88,7 +88,7 @@ const lockPoll = async (req: Request, res: Response, next: NextFunction) => {
         console.log(errors);
         return res.status(401).send({ message: 'Invalid fields sent' });
     }
-    Poll.findById(pollId, (err: any, poll: any) => {
+    Poll.findById(pollId, async (err: any, poll: any) => {
         if (err) {
             return next(new Error('Could not find poll: ' + err));
         }
@@ -96,7 +96,7 @@ const lockPoll = async (req: Request, res: Response, next: NextFunction) => {
             return next(new Error('Poll not found'));
         }
         poll.locked = true;
-        poll.save();
+        await poll.save();
         return res.status(200).json({ message: 'Poll locked successfully' });
     })
         .catch((err: any) => {

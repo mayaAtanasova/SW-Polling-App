@@ -1,5 +1,5 @@
 import { IUser } from "../Interfaces/IUser";
-import jwtDecoder from '../hooks/jwtDecoder';
+import jwtDecoder from '../helpers/jwtDecoder';
 import { TokenResponse, useGoogleLogin } from '@react-oauth/google'
 
 

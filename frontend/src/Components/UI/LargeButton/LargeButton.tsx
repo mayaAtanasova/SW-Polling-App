@@ -2,7 +2,7 @@ import styles from './LargeButton.module.css';
 
 type componentProps = {
     text: string,
-    onClick: () => void,
+    onClick: (ev?:any) => void,
 }
 const LargeButton = ({ text, onClick }: componentProps) => {
   return (

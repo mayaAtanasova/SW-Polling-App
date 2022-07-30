@@ -115,7 +115,7 @@ const LoginForm = () => {
         if (isAdmin) {
             return <Navigate to="/admin" />
         }
-        return <Navigate to="/" replace /> //or a user dashboard
+        return <Navigate to="/" replace />
     }
 
     return (

@@ -2,7 +2,7 @@ import isEmail from 'validator/lib/isEmail';
 
 export const nameValidator = (name: string): string => {
     if (!name) {
-        return 'Name is required';
+        return 'The field is required';
     }
     return '';
 };
@@ -33,3 +33,4 @@ export const confrimPasswordValidator = (confirmPassword: string, password: stri
     }
     return '';
 };
+

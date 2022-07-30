@@ -57,7 +57,7 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
     const newEvent = new Event({
         title,
         description,
-        members: [],
+        attendees: [],
         messages: [],
         voted: [],
         createdBy: userId,
@@ -145,15 +145,48 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
             });
     }
 
-    const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
-        const { evid } = req.body;
+    const editEvent = async (req: Request, res: Response, next: NextFunction) => {
+        const eventId = req.params.eventId;
+        const { title, description } = req.body;
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             console.log(errors);
             return res.status(401).send({ message: 'Invalid fields sent' });
         }
         try {
-            await Event.findByIdAndDelete(evid);
+            const event = await Event.findByIdAndUpdate(eventId, { title, description }, { returnDocument: 'after', lean: true });
+            res.status(200).json({
+                message: 'Event edited successfully',
+                event
+            })
+        } catch (err) {
+            return next(new Error('Could not edit event: ' + err));
+        }
+
+
+    }
+
+    const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
+        const { eventId } = req.body;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.log(errors);
+            return res.status(401).send({ message: 'Invalid fields sent' });
+        }
+        try {
+            Event
+            .findById(eventId)
+            .exec(async (err: any, event: any) => {
+                if (err) {
+                    return next(new Error('Could not find event: ' + err));
+                }
+                if (!event) {
+                    return next(new Error('Event not found'));
+                }
+                event.deleted = true;
+                await event.save();
+                res.status(200).json({ message: 'Event deleted successfully' });
+            });
         } catch (err) {
             return next(new Error('Could not delete event: ' + err));
         }

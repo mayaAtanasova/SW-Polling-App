@@ -4,7 +4,7 @@ import { clearEventData, setEventId } from "./eventSlice";
 
 import AuthService from "../services/authService";
 import { IUser } from "../Interfaces/IUser";
-import jwtDecoder from "../hooks/jwtDecoder";
+import jwtDecoder from "../helpers/jwtDecoder";
 import { TokenResponse } from "@react-oauth/google";
 
 let user: IUser | null = null

@@ -5,7 +5,7 @@ import EventService from '../services/eventService';
 import MessageService from '../services/messageService'
 import { IEvent } from '../Interfaces/IEvent';
 import { IUser } from '../Interfaces/IUser';
-import jwtDecoder from "../hooks/jwtDecoder";
+import jwtDecoder from "../helpers/jwtDecoder";
 
 const eventId = localStorage.getItem("eventId");
 const emptyEvent: IEvent = {

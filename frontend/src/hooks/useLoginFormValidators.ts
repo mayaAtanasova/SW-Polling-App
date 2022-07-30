@@ -4,7 +4,7 @@ import {
     emailValidator,
     passwordValidator,
     confrimPasswordValidator,
-} from './validators';
+} from '../helpers/validators';
 import { IErrors } from '../Interfaces/IError';
 import { IForm } from '../Interfaces/IForm';
 
@@ -39,6 +39,9 @@ export const useLoginFormValidator = (form: IForm) => {
         'email': emailValidator,
         'password': passwordValidator,
         'confirmPassword': confrimPasswordValidator,
+        'title': nameValidator,
+        'description': nameValidator,
+        'type': nameValidator,
     });
 
     const [errors, setErrors] = useState(initialState);

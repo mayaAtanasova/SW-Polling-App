@@ -5,6 +5,7 @@ const eventUrl = `${baseUrl}/events`;
 
 type EventCredentials = {
     title: string,
+    description?: string
     userId: string,
 }
 
@@ -50,7 +51,92 @@ const fetchEventData = async (eventId: string) => {
     }
 }
 
+const createEvent = async ({ title, description, userId }: EventCredentials) => {
+    try {
+        const response = await fetch(`${eventUrl}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title, description, userId })
+        });
+        const data = await response.json();
+        return {
+            message: data.message,
+            event: data.event
+        };
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.error(message);
+    }
+}
+
+const getEventsByCreator = async (userId: string) => {
+    try {
+        const response = await fetch(`${eventUrl}/admins/${userId}`);
+        const data = await response.json();
+        return {
+            message: data.message,
+            events: data.events
+        };
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+            console.error(message);
+    }
+}
+
+const editEvent = async (eventId: string, title: string, description: string) => {
+    try {
+        const response = await fetch(`${eventUrl}/${eventId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title, description })
+        });
+        const data = await response.json();
+        return {
+            message: data.message,
+            event: data.event
+        };
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+            console.error(message);
+    }
+}
+
+const deleteEvent = async (eventId: string) => {
+    try {
+        const response = await fetch(`${eventUrl}/${eventId}`, {
+            method: 'DELETE',
+        });
+        const data = await response.json();
+        return {
+            message: data.message,
+        };
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+            console.error(message);
+    }
+}
+
 export default {
     joinEvent,
     fetchEventData,
+    createEvent,
+    editEvent,
+    deleteEvent,
+    getEventsByCreator,
 }
