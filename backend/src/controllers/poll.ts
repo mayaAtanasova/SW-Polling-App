@@ -33,7 +33,8 @@ const createPoll = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 const editPoll = async (req: Request, res: Response, next: NextFunction) => {
-    const { pollId, title, options } = req.body;
+    const pollId = req.params.pollId;
+    const { type, title, options } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
@@ -46,8 +47,10 @@ const editPoll = async (req: Request, res: Response, next: NextFunction) => {
         if (!poll) {
             return next(new Error('Poll not found'));
         }
+        poll.type = type;
         poll.title = title;
         poll.options = options;
+        poll.editedAt = new Date().toISOString();
         poll.save();
         return res.status(200).json({ message: 'Poll edited successfully', poll });
     })
@@ -57,7 +60,7 @@ const editPoll = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 const deletePoll = async (req: Request, res: Response, next: NextFunction) => {
-    const { pollId } = req.body;
+    const pollId = req.params.pollId;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
@@ -94,7 +97,7 @@ const lockPoll = async (req: Request, res: Response, next: NextFunction) => {
         }
         poll.locked = true;
         poll.save();
-        return res.status(200).json({ message: 'Poll locked successfully', poll });
+        return res.status(200).json({ message: 'Poll locked successfully' });
     })
         .catch((err: any) => {
             return next(new Error('Could not lock poll: ' + err));
@@ -155,7 +158,7 @@ const voteInPoll = async (req: Request, res: Response, next: NextFunction) => {
     //check if user already voted
     const index = poll.votes.findIndex((vote: any) => vote._id.toString() === userId);
     if (index !== -1) {
-        return res.status(401).json({ message: `User ${poll.votes[index].displayName} already voted`, pollId: poll._id, pollTitle: poll.title });
+        return res.status(401).json({ message: `User ${poll.votes[index].displayName} already voted`});
     }
 
     //create vote
@@ -173,6 +176,7 @@ const voteInPoll = async (req: Request, res: Response, next: NextFunction) => {
         poll.votes.push(newVote);
         await poll.save({ session: sess });
         await sess.commitTransaction();
+        
 } catch (err) {
     return next(new Error('DB transaction failed: ' + err));
 }
@@ -180,7 +184,6 @@ const voteInPoll = async (req: Request, res: Response, next: NextFunction) => {
 //send response
 res.status(200).json({
     message: 'User voted successfully',
-    poll: poll, //нужно ли е 
 })
 }
 
