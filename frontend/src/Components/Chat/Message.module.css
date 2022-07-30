@@ -7,6 +7,7 @@
   border-radius: 0.5rem;
   padding: 0.5rem;
   width: 75%;
+  position: relative;
 
   display: flex;
   align-items: flex-start;
@@ -23,7 +24,7 @@
   font-style: normal;
 }
 
-.msgDate {
+.msgDateGroup {
   align-self: flex-end;
 }
 
@@ -36,4 +37,30 @@
 .otherMessage {
   background-color: rgba(81, 140, 161, 0.5);
   border-top-left-radius: 0;
+}
+
+.actionsGroup {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.visible {
+    opacity: 1;
+}
+
+.actionBtn {
+  width: 1rem;
+  height: 1rem;
+  padding: 0.2rem;
+  border: 2px solid var(--color-text);
+  border-radius: 100%;
+}
+
+.actionBtn:hover{
+cursor: pointer;
 }

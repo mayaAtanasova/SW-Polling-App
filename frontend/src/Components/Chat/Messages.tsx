@@ -13,26 +13,28 @@ const Messages = ({ messages }: componentProps) => {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    if(messagesEndRef.current) {
-    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   useEffect(scrollToBottom, [messages]);
 
   return (
-    <div className={styles.chatWrapper}>
+    <>
       <div className={styles.chatHeading}>
         <h4>CHAT AREA</h4>
       </div>
-      <div className={styles.messageArea}>
-        {messages &&
-          messages.map((message: any) => (
-            <Message key={message.id} message={message}/>
-          ))}
+      <div className={styles.chatWrapper}>
+        <div className={styles.messageArea}>
+          {messages &&
+            messages.map((message: any) => (
+              <Message key={message.id} message={message} />
+            ))}
           <div ref={messagesEndRef}></div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

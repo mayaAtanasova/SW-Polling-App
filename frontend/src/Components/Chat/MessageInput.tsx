@@ -34,7 +34,7 @@ const MessageInput = ({ onChatMessage }: inputComponentProps) => {
                 type="submit"
             >
                 <FontAwesomeIcon className={styles.faIcon} icon={faPaperPlane} />
-                Send
+                <p>Send</p>
             </button>
         </form>
     )
