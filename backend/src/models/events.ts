@@ -42,7 +42,7 @@ const eventSchema = new mongoose.Schema({
         type: Date,
         default: new Date().toISOString(),
     },
-    deleted: {
+    archived: {
         type: Boolean,
         default: false,
     }

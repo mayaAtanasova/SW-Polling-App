@@ -78,16 +78,13 @@ const getEventsByCreator = async (userId: string) => {
     try {
         const response = await fetch(`${eventUrl}/admins/${userId}`);
         const data = await response.json();
-        return {
-            message: data.message,
-            events: data.events
-        };
+        return data;
     } catch (error: any) {
         const message =
             (error.response && error.response.data && error.response.data.message)
             || error.message
             || error.toString();
-            console.error(message);
+        console.error(message);
     }
 }
 
@@ -110,7 +107,7 @@ const editEvent = async (eventId: string, title: string, description: string) =>
             (error.response && error.response.data && error.response.data.message)
             || error.message
             || error.toString();
-            console.error(message);
+        console.error(message);
     }
 }
 
@@ -128,7 +125,7 @@ const deleteEvent = async (eventId: string) => {
             (error.response && error.response.data && error.response.data.message)
             || error.message
             || error.toString();
-            console.error(message);
+        console.error(message);
     }
 }
 

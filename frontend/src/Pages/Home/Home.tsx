@@ -51,7 +51,6 @@ const Home = ({ socket }: componentProps) => {
     }
 
     const handleJoinEvent = (title: string) => async (event: any) => {
-        console.log(title, userId);
         event.preventDefault();
         if (userId) {
             await dispatch(joinEvent({ title, userId }));

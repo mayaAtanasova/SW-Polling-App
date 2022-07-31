@@ -5,7 +5,7 @@ import Message from '../interfaces/messageInterface'
 
 const getEventsByCreator = async (req: Request, res: Response, next: NextFunction) => {
     const createdBy = req.params.createdBy;
-    
+    console.log(createdBy);
     Event
     .find({ createdBy })
     .populate("attendees polls createdBy")
@@ -40,10 +40,12 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
                 description: event.description,
                 attendees,
                 polls,
-                host: event.createdBy.displayName
+                host: event.createdBy.displayName,
+                date: event.createdAt,
+                archived: event.archived,
             }
         });
-        res.status(200).json(modifiedEvents);
+        res.status(200).json({ events: modifiedEvents });
     });
 };
 
@@ -166,6 +168,36 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
 
     }
 
+    const archiveEvent = async (req: Request, res: Response, next: NextFunction) => {
+        const { eventId } = req.body;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.log(errors);
+            return res.status(401).send({ message: 'Invalid fields sent' });
+        }
+        try {
+            Event
+            .findById(eventId)
+            .exec(async (err: any, event: any) => {
+                if (err) {
+                    return next(new Error('Could not find event: ' + err));
+                }
+                if (!event) {
+                    return next(new Error('Event not found'));
+                }
+                event.archived = true;
+                await event.save();
+                res.status(200).json({ message: 'Event deleted successfully' });
+            });
+        } catch (err) {
+            return next(new Error('Could not delete event: ' + err));
+        }
+
+        res.json({
+            message: 'Event deleted successfully',
+        })
+    }
+
     const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
         const { eventId } = req.body;
         const errors = validationResult(req);
@@ -201,5 +233,6 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
         fetchEventData,
         createEvent,
         joinEvent,
+        archiveEvent,
         deleteEvent,
     }

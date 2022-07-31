@@ -1,0 +1,47 @@
+.eventCard {
+  width: 30%;
+  height: 100%;
+  margin: 1rem;
+  border-radius: 0.5rem;
+  border: 2px solid rgba(81, 140, 161, 0.5);
+  background-color: rgba(81, 140, 161, 0.2);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.eventCard * {
+  margin: 0 0 0.5rem 0;
+}
+
+.eventCard:hover {
+  background-color: rgba(81, 140, 161, 0.5);
+  cursor: pointer;
+}
+
+.titleHolder {
+  margin: 0 auto;
+  text-align: center;
+  background-color: rgba(81, 140, 161, 0.2);
+  border-bottom: 1px solid rgba(81, 140, 161, 0.5);
+}
+
+.titleHolder h2 {
+  border-bottom: 4px solid var(--color-accent);
+  margin-bottom: 0;
+  margin-top: 1rem;
+  padding-bottom: 0.5rem;
+  display: inline-block;
+  font-size: 1.5rem;
+  vertical-align: bottom;
+}
+
+.eventCard p:first-of-type,
+.eventCard span {
+  font-style: italic;
+}
+
+.description {
+  font-size: 1.25rem;
+  font-weight: 400;
+  text-align: center;
+  margin: 1rem 0;
+}

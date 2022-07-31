@@ -19,16 +19,13 @@ const addUser = (socketId: string, userId: string, displayName: string) => {
 const userJoinEvent = (sid:string, uid: string, displayName:string, eventTitle:string) => {
     let user: User;
     const index = users.findIndex(user => user.uid === uid);
-    console.log('user before rewrite', users[index]);
     if (index !== -1) {
         user = { ... users[index], eventTitle, sid };
         users.splice(index, 1, user);
-        console.log('user after rewrite', user);
     } else {
         user = { sid, uid, displayName, eventTitle };
         users.push(user);
     }
-    console.log('users after push', users);
     return user;
 };
 

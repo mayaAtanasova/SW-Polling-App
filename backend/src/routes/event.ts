@@ -17,4 +17,5 @@ eventRouter.post('/join',
 body('title').isLength({ min: 1 }).withMessage('Title is required'),
 event.joinEvent);
 
+eventRouter.post('archive/:evid', event.archiveEvent);
 eventRouter.delete('/:evid', event.deleteEvent);
