@@ -29,13 +29,13 @@
 }
 
 .myMessage {
-  background-color: hsl(196, 75%, 68%, 0.5);
+  background-color: var(--color-light-transparent);
   border-top-right-radius: 0;
   align-self: flex-end;
 }
 
 .otherMessage {
-  background-color: rgba(81, 140, 161, 0.5);
+  background-color: var(--color-dark-transparent);
   border-top-left-radius: 0;
 }
 

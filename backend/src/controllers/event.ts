@@ -122,6 +122,7 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
                     return {
                         id: attendee._id,
                         displayName: attendee.displayName,
+                        email: attendee.email,
                         vpoints: attendee.vpoints,
                     };
                 });
@@ -164,8 +165,6 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
         } catch (err) {
             return next(new Error('Could not edit event: ' + err));
         }
-
-
     }
 
     const archiveEvent = async (req: Request, res: Response, next: NextFunction) => {
@@ -196,6 +195,28 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
         res.json({
             message: 'Event deleted successfully',
         })
+    }
+
+    const updateVpoints = async (req: Request, res: Response, next: NextFunction) => {
+        const { userId, vpoints } = req.body;
+
+        try {
+            User
+            .findById(userId)
+            .exec(async (err: any, user: any) => {
+                if (err) {
+                    return next(new Error('Error finding user: ' + err));
+                }
+                if (!user) {
+                    return next(new Error('User not found'));
+                }
+                user.vpoints = vpoints;
+                await user.save();
+                res.status(200).json(user);
+            });
+        } catch (err) {
+            return next(new Error('Could not update vpoints: ' + err));
+        }
     }
 
     const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
@@ -234,5 +255,6 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
         createEvent,
         joinEvent,
         archiveEvent,
+        updateVpoints,
         deleteEvent,
     }

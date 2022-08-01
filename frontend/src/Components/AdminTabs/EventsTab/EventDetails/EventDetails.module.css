@@ -1,0 +1,20 @@
+.eventDetailsBkg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.eventDetailsWrapper {
+padding: 1rem;
+border: 1px solid var(--color-light-transparent);
+border-radius: 0.5rem;
+background-color: var(--color-bkg);
+
+}

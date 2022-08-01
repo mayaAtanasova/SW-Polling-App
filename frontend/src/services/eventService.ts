@@ -9,6 +9,11 @@ type EventCredentials = {
     userId: string,
 }
 
+type userVPoints = {
+    userId: string,
+    vpoints: number,
+}
+
 const joinEvent = async (eventCredentials: EventCredentials) => {
     try {
         const response = await fetch(`${eventUrl}/join`, {
@@ -129,6 +134,26 @@ const deleteEvent = async (eventId: string) => {
     }
 }
 
+const editUserVpoints = async ( userVPoints:userVPoints ) => {
+    try {
+        const response = await fetch(`${eventUrl}/vpoints`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userVPoints)
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.error(message);
+    }
+}
+
 export default {
     joinEvent,
     fetchEventData,
@@ -136,4 +161,5 @@ export default {
     editEvent,
     deleteEvent,
     getEventsByCreator,
+    editUserVpoints
 }

@@ -1,5 +1,5 @@
+import Avatar from '../../Components/Shared/Avatar/Avatar';
 import { useMySelector } from '../../hooks/useReduxHooks';
-import { genColor } from '../../helpers/colorGenerator';
 
 import styles from './Profile.module.css';
 
@@ -7,7 +7,6 @@ const Profile = () => {
 
   const { user } = useMySelector((state: any) => state.auth);
   const { loading, event } = useMySelector((state: any) => state.event);
-  const filteredAttendees = event.attendees.filter((attendee: any) => attendee.id !== user.id);
 
   if (loading) {
     return <div>Loading...</div>
@@ -38,9 +37,7 @@ const Profile = () => {
           .map((attendee: any) =>
 
             <div className={styles.attendee} key={attendee.id}>
-              <span className={styles.profileLogo} style={{ 'backgroundColor': genColor() }} >
-                {attendee.displayName.split(' ').map((name: any) => name[0].toUpperCase()).join('')}
-              </span>
+              <Avatar displayName={attendee.displayName}/>
               <div >{attendee.displayName}</div>
               <div>vpoints: {attendee.vpoints}</div>
             </div>

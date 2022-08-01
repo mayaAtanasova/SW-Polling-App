@@ -7,11 +7,13 @@ import eventsService from '../../../services/eventService';
 import styles from './EventsTab.module.css';
 import { setMessage } from '../../../store/messageSlice';
 import EventCard from './EventCard/EventCard';
+import EventDetails from './EventDetails/EventDetails';
 
 const EventsTab = () => {
     const [showEventForm, setShowEventForm] = useState(false);
     const [loading, setLoading] = useState(false);
     const [events, setEvents] = useState([]);
+    const [currentEvent, setCurrentEvent] = useState(null);
 
     const { user } = useMySelector(state => state.auth);
     const userId = user?.id;
@@ -51,6 +53,18 @@ const EventsTab = () => {
         getCurrentEvents();
     }
 
+    const selectEvent = (eventId: string) => (ev:any) => {
+        ev.preventDefault();
+        const selectedEvent = events.find((event: any) => event.id === eventId);
+        if(selectedEvent){
+            setCurrentEvent(selectedEvent);
+        }
+    }
+
+    const handleDetailViewClose = (eventId:string) => (ev:any) => {
+        setCurrentEvent(null);
+    }
+
     return (
         <div className={styles.eventsTabWrapper}>
 
@@ -72,9 +86,11 @@ const EventsTab = () => {
             {!events && <p>You have no events yet.</p>}
             <div className={styles.eventsHolder}>
                 {events && events.map((event: any) => {
-                    return (<EventCard key={event.id} event={event} />)
+                    return (<EventCard key={event.id} event={event} onSelectEvent={selectEvent}/>)
                 })}
             </div>
+
+            {currentEvent && <EventDetails event={currentEvent} onDetailsClose={handleDetailViewClose}></EventDetails>}
 
         </div>
     )

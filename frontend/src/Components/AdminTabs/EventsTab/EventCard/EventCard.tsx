@@ -11,12 +11,15 @@ type componentProps = {
         polls: string[],
         attendees: IUser[],
         date: string,
-    }
+    },
+    onSelectEvent: (eventId: string) => (ev:any) => void,
 }
 
-const EventCard = ({ event }: componentProps) => {
+const EventCard = ({ event, onSelectEvent }: componentProps) => {
     return (
-        <div className={styles.eventCard}>
+        <div 
+        className={styles.eventCard}
+        onClick={onSelectEvent(event.id)}>
             <div className={styles.titleHolder}>
                 <h2>{event.title}</h2>
             </div>

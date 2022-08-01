@@ -1,6 +1,6 @@
 nav {
   background-color: var(--color-bkg);
-  border-bottom: 0.2px solid rgba(107, 107, 107, 0.5);
+  border-bottom: 0.2px solid var(--color-grey-transparent);
   display: flex;
   justify-content: space-between;
   align-items: center;

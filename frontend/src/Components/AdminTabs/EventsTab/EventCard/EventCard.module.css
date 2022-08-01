@@ -3,8 +3,8 @@
   height: 100%;
   margin: 1rem;
   border-radius: 0.5rem;
-  border: 2px solid rgba(81, 140, 161, 0.5);
-  background-color: rgba(81, 140, 161, 0.2);
+  border: 2px solid var(--color-light-transparent);
+  background-color: var(--color-dark-transparent);
   transition: background-color 0.2s ease-in-out;
 }
 
@@ -13,15 +13,15 @@
 }
 
 .eventCard:hover {
-  background-color: rgba(81, 140, 161, 0.5);
+  background-color: var(--color-light-transparent);
   cursor: pointer;
 }
 
 .titleHolder {
   margin: 0 auto;
   text-align: center;
-  background-color: rgba(81, 140, 161, 0.2);
-  border-bottom: 1px solid rgba(81, 140, 161, 0.5);
+  background-color: var(--color-dark-transparent);
+  border-bottom: 1px solid var(--color-light-transparent);
 }
 
 .titleHolder h2 {

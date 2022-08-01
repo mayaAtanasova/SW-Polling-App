@@ -6,6 +6,10 @@
 --color-accent: #71caeb;
 --color-darkbkg: #1e485f;
 --color-bkg: #1b1b1b;
+--color-bkg-dark-transparent: rgba(27, 27, 27, 0.9);
+--color-light-transparent:rgba(81, 140, 161, 0.5);
+--color-dark-transparent:rgba(81, 140, 161, 0.2);
+--color-grey-transparent:rgba(107, 107, 107, 0.7);
 }
 html * {
   box-sizing: border-box;
