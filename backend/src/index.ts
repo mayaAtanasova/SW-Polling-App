@@ -57,7 +57,7 @@ const io = new Server(server, {
 });
 
 //Runs when a client connects to chat
-io.sockets.on('connection', socket => {
+io.sockets.on('connect', socket => {
     console.log(`Client with id ${socket.id} connected`);
 
     //new user appears

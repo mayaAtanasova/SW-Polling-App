@@ -5,22 +5,20 @@ import eventService from '../../../services/eventService';
 
 import Avatar from '../Avatar/Avatar';
 
-import styles from './UsersTable.module.css';
-import { faEdit } from '@fortawesome/free-regular-svg-icons';
-import { faCheck, faPencil } from '@fortawesome/free-solid-svg-icons';
+import styles from './UsersRow.module.css';
+import { faAngleDown, faAngleUp, faCheck, faPencil } from '@fortawesome/free-solid-svg-icons';
+import { IUserCompact } from '../../../Interfaces/IUser';
+import { setUserVPoints } from '../../../store/eventSlice';
 
 type componentProps = {
-    user: {
-        id: string,
-        displayName: string,
-        email: string,
-        vpoints: number,
-    },
+    user: IUserCompact,
+    handleEditUser?: (user: IUserCompact) => void,
 }
 
-const UsersRow = ({ user }: componentProps) => {
+const UsersRow = ({ user, handleEditUser }: componentProps) => {
 
     const { isAdmin } = useMySelector(state => state.auth);
+    const { event } = useMySelector(state => state.event);
     const dispatch = useMyDispatch();
 
     const [editState, setEditState] = useState(false);
@@ -30,12 +28,28 @@ const UsersRow = ({ user }: componentProps) => {
         setEditState(true);
     }
 
-    const handleVPointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setVPoints(Number(e.target.value));
+    const increasePoints = () => {
+        const newPoints = vPoints <= 9 ? vPoints + 1 : 10;
+        setVPoints(newPoints);
+    }
+
+    const decreasePoints = () => {
+        const newPoints = vPoints >= 2 ? vPoints - 1 : 1;
+        setVPoints(newPoints);
     }
 
     const handleVPointsSave = async (ev: any) => {
-        const updatedUser = await eventService.editUserVpoints({ userId: user.id, vpoints: vPoints });
+        ev.stopPropagation();
+        if (vPoints !== user.vpoints) {
+            const updatedUser: IUserCompact = await eventService.editUserVpoints({ userId: user.id, vpoints: vPoints });
+            if (updatedUser && handleEditUser) {
+                handleEditUser(updatedUser);
+            }
+            const userInCurrentEvent = event.attendees.find(attendee => attendee.id === user.id);
+            if (userInCurrentEvent) {
+                dispatch(setUserVPoints(updatedUser));
+            }
+        }
         setEditState(false);
     }
 
@@ -46,23 +60,29 @@ const UsersRow = ({ user }: componentProps) => {
                 <td>{user.displayName}</td>
                 <td>{user.email}</td>
                 <td>
-                    {editState
-                        ? <input type="number" min="1" value={vPoints} onChange={handleVPointsChange} />
-                        : <span>{vPoints}</span>
-                    }
-                                    {isAdmin &&
-                    <span>
-                        {!editState
-                        ? <span
-                            onClick={handleVPointsEdit}>
-                            <FontAwesomeIcon icon={faPencil} />
-                        </span>
-                        : <span
-                            onClick={handleVPointsSave}>
-                            <FontAwesomeIcon icon={faCheck} />
-                        </span>
-                        }
-                    </span>}
+                    <div className={styles.pointsGroup}>
+                        <span className={styles.pointsHolder}>{vPoints}</span>
+                        {!editState && <div className={styles.placeholder}></div>}
+                        {editState && <span className={styles.arrowsGroup}>
+                            <button><FontAwesomeIcon icon={faAngleUp} onClick={increasePoints} /></button>
+                            <button><FontAwesomeIcon icon={faAngleDown} onClick={decreasePoints} /></button>
+                        </span>}
+                        {isAdmin &&
+                            <span>
+                                {!editState
+                                    ? <button
+                                        className={styles.editBtn}
+                                        onClick={handleVPointsEdit}>
+                                        <FontAwesomeIcon icon={faPencil} />
+                                    </button>
+                                    : <button
+                                        className={styles.confirmBtn}
+                                        onClick={handleVPointsSave}>
+                                        <FontAwesomeIcon icon={faCheck} />
+                                    </button>
+                                }
+                            </span>}
+                    </div>
                 </td>
 
             </tr>
@@ -70,4 +90,4 @@ const UsersRow = ({ user }: componentProps) => {
     )
 }
 
-export default UsersRow
+export default UsersRow;

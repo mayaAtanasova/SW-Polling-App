@@ -7,4 +7,12 @@ export interface IUser {
     lastName: string;
     displayName?: string;
     role?: string;
+    vpoints?:number;
+}
+
+export interface IUserCompact {
+    id: string;
+    email: string;
+    displayName: string;
+    vpoints:number;
 }

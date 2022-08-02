@@ -71,7 +71,9 @@ const Home = ({ socket }: componentProps) => {
             date: new Date().toISOString(),
         }
         console.log('new message: ' + newMessage.text);
-        await messageService.sendMessage(newMessage);
+        const sentMessage = await messageService.sendMessage(newMessage);
+        console.log(sentMessage);
+        console.log(socket);
         socket?.emit("chat message", userId, title);
     }
 

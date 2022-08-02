@@ -1,35 +1,35 @@
 import styles from './EventDetails.module.css';
 import moment from 'moment';
-import { useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
 import UsersTable from '../../../Shared/UsersTable/UsersTable';
+import { IUserCompact } from '../../../../Interfaces/IUser';
+import { IEventCompact } from '../../../../Interfaces/IEvent';
+import { useEffect, useState } from 'react';
 
 type componentProps = {
-    event: {
-        id: string,
-        title: string,
-        description: string,
-        host: string,
-        polls: [],
-        attendees: [{
-            id: string,
-            displayName: string,
-            email: string,
-            vpoints: number,
-        }],
-        date: string,
-    },
-    onDetailsClose: (eventId:string) => (ev:any) => void,
+    event: IEventCompact;
+    onDetailsClose: (eventId: string) => (ev: any) => void,
+    handleEditUser: (eventId: string) => (user: IUserCompact) => void,
 }
 
-const EventDetails = ({ event, onDetailsClose }: componentProps) => {
+const EventDetails = ({ event, onDetailsClose, handleEditUser }: componentProps) => {
 
-    useEffect(() => {
-        console.log('event', event);
-        console.log('attended by', event.attendees);
-    }, []);
+    const [sliceIndex, setSliceIndex] = useState<number>(0);
+    const attendeeSlice = event.attendees.slice(sliceIndex, sliceIndex + 3);
+    const lessAvailable = sliceIndex > 0;
+    const moreAvailable = sliceIndex < event.attendees.length - 3;
+
+    const prevAttendees = () => {
+        setSliceIndex(sliceIndex => sliceIndex - 3);
+    }
+
+    const nextAttendees = () => {
+        setSliceIndex(sliceIndex + 3);
+    }
 
     return (
-        <div className={styles.eventDetailsBkg}>
+        <div className={styles.eventDetailsBkg} >
             <div className={styles.eventDetailsWrapper}>
                 <div className={styles.eventDetailsTitle}>
                     <h2>{event.title}</h2>
@@ -39,12 +39,28 @@ const EventDetails = ({ event, onDetailsClose }: componentProps) => {
                 </div>
                 <p>Created by: <span>{event.host}</span></p>
                 <p>Created on: <span>{moment(event.date).format('DD.MM.YYYY')}</span></p>
-                <p>Attendees:</p>
+                <div className={styles.divider}></div>
+                <h3>Attendees: </h3>
+                {event.attendees.length === 0 && <h4>No one is attending yet.</h4>}
                 <div className={styles.attendeeTableWrapper}>
-                    <UsersTable users={event.attendees} />
+                    {event.attendees.length > 0 && <UsersTable
+                        users={attendeeSlice}
+                        onEditUser={handleEditUser(event.id)}
+                    />}
+                    {event.attendees.length > 0 &&
+                        <div className={styles.attendeesNavigationWrapper}>
+                            <button disabled={!lessAvailable} onClick={prevAttendees}>&lt; prev</button>
+                            <p>{sliceIndex + 1} to {sliceIndex + 3 > event.attendees.length ? event.attendees.length : sliceIndex + 3} of {event.attendees.length}</p>
+                            <button disabled={!moreAvailable} onClick={nextAttendees}>next &gt;</button>
+                        </div>
+                    }
                 </div>
-                <p>Polls:</p>
-                <button onClick={onDetailsClose(event.id)}>Close</button>
+                <div className={styles.divider}></div>
+                <h3>Polls:</h3>
+                {event.polls.length === 0 && <h4>No polls for this event yet.</h4>}
+                <button className={styles.closeBtn} onClick={onDetailsClose(event.id)}>
+                    <FontAwesomeIcon icon={faClose} />
+                </button>
             </div>
         </div>
     )

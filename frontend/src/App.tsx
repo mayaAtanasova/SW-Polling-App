@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import socketIOClient, { Socket } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 import { Provider } from 'react-redux';
 import store from './store/store';
@@ -11,7 +11,7 @@ import Navbar from './Components/Navbar/Navbar';
 import Login from './Pages/Login/Login';
 import Register from './Pages/Register/Register';
 import AdminDashboard from './Pages/AdminDashboard/AdminDashboard';
-import Profile from './Pages/Profile/Profile';
+import Profile from './Pages/EventProfile/Profile';
 
 import './App.css';
 
@@ -23,8 +23,12 @@ function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const socket = socketIOClient(socketURL, { transports: ['websocket'] });
+    const socket = io(socketURL, { transports: ['websocket'] });
     setSocket(socket);
+    socket.connect();
+    socket.on('connect', () => {
+      console.log('connected to socket');
+    })
   }, []);
 
   return (
@@ -37,7 +41,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Home socket={socket}/>} />
             <Route path="/register" element={<Register />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin" element={<AdminDashboard socket={ socket }/>} />
             <Route path='/profile' element={<Profile />} />
           </Routes>
         </BrowserRouter>

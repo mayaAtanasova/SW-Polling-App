@@ -1,0 +1,52 @@
+.editBtn,
+.confirmBtn {
+  background-color: transparent;
+  border: none;
+  font-size: 1rem;
+  color: white;
+  padding: 0;
+}
+
+.editBtn svg,
+.confirmBtn svg {
+  width: 1rem;
+}
+
+.editBtn:hover,
+.confirmBtn:hover {
+  cursor: pointer;
+}
+
+.pointsGroup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pointsHolder {
+  width: 1.5rem;
+  text-align: right;
+}
+
+.placeholder {
+  width: 25%;
+}
+
+.arrowsGroup {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrowsGroup button {
+  border: none;
+  padding: 0;
+  background-color: var(--color-dark-transparent);
+  color: white;
+}
+
+.arrowsGroup button:hover {
+  cursor: pointer;
+}

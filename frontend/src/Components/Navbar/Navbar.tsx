@@ -90,7 +90,7 @@ const Navbar = ({ socket }: componentProps) => {
                             <NavLink
                                 className={({ isActive }) => isActive ? styles.activeLink : styles.link}
                                 to='/profile'>
-                                Event Details
+                                Event Info
                             </NavLink>
                         </li>
                     )}

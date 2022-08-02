@@ -6,7 +6,6 @@ const msgUrl = `${baseUrl}/messages`;
 export const fetchMessages = async (title:string) => {
     try {
         const response = await fetch(`${msgUrl}/${title}`);
-        console.log(response);
         const data = await response.json();
         return {
             messages: data.messages,

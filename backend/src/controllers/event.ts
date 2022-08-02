@@ -212,7 +212,13 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
                 }
                 user.vpoints = vpoints;
                 await user.save();
-                res.status(200).json(user);
+                const modifiedUser = {
+                    id: user._id,
+                    displayName: user.displayName,
+                    email: user.email,
+                    vpoints: user.vpoints,
+                }
+                res.status(200).json(modifiedUser);
             });
         } catch (err) {
             return next(new Error('Could not update vpoints: ' + err));

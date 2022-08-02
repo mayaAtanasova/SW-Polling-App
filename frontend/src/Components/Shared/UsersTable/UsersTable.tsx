@@ -1,17 +1,14 @@
+import { IUser, IUserCompact } from '../../../Interfaces/IUser';
 import UsersRow from './UsersRow';
 import styles from './UsersTable.module.css';
 
 type componentProps = {
-  users: [{
-    id: string,
-    displayName: string,
-    email: string,
-    vpoints: number,
-  }],
+  users: IUserCompact[],
+  onEditUser?: (user:IUserCompact) => void,
 }
 
 
-const UsersTable = ({ users }: componentProps) => {
+const UsersTable = ({ users, onEditUser }: componentProps) => {
 
 
   return (
@@ -26,7 +23,7 @@ const UsersTable = ({ users }: componentProps) => {
           </tr>
         </thead>
         <tbody>
-          {users.map(user => <UsersRow key={user.id} user={user} />)}
+          {users.map(user => <UsersRow key={user.id} user={user} handleEditUser={onEditUser}/>)}
         </tbody>
       </table>
     </div>
