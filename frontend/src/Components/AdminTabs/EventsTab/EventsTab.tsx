@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Socket } from 'socket.io-client';
 
 import LargeButton from '../../UI/LargeButton/LargeButton';
 import EventForm from './EventForm/EventForm';
@@ -12,7 +13,11 @@ import EventDetails from './EventDetails/EventDetails';
 import { IUserCompact } from '../../../Interfaces/IUser';
 import { IEventCompact } from '../../../Interfaces/IEvent';
 
-const EventsTab = () => {
+type componentProps = {
+    socket: Socket | null,
+}
+
+const EventsTab = ({ socket }:componentProps) => {
     const [showEventForm, setShowEventForm] = useState(false);
     const [loading, setLoading] = useState(false);
     const [events, setEvents] = useState<IEventCompact[]>([]);
@@ -26,7 +31,13 @@ const EventsTab = () => {
         getCurrentEvents();
     }, []);
 
+    useEffect(() => {
+        if (!socket) return;
+        socket.on('fetch event data', getCurrentEvents);
+    }, [socket]);
+
     const getCurrentEvents = () => {
+        console.log('getting events in events tab')
         if (userId) {
             setLoading(true);
             eventsService

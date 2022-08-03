@@ -52,7 +52,7 @@ const AdminDashboard = ({ socket }: componentProps) => {
         </li>
       </ul>
       <div className={styles.outlet}>
-        {activeTab === 'events' && <EventsTab />}
+        {activeTab === 'events' && <EventsTab socket={socket}/>}
         {activeTab === 'polls' && <PollsTab />}
       </div>
     </div>

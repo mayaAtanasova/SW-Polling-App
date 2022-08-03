@@ -75,7 +75,7 @@ const Navbar = ({ socket }: componentProps) => {
                             </li>
                         </>
                     )}
-                    {isAdmin && (
+                    {isAuthenticated && isAdmin && (
 
                         <li>
                             <NavLink

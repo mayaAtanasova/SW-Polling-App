@@ -54,8 +54,8 @@ const Home = ({ socket }: componentProps) => {
         event.preventDefault();
         if (userId) {
             await dispatch(joinEvent({ title, userId }));
+            socket?.emit('joinEvent', { userId, displayName, title });
         }
-        socket?.emit('joinEvent', { userId, displayName, title });
         console.log('after emit event and user ' + displayName + ' ' + title);
     }
 

@@ -7,46 +7,46 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
     const createdBy = req.params.createdBy;
     console.log(createdBy);
     Event
-    .find({ createdBy })
-    .populate("attendees polls createdBy")
-    .exec((err: any, events: any) => {
-        if (err) {
-            return next(err);
-        }
-        if(!events) {
-            return res.status(404).json({ message: 'Events not found' });
-        }
-        const modifiedEvents = events.map((event: any) => {
-            const attendees = event.attendees.map((attendee: any) => {
-                return {
-                    id: attendee._id,
-                    displayName: attendee.displayName,
-                    email: attendee.email,
-                    vpoints: attendee.vpoints,
-                };
-            });
-            const polls = event.polls.map((poll: any) => {
-                return {
-                    id: poll._id,
-                    title: poll.title,
-                    description: poll.description,
-                    options: poll.options,
-                    voted: poll.voted,
-                };
-            });
-            return {
-                id: event._id,
-                title: event.title,
-                description: event.description,
-                attendees,
-                polls,
-                host: event.createdBy.displayName,
-                date: event.createdAt,
-                archived: event.archived,
+        .find({ createdBy })
+        .populate("attendees polls createdBy")
+        .exec((err: any, events: any) => {
+            if (err) {
+                return next(err);
             }
+            if (!events) {
+                return res.status(404).json({ message: 'Events not found' });
+            }
+            const modifiedEvents = events.map((event: any) => {
+                const attendees = event.attendees.map((attendee: any) => {
+                    return {
+                        id: attendee._id,
+                        displayName: attendee.displayName,
+                        email: attendee.email,
+                        vpoints: attendee.vpoints,
+                    };
+                });
+                const polls = event.polls.map((poll: any) => {
+                    return {
+                        id: poll._id,
+                        title: poll.title,
+                        description: poll.description,
+                        options: poll.options,
+                        voted: poll.voted,
+                    };
+                });
+                return {
+                    id: event._id,
+                    title: event.title,
+                    description: event.description,
+                    attendees,
+                    polls,
+                    host: event.createdBy.displayName,
+                    date: event.createdAt,
+                    archived: event.archived,
+                }
+            });
+            res.status(200).json({ events: modifiedEvents });
         });
-        res.status(200).json({ events: modifiedEvents });
-    });
 };
 
 const createEvent = async (req: Request, res: Response, next: NextFunction) => {
@@ -86,96 +86,88 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
         .populate('attendees')
         .then(async (event: any) => {
             const index = event.attendees.findIndex((attendee: any) => attendee._id.toString() === userId);
-            if (index !== -1) {
-                return res.status(401).json({ message: `User ${event.attendees[index].displayName} joined event`, evid: event._id, eventTitle: event.title });
+            if (index === -1) {
+                event.attendees.push(userId);
             }
-            event.attendees.push(userId);
             await event.save();
-            User.findById(userId, (err: any, user: any) => {
-                if (err) {
-                    return next(new Error('Could not find user: ' + err));
-                }
-                if (!user) {
-                    return next(new Error('User not found'));
-                }
-                return res.status(200).json({ message: `${user.displayName} joined event`, evid: event._id, eventtitle: event.title });
-            })
-                .catch((err: any) => {
-                    return next(new Error('Could not join event: ' + err));
-                });
+            return res.status(200).json({ message: `User ${event.attendees[index].displayName} joined event`, evid: event._id, eventTitle: event.title });
+        })
+        .catch((err: any) => {
+            return next(new Error('Could not join event: ' + err));
         });
-    }
 
-    const fetchEventData = async (req: Request, res: Response, next: NextFunction) => {
-        const evid = req.params.evid;
-        Event
-            .findById(evid)
-            .populate("attendees messages createdBy")
-            .exec((err: any, event: any) => {
-                if (err) {
-                    return next(new Error('Could not join event: ' + err));
-                }
-                if (!event) {
-                    return res.status(404).json({ message: 'Event not found' });
-                }
-                const attendees = event.attendees.map((attendee: any) => {
-                    return {
-                        id: attendee._id,
-                        displayName: attendee.displayName,
-                        email: attendee.email,
-                        vpoints: attendee.vpoints,
-                    };
-                });
+}
 
-                const messages = event.messages.map((message: Message) => {
-                    return {
-                        id: message._id,
-                        text: message.text,
-                        username: message.username,
-                        userId: message.userId,
-                        date: message.date,
-                    };
-                });
-                const modifiedEvent = {
-                    id: event._id,
-                    title: event.title,
-                    description: event.description,
-                    attendees,
-                    messages,
-                    host: event.createdBy.displayName
-                }
-                return res.status(200).json({ message: 'User joined event successfully', event: modifiedEvent });
+const fetchEventData = async (req: Request, res: Response, next: NextFunction) => {
+    const evid = req.params.evid;
+    Event
+        .findById(evid)
+        .populate("attendees messages createdBy")
+        .exec((err: any, event: any) => {
+            if (err) {
+                return next(new Error('Could not join event: ' + err));
+            }
+            if (!event) {
+                return res.status(404).json({ message: 'Event not found' });
+            }
+            const attendees = event.attendees.map((attendee: any) => {
+                return {
+                    id: attendee._id,
+                    displayName: attendee.displayName,
+                    email: attendee.email,
+                    vpoints: attendee.vpoints,
+                };
             });
-    }
 
-    const editEvent = async (req: Request, res: Response, next: NextFunction) => {
-        const eventId = req.params.eventId;
-        const { title, description } = req.body;
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            console.log(errors);
-            return res.status(401).send({ message: 'Invalid fields sent' });
-        }
-        try {
-            const event = await Event.findByIdAndUpdate(eventId, { title, description }, { returnDocument: 'after', lean: true });
-            res.status(200).json({
-                message: 'Event edited successfully',
-                event
-            })
-        } catch (err) {
-            return next(new Error('Could not edit event: ' + err));
-        }
-    }
+            const messages = event.messages.map((message: Message) => {
+                return {
+                    id: message._id,
+                    text: message.text,
+                    username: message.username,
+                    userId: message.userId,
+                    date: message.date,
+                };
+            });
+            const modifiedEvent = {
+                id: event._id,
+                title: event.title,
+                description: event.description,
+                attendees,
+                messages,
+                host: event.createdBy.displayName
+            }
+            return res.status(200).json({ message: 'User joined event successfully', event: modifiedEvent });
+        });
+}
 
-    const archiveEvent = async (req: Request, res: Response, next: NextFunction) => {
-        const { eventId } = req.body;
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            console.log(errors);
-            return res.status(401).send({ message: 'Invalid fields sent' });
-        }
-        try {
-            Event
+const editEvent = async (req: Request, res: Response, next: NextFunction) => {
+    const eventId = req.params.eventId;
+    const { title, description } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
+        return res.status(401).send({ message: 'Invalid fields sent' });
+    }
+    try {
+        const event = await Event.findByIdAndUpdate(eventId, { title, description }, { returnDocument: 'after', lean: true });
+        res.status(200).json({
+            message: 'Event edited successfully',
+            event
+        })
+    } catch (err) {
+        return next(new Error('Could not edit event: ' + err));
+    }
+}
+
+const archiveEvent = async (req: Request, res: Response, next: NextFunction) => {
+    const { eventId } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
+        return res.status(401).send({ message: 'Invalid fields sent' });
+    }
+    try {
+        Event
             .findById(eventId)
             .exec(async (err: any, event: any) => {
                 if (err) {
@@ -188,20 +180,20 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
                 await event.save();
                 res.status(200).json({ message: 'Event deleted successfully' });
             });
-        } catch (err) {
-            return next(new Error('Could not delete event: ' + err));
-        }
-
-        res.json({
-            message: 'Event deleted successfully',
-        })
+    } catch (err) {
+        return next(new Error('Could not delete event: ' + err));
     }
 
-    const updateVpoints = async (req: Request, res: Response, next: NextFunction) => {
-        const { userId, vpoints } = req.body;
+    res.json({
+        message: 'Event deleted successfully',
+    })
+}
 
-        try {
-            User
+const updateVpoints = async (req: Request, res: Response, next: NextFunction) => {
+    const { userId, vpoints } = req.body;
+
+    try {
+        User
             .findById(userId)
             .exec(async (err: any, user: any) => {
                 if (err) {
@@ -220,20 +212,20 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
                 }
                 res.status(200).json(modifiedUser);
             });
-        } catch (err) {
-            return next(new Error('Could not update vpoints: ' + err));
-        }
+    } catch (err) {
+        return next(new Error('Could not update vpoints: ' + err));
     }
+}
 
-    const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
-        const { eventId } = req.body;
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            console.log(errors);
-            return res.status(401).send({ message: 'Invalid fields sent' });
-        }
-        try {
-            Event
+const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
+    const { eventId } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
+        return res.status(401).send({ message: 'Invalid fields sent' });
+    }
+    try {
+        Event
             .findById(eventId)
             .exec(async (err: any, event: any) => {
                 if (err) {
@@ -246,21 +238,21 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
                 await event.save();
                 res.status(200).json({ message: 'Event deleted successfully' });
             });
-        } catch (err) {
-            return next(new Error('Could not delete event: ' + err));
-        }
-
-        res.json({
-            message: 'Event deleted successfully',
-        })
+    } catch (err) {
+        return next(new Error('Could not delete event: ' + err));
     }
 
-    export default {
-        getEventsByCreator,
-        fetchEventData,
-        createEvent,
-        joinEvent,
-        archiveEvent,
-        updateVpoints,
-        deleteEvent,
-    }
+    res.json({
+        message: 'Event deleted successfully',
+    })
+}
+
+export default {
+    getEventsByCreator,
+    fetchEventData,
+    createEvent,
+    joinEvent,
+    archiveEvent,
+    updateVpoints,
+    deleteEvent,
+}

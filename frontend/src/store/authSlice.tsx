@@ -104,7 +104,7 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.isAuthenticated = true;
                 state.user = action.payload.user;
-                state.isAdmin = action.payload.user && action.payload.user.role === "admin";
+                state.isAdmin = action.payload.user.role === "admin";
             })
             .addCase(register.rejected, (state, action) => {
                 state.loading = false;
@@ -139,6 +139,7 @@ const authSlice = createSlice({
             .addCase(logout.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = false;
+                state.isAdmin = false;
                 state.user = null;
             })
             .addCase(logout.rejected, (state, action) => {
