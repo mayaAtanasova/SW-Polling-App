@@ -28,6 +28,7 @@ const AdminDashboard = ({ socket }: componentProps) => {
 
   useEffect(() => {
     if (!socket) return;
+    
     if (loggedInChat && !title) {
       const title = localStorage.getItem('eventTitle');
       socket.emit('joinEvent', { userId, displayName, title });
