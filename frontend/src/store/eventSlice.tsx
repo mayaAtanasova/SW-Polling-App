@@ -15,7 +15,7 @@ const emptyEvent: IEvent = {
     host:'',
     attendees: [],
     messages: [],
-    voted:[],
+    polls:[],
 }
 const event: IEvent = emptyEvent;
 
@@ -75,7 +75,6 @@ const initialState = {
     eventId,
     event,
     loggedInChat: !!eventId,
-    voted: false,
     loading: false,
 }
 
@@ -86,8 +85,12 @@ const eventSlice = createSlice({
         setEventId: (state, action) => {
             state.eventId = action.payload;
         },
-        setVoted: (state, action) => {
-            state.voted = action.payload;
+        setVote: (state, action) => {
+            const pollId=action.payload.currentPollId;
+            const selectedPoll= state.event.polls.find(poll => poll._id === pollId);
+            if(selectedPoll) {
+                selectedPoll.votes.push(action.payload.userId);
+            }
         },
         setUserVPoints : (state, action) => {
             const user = action.payload;
@@ -133,5 +136,5 @@ const eventSlice = createSlice({
 });
 
 const { reducer, actions } = eventSlice;
-export const { setEventId, setVoted, setUserVPoints, clearEventData } = actions;
+export const { setEventId, setVote, setUserVPoints, clearEventData } = actions;
 export default reducer;

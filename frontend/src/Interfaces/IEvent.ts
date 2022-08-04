@@ -7,8 +7,7 @@ export interface IEvent {
     title: string;
     description: string;
     host: string;
-    polls?: IPoll[];
-    voted?: [];
+    polls: IPoll[];
     attendees: IUser[];
     messages: IMessage[];
 }

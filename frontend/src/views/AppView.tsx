@@ -9,14 +9,14 @@ import Profile from '../Pages/EventProfile/Profile';
 import { useMySelector } from '../hooks/useReduxHooks';
 
 import './AppView.css';
-import IRootState from '../Interfaces/IRootState';
+import { RootState } from '../store/store';
 
 const socketURL = process.env.REACT_APP_BAS_URL ?? 'http://localhost:4000'
 const socket = io(socketURL, { transports: ['websocket'] });
 
 const AppView = () => {
 
-  const { user, isAuthenticated } = useMySelector((state: IRootState) => state.auth);
+  const { user, isAuthenticated } = useMySelector((state: RootState) => state.auth);
   const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
   const [lastPong, setLastPong] = useState<string>('');
   const { id, displayName } = user!;

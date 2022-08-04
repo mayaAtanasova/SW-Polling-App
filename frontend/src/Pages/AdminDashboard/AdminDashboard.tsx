@@ -7,7 +7,7 @@ import EventsTab from '../../Components/AdminTabs/EventsTab/EventsTab';
 import PollsTab from '../../Components/AdminTabs/PollsTab/PollsTab';
 
 import styles from './AdminDashboard.module.css';
-import IRootState from '../../Interfaces/IRootState';
+import { RootState } from '../../store/store';
 import { fetchEvent } from '../../store/eventSlice';
 
 type componentProps = {
@@ -17,7 +17,7 @@ type componentProps = {
 const AdminDashboard = ({ socket }: componentProps) => {
 
   const dispatch = useMyDispatch();
-  const { loggedInChat, eventId, event } = useMySelector((state: IRootState) => state.event);
+  const { loggedInChat, eventId, event } = useMySelector((state: RootState) => state.event);
   const title = event?.title;
 
   const { user } = useMySelector(state => state.auth);

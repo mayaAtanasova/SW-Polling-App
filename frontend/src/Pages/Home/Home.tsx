@@ -8,7 +8,7 @@ import { joinEvent, fetchEvent, fetchMessages } from '../../store/eventSlice';
 import Welcome from '../../Components/Welcome/Welcome';
 import { Navigate } from 'react-router-dom';
 import Messages from '../../Components/Chat/Messages';
-import IRootState from '../../Interfaces/IRootState';
+import { RootState } from '../../store/store';
 import { IMessage } from '../../Interfaces/IMessage';
 import messageService from '../../services/messageService';
 import MessageInput from '../../Components/Chat/MessageInput';
@@ -21,8 +21,8 @@ type componentProps = {
 
 const Home = ({ socket }: componentProps) => {
 
-    const { user, isAuthenticated } = useMySelector((state: IRootState) => state.auth);
-    const { loading, loggedInChat, eventId, event } = useMySelector((state: IRootState) => state.event);
+    const { user, isAuthenticated } = useMySelector((state: RootState) => state.auth);
+    const { loading, loggedInChat, eventId, event } = useMySelector((state: RootState) => state.event);
     const userId = user?.id;
     const displayName = user?.displayName;
     const title = event?.title;
@@ -73,11 +73,13 @@ const Home = ({ socket }: componentProps) => {
             username: user.displayName!,
             date: new Date().toISOString(),
         }
-        console.log('new message: ' + newMessage.text);
         const sentMessage = await messageService.sendMessage(newMessage);
-        console.log(sentMessage);
-        console.log(socket);
         socket?.emit("chat message", userId, title);
+    }
+
+    //???????
+    const userVoted = (pollId:string) => {
+        socket?.emit("user voted", userId, title, pollId);
     }
 
     if (!user) {
@@ -105,7 +107,8 @@ const Home = ({ socket }: componentProps) => {
 
                     {isAuthenticated && loggedInChat && polls && polls.length > 0 &&
                         <div className={styles.pollsArea}>
-                            <Polls polls={polls} />
+                            <Polls polls={polls} 
+                            onVoteComplete={userVoted}/>
                         </div>}
                 </div>
         </div>

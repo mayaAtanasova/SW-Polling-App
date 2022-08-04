@@ -135,7 +135,7 @@ const getPollById = async (req: Request, res: Response, next: NextFunction) => {
                 },
                 {
                     path: 'votes',
-                    select: '_id option user',
+                    select: 'option user createdAt',
                     populate: {
                         path: 'user',
                         select: '_id displayName',
@@ -200,6 +200,7 @@ const voteInPoll = async (req: Request, res: Response, next: NextFunction) => {
     //send response
     res.status(200).json({
         message: 'User voted successfully',
+        vote: newVote,
     })
 }
 
