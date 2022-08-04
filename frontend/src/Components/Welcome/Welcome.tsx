@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { IUser } from '../../Interfaces/IUser'
+import { Link } from 'react-router-dom'
+import { IUser, IUserCompact } from '../../Interfaces/IUser'
 import styles from './Welcome.module.css'
 
 type welcomeComponentProps = {
-    user: IUser,
+    user: IUserCompact,
     isAuthenticated: boolean,
-    onJoinEvent: (title:string) => (event:any) => void,
+    onJoinEvent: (title: string) => (event: any) => void,
 }
 
 const Welcome = ({ user, isAuthenticated, onJoinEvent }: welcomeComponentProps) => {
@@ -21,15 +22,14 @@ const Welcome = ({ user, isAuthenticated, onJoinEvent }: welcomeComponentProps) 
             <div className={styles.welcomeText}>
 
                 <h1 className={styles.title}>Welcome to the StreamWorks Poll App</h1>
-                {!isAuthenticated && <p>Please log in to start using it</p>}
                 {isAuthenticated &&
                     <>
                         <p>You are logged in as <span>{user.displayName}</span></p>
                         <p>Please enter your event title to proceed:</p>
 
-                        <form 
-                        className={styles.joinForm} 
-                        onSubmit={onJoinEvent(title)}
+                        <form
+                            className={styles.joinForm}
+                            onSubmit={onJoinEvent(title)}
                         >
                             <input
                                 className={styles.formField}

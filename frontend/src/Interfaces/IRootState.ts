@@ -1,5 +1,5 @@
 import { IEvent } from "./IEvent";
-import { IUser } from "./IUser";
+import { IUser, IUserCompact } from "./IUser";
 
 export default interface IRootState {
     event: {
@@ -10,7 +10,7 @@ export default interface IRootState {
         loading: boolean,
     },
     auth: {
-        user: IUser | null,
+        user: IUserCompact | null,
         isAuthenticated: boolean,
         isAdmin: boolean | null,
         loading: boolean,

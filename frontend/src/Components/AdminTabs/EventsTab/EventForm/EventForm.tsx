@@ -14,7 +14,7 @@ const EventForm = ({ hideEventForm }: formProps) => {
 
     const [loading, setLoading] = useState(false);
     const { user } = useMySelector(state => state.auth);
-    const userId = user!.id;
+    const userId = user?.id;
 
     const [form, setForm] = useState({
         title: '',

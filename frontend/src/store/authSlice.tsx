@@ -3,15 +3,15 @@ import { setMessage } from "./messageSlice";
 import { clearEventData, setEventId } from "./eventSlice";
 
 import AuthService from "../services/authService";
-import { IUser } from "../Interfaces/IUser";
+import { IUser, IUserCompact } from "../Interfaces/IUser";
 import jwtDecoder from "../helpers/jwtDecoder";
 import { TokenResponse } from "@react-oauth/google";
 
-let user: IUser | null = null
-
-const tokenStr = localStorage.getItem("token");
-if (tokenStr) {
-    user = jwtDecoder(tokenStr);
+const emptyUser: IUserCompact = {
+    id: '',
+    email: '',
+    displayName: '',
+    vpoints: 0,
 }
 
 export const register = createAsyncThunk(
@@ -81,9 +81,9 @@ export const logout = createAsyncThunk(
 )
 
 const initialState = {
-    user,
-    isAuthenticated: !!user,
-    isAdmin: user && user.role === 'admin',
+    user: emptyUser,
+    isAuthenticated: false,
+    isAdmin: false,
     loading: false,
 };
 
@@ -93,6 +93,8 @@ const authSlice = createSlice({
     reducers: {
         setUser: (state, action) => {
             state.user = action.payload;
+            state.isAuthenticated = !!action.payload;
+            state.isAdmin = action.payload && action.payload.role === 'admin';
         }
     },
     extraReducers: (builder) => {
@@ -140,7 +142,7 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.isAuthenticated = false;
                 state.isAdmin = false;
-                state.user = null;
+                state.user = emptyUser;
             })
             .addCase(logout.rejected, (state, action) => {
                 state.loading = false;
@@ -148,5 +150,6 @@ const authSlice = createSlice({
     }
 });
 
-const { reducer } = authSlice;
+const { reducer, actions } = authSlice;
+export const { setUser } = actions;
 export default reducer;

@@ -1,7 +1,7 @@
 import { IVote } from "./IVote";
 
 export interface IPoll {
-    id?: string;
+    _id?: string;
     title: string;
     event: string;
     createdBy: string;

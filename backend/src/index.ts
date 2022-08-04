@@ -11,7 +11,8 @@ import {
     addUser,
     userJoinEvent,
     getCurrentUser,
-    userLeave,
+    userLeaveEvent,
+    userDisconnect,
     getEventUsers
 } from './utils/usersManager'
 import { msgRouter } from "./routes/message";
@@ -44,7 +45,7 @@ app.use('/events', eventRouter);
 app.use('/polls', pollsRouter);
 
 app.use('/', (req, res) => {
-    res.send('Hello World');
+    res.send({message: 'app is operational'});
 });
 
 //socket.io
@@ -62,12 +63,13 @@ io.sockets.on('connect', socket => {
 
     //new user appears
     socket.on('new user', (userId, displayName) => {
-        console.log(`${displayName} connected to the chat system`);
+        console.log(`${displayName} connected to the sw poll system`);
         const user = addUser(socket.id, userId, displayName);
     })
 
     //When user joins event
-    socket.on('joinEvent', async ({ userId, displayName, title }) => {
+    socket.on('join event', async ({ userId, displayName, title }) => {
+        console.log(`${displayName} joined ${title}`);
         const user = userJoinEvent(socket.id, userId, displayName, title);
         socket.join(user.eventTitle);
 
@@ -80,6 +82,7 @@ io.sockets.on('connect', socket => {
 
     //Listen for chat msgs
     socket.on('chat message', (userId, title) => {
+        console.log('received new message');
         const users = getEventUsers(title);
 
         //Broadcast to room to get data
@@ -88,10 +91,17 @@ io.sockets.on('connect', socket => {
         })
     });
 
+    //When user leaves event
+    socket.on('leave event', (userId, title) => {
+        console.log(`${userId} left ${title}`);
+        const user = userLeaveEvent(socket.id, title);
+        socket.leave(user.eventTitle);
+    });
+
     //Runs when client disconnects
     socket.on('disconnect', async () => {
         console.log(`user id ${socket.id} disconnected`);
-        const user = userLeave(socket.id);
+        const user = userDisconnect(socket.id);
         if (user) {
             const event = user.eventTitle;
 

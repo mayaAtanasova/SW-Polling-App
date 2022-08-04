@@ -1,11 +1,18 @@
-import { sign, SignOptions } from 'jsonwebtoken';
+import { sign, verify, SignOptions } from 'jsonwebtoken';
+
+interface JwtPayload {
+    id: string,
+    displayName: string,
+    role: string,
+    vpoints: number
+}
 
 export const issueJwt = (
-    id:string, 
-    displayName:string, 
-    role:string, 
-    vpoints:number
-    ) => {
+    id: string,
+    displayName: string,
+    role: string,
+    vpoints: number
+) => {
     const payload = {
         id,
         displayName,
@@ -17,3 +24,10 @@ export const issueJwt = (
     };
     return sign(payload, process.env.JWT_SECRET, options);
 };
+
+export const verifyJwt = (id: string, token: string) => {
+    const decodedToken = verify(token, process.env.JWT_SECRET);
+    if (typeof decodedToken !== 'string') {
+        return decodedToken.id === id;
+    }
+}

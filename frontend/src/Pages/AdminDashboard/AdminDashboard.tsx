@@ -33,7 +33,7 @@ const AdminDashboard = ({ socket }: componentProps) => {
       const title = localStorage.getItem('eventTitle');
       socket.emit('joinEvent', { userId, displayName, title });
     }
-  }, [socket]);
+  }, []);
 
   return (
     <div className={styles.dashboardWrapper}>

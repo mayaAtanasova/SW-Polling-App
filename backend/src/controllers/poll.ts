@@ -4,6 +4,7 @@ import { Event, User, Poll } from '../models';
 import PollInterface from '../interfaces/pollInterface';
 import { Vote } from '../models';
 import mongoose from 'mongoose';
+import UserInterface from 'src/interfaces/userInterface';
 
 const createPoll = async (req: Request, res: Response, next: NextFunction) => {
     const { type, title, userId, eventId, options } = req.body;
@@ -12,6 +13,18 @@ const createPoll = async (req: Request, res: Response, next: NextFunction) => {
         console.log(errors);
         return res.status(401).send({ message: 'Invalid fields sent' });
     }
+    //find event
+    let event;
+    try {
+        event = await Event.findById(eventId).populate('createdBy polls');
+    } catch (err) {
+        return next(new Error('Could not find event by id: ' + err));
+    }
+
+    // check if creator of poll is the creator of the event
+    if (event.createdBy._id.toString() !== userId) {
+        return next(new Error('You are not the creator of this event and cannot add polls'));
+    }
     const newPoll = new Poll({
         type,
         title,
@@ -19,13 +32,18 @@ const createPoll = async (req: Request, res: Response, next: NextFunction) => {
         createdBy: userId,
         options,
     });
-
+    //Transaction to both collections event and poll
     try {
-        await newPoll.save();
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await newPoll.save({ session: sess });
+        event.polls.push(newPoll);
+        await event.save({ session: sess });
+        await sess.commitTransaction();
     } catch (err) {
         return next(new Error('Could not create poll: ' + err));
     }
-
+    //Send response
     res.status(200).json({
         message: 'Poll created successfully',
         poll: newPoll,
@@ -69,7 +87,7 @@ const deletePoll = async (req: Request, res: Response, next: NextFunction) => {
     Poll.findById(pollId, (err: any, poll: any) => {
         if (err) {
             return next(new Error('Could not find poll: ' + err));
-        }   
+        }
         if (!poll) {
             return next(new Error('Poll not found'));
         }
@@ -104,41 +122,39 @@ const lockPoll = async (req: Request, res: Response, next: NextFunction) => {
         });
 }
 
-const getPollsByEvent = async (req: Request, res: Response, next: NextFunction) => {
-    const { eventId } = req.body;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        console.log(errors);
-        return res.status(401).send({ message: 'Invalid fields sent' });
-    }
+const getPollById = async (req: Request, res: Response, next: NextFunction) => {
+    const pollId = req.params.pollId;
+
     try {
-        Event
-            .findById(eventId)
-            .populate('polls votes')
-            .exec((err: any, event: any) => {
-                if (err) {
-                    return next(new Error('Could not find event: ' + err));
-                }
-                if (!event) {
-                    return next(new Error('Event not found'));
-                }
-                const polls = event.polls.map((poll: PollInterface) => {
-                    return {
-                        id: poll._id,
-                        type: poll.type,
-                        title: poll.title,
-                        options: poll.options,
-                        createdBy: poll.createdBy,
-                        createdAt: poll.createdAt,
-                        editedAt: poll.editedAt,
-                        votes: poll.votes,
+        Poll
+            .findById(pollId)
+            .populate([
+                {
+                    path: 'createdBy',
+                    select: '_id displayName',
+                },
+                {
+                    path: 'votes',
+                    select: '_id option user',
+                    populate: {
+                        path: 'user',
+                        select: '_id displayName',
                     }
-                });
-                return res.status(200).json({ polls, })
+                }
+            ])
+            .exec((err: any, poll: any) => {
+                if (err) {
+                    return next(new Error('Could not find poll: ' + err));
+                }
+                if (!poll) {
+                    return next(new Error('Poll not found'));
+                }
+                return res.status(200).json({ poll });
             })
     } catch (err) {
-        return next(new Error('Could not fetch polls: ' + err));
+        return next(new Error('Could not fetch poll: ' + err));
     }
+
 }
 
 const voteInPoll = async (req: Request, res: Response, next: NextFunction) => {
@@ -158,7 +174,7 @@ const voteInPoll = async (req: Request, res: Response, next: NextFunction) => {
     //check if user already voted
     const index = poll.votes.findIndex((vote: any) => vote._id.toString() === userId);
     if (index !== -1) {
-        return res.status(401).json({ message: `User ${poll.votes[index].displayName} already voted`});
+        return res.status(401).json({ message: `User ${poll.votes[index].displayName} already voted` });
     }
 
     //create vote
@@ -176,15 +192,15 @@ const voteInPoll = async (req: Request, res: Response, next: NextFunction) => {
         poll.votes.push(newVote);
         await poll.save({ session: sess });
         await sess.commitTransaction();
-        
-} catch (err) {
-    return next(new Error('DB transaction failed: ' + err));
-}
 
-//send response
-res.status(200).json({
-    message: 'User voted successfully',
-})
+    } catch (err) {
+        return next(new Error('DB transaction failed: ' + err));
+    }
+
+    //send response
+    res.status(200).json({
+        message: 'User voted successfully',
+    })
 }
 
 export default {
@@ -192,6 +208,6 @@ export default {
     editPoll,
     deletePoll,
     lockPoll,
-    getPollsByEvent,
+    getPollById,
     voteInPoll,
 }

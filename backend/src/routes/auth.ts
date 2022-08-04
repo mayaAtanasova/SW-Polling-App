@@ -17,3 +17,5 @@ authRouter.post('/login',
     auth.login);
 
 authRouter.post('/google', auth.googleLogin);
+
+authRouter.post('/verify', auth.verifyUser);

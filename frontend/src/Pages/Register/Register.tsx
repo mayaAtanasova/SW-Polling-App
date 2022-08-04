@@ -1,5 +1,5 @@
 import { FocusEventHandler, useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -31,6 +31,7 @@ const Register = () => {
     const { loading, isAuthenticated, isAdmin } = useMySelector((state: any) => state.auth);
     const { message } = useMySelector((state: any) => state.message);
     const dispatch = useMyDispatch();
+    const navigate = useNavigate();
 
     const {
         errors,
@@ -106,16 +107,11 @@ const Register = () => {
             .catch(error => {
                 console.error(error);
             })
+            navigate('/');
     };
 
-    if (isAuthenticated) {
-        if (isAdmin) {
-            return <Navigate to="/admin" />
-        }
-        return <Navigate to="/" />
-    }
-
     return (
+        <div className={styles.registerFormWrapper}>
         <form
             className={styles.form}
             onSubmit={onSubmitForm}
@@ -240,11 +236,13 @@ const Register = () => {
                     type="submit"
                     disabled={!formValid || loading}
                 >
-                    {!loading && <p>Register</p>}
-                    {loading && <p>...Loading</p>}
+                    {!loading && <span>Register</span>}
+                    {loading && <span>...Loading</span>}
                 </button>
+                <Link className={styles.altLink} to="/login">Already have a registration?</Link>
             </div>
         </form>
+        </div>
     );
 };
 

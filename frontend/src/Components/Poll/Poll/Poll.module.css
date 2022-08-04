@@ -1,0 +1,17 @@
+.pollItem {
+    width: 95%;
+    margin: 1rem;
+    padding: 1rem 2rem;
+    background-color: var(--color-light-transparent);
+    border-radius: 0.5rem;;
+
+    display: flex;
+    align-items:center;
+    justify-content: space-between;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.pollItem:hover {
+cursor: pointer;
+background-color: var(--color-dark-transparent);
+}

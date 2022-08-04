@@ -12,6 +12,7 @@ import IRootState from '../../Interfaces/IRootState';
 import { IMessage } from '../../Interfaces/IMessage';
 import messageService from '../../services/messageService';
 import MessageInput from '../../Components/Chat/MessageInput';
+import Polls from '../../Components/Poll/Polls/Polls';
 
 
 type componentProps = {
@@ -20,25 +21,26 @@ type componentProps = {
 
 const Home = ({ socket }: componentProps) => {
 
-    const dispatch = useMyDispatch();
-    const { user, isAuthenticated, isAdmin } = useMySelector((state: IRootState) => state.auth);
+    const { user, isAuthenticated } = useMySelector((state: IRootState) => state.auth);
     const { loading, loggedInChat, eventId, event } = useMySelector((state: IRootState) => state.event);
     const userId = user?.id;
     const displayName = user?.displayName;
     const title = event?.title;
     const messages = event?.messages;
+    const polls = event?.polls;
+
+    const dispatch = useMyDispatch();
 
     useEffect(() => {
         if (!socket) return;
-        socket.emit('new user', userId, displayName);
         socket.on('fetch messages', (title: string) => fetchEventMessages(title));
         socket.on('fetch event data', fetchEventData);
 
         if (loggedInChat && !title) {
             const title = localStorage.getItem('eventTitle');
-            socket.emit('joinEvent', { userId, displayName, title });
+            socket.emit('join event', { userId, displayName, title });
         }
-    }, [socket]);
+    }, []);
 
     const fetchEventData = () => {
         console.log('fetching event data');
@@ -52,9 +54,10 @@ const Home = ({ socket }: componentProps) => {
 
     const handleJoinEvent = (title: string) => async (event: any) => {
         event.preventDefault();
+        event.stopPropagation();
         if (userId) {
             await dispatch(joinEvent({ title, userId }));
-            socket?.emit('joinEvent', { userId, displayName, title });
+            socket?.emit('join event', { userId, displayName, title });
         }
         console.log('after emit event and user ' + displayName + ' ' + title);
     }
@@ -82,27 +85,30 @@ const Home = ({ socket }: componentProps) => {
     }
 
     return (
-        <>
-            <div className={styles.heroContainer}>
+        <div className={styles.homeContainer}>
                 <img src="/assets/hero_bkg.png" alt="" />
+
+                {isAuthenticated && !loggedInChat &&
+                    <Welcome
+                        user={user}
+                        isAuthenticated={isAuthenticated}
+                        onJoinEvent={handleJoinEvent}
+                    />}
+
                 <div className={styles.homeContainer}>
-
-                    {isAuthenticated && !loggedInChat &&
-                        <Welcome
-                            user={user}
-                            isAuthenticated={isAuthenticated}
-                            onJoinEvent={handleJoinEvent}
-                        />}
-
                     {isAuthenticated && loggedInChat && messages &&
                         <div className={styles.chatArea}>
                             <Messages messages={messages} />
                             <MessageInput onChatMessage={sendChatMessage} />
                         </div>
                     }
+
+                    {isAuthenticated && loggedInChat && polls && polls.length > 0 &&
+                        <div className={styles.pollsArea}>
+                            <Polls polls={polls} />
+                        </div>}
                 </div>
-            </div>
-        </>
+        </div>
     );
 };
 

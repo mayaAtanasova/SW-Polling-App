@@ -2,13 +2,13 @@ import { User } from '../models';
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import UserInterface from '../interfaces/userInterface';
-import { issueJwt } from '../utils/jwt';
+import { issueJwt, verifyJwt } from '../utils/jwt';
 import { validationResult } from 'express-validator';
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password, firstName, lastName, role } = req.body; //voting points to be added later
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
         console.log(errors);
         return res.status(401).send({ message: 'Invalid fields sent' });
     }
@@ -47,7 +47,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 const login = (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body; //voting points to be added later
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
         console.log(errors);
         return res.status(401).send({ message: 'Invalid fields sent' });
     }
@@ -61,7 +61,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
             res.status(401).send({ message: 'User not found' });
             return;
         }
-        if(!user.hashedp){
+        if (!user.hashedp) {
             res.status(401).send({ message: 'You are not registered, try a google sign-in.' });
             return;
         }
@@ -110,8 +110,33 @@ const googleLogin = async (req: Request, res: Response) => {
 
 };
 
+const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
+    const { id, token } = req.body;
+    // Find user with id
+    let user;
+    try {
+        user = await User.findById(id);
+    } catch (error) {
+        return next(new Error('Could not find user by id: ' + error));
+    }
+
+    // Verify Token
+    const tokenIsValid = verifyJwt(id, token);
+    if (!tokenIsValid) {
+        res.json({ message: 'Access denied, invalid token.', access: false });
+        return next();
+    }
+
+    // Send response
+    res.status(200).json({
+        message: 'Successful authorization.',
+        access: true
+    });
+}
+
 export default {
     register,
     login,
     googleLogin,
+    verifyUser
 }

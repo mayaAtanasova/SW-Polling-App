@@ -28,12 +28,16 @@ const userJoinEvent = (sid:string, uid: string, displayName:string, eventTitle:s
     }
     return user;
 };
+const userLeaveEvent = (sid:string, eventTitle:string) => {
+    const user = users.find(user => user.sid === sid);
+    return user;
+}
 
 const getCurrentUser = (sid:string) => {
     return users.find(user => user.sid === sid);
 };
 
-const userLeave = (sid:string) => {
+const userDisconnect = (sid:string) => {
     const index = users.findIndex(user => user.sid === sid);
     if (index !== -1) {
         return users.splice(index, 1)[0];
@@ -49,6 +53,7 @@ export {
     addUser,
     userJoinEvent,
     getCurrentUser,
-    userLeave,
+    userDisconnect,
+    userLeaveEvent,
     getEventUsers
 }

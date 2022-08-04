@@ -105,7 +105,6 @@ const eventSlice = createSlice({
             .addCase(joinEvent.fulfilled, (state, action) => {
                 state.loggedInChat = true;
                 state.eventId = action.payload.event.id;
-                state.event = action.payload.event;
                 state.loading = false;
             })
             .addCase(joinEvent.pending, (state, action) => {

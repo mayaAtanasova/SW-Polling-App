@@ -7,7 +7,6 @@ const api_url = 'http://localhost:4000/auth'
 
 
 const register = async (user: IUser) => {
-    console.log(user);
     try {
         const response = await fetch(api_url + '/register', {
             method: 'POST',
@@ -73,7 +72,7 @@ const login = async (user: { email: string, password: string }) => {
     }
 };
 
-const googleLogin = async (tokenResponse: TokenResponse): Promise<{ message: string; user: IUser }> => {
+const googleLogin = async (tokenResponse: TokenResponse): Promise<{ message: string; user: any }> => {
     try {
         const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
             headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
@@ -114,6 +113,31 @@ const googleLogin = async (tokenResponse: TokenResponse): Promise<{ message: str
     }
 };
 
+const verifyUser = async (id: string, token:string) => {
+    try {
+        const response = await fetch(api_url + '/verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id, token })
+        })
+        if (response.status !== 200) {
+            const errorData = await response.json();
+            throw new Error(errorData.message);
+        }
+        const data = await response.json();
+        return data;
+
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        throw new Error(message);
+    }
+}
+
 const logout = async () => {
     localStorage.clear();
 }
@@ -122,5 +146,6 @@ export default {
     register,
     login,
     googleLogin,
+    verifyUser,
     logout,
 }
