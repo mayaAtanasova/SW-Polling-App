@@ -172,9 +172,9 @@ const voteInPoll = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     //check if user already voted
-    const index = poll.votes.findIndex((vote: any) => vote._id.toString() === userId);
+    const index = poll.votes.findIndex((vote: any) => vote.user.toString() === userId);
     if (index !== -1) {
-        return res.status(401).json({ message: `User ${poll.votes[index].displayName} already voted` });
+        return res.status(401).json({ message: `User already voted` });
     }
 
     //create vote

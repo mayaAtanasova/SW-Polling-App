@@ -19,6 +19,7 @@ const Polls = ({ polls }: componentProps) => {
     const [currentPollId, setCurrentPollId] = useState('');
     const [selectedPoll, setSelectedPoll] = useState<IPoll | null>(null);
     const { user } = useMySelector(state => state.auth);
+    const [voting, setVoting] = useState(false);
     const userId = user?.id;
 
     const dispatch = useMyDispatch();
@@ -51,6 +52,7 @@ const Polls = ({ polls }: componentProps) => {
 
     //vote in selected poll
     const onVote = (option: string) => (ev:any) => {
+        setVoting(true);
         console.log(currentPollId, userId, option);
         pollsService.voteInPoll(currentPollId, userId, option)
         .then(() => {
@@ -63,6 +65,7 @@ const Polls = ({ polls }: componentProps) => {
         .finally(() => {
             setSelectedPoll(null);
             setCurrentPollId('');
+            setVoting(false);
         })
     }
 
