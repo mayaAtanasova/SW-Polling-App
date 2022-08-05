@@ -67,7 +67,7 @@ const PollDetails = ({ poll, onPollClose, onVote }: componentProps) => {
         const getRating = (id: number) => (ev: any) => {
             const curRating = id + 1;
             const curAnswer = curRating.toString();
-            setRating(rating);
+            setRating(curRating);
             setAnswer(curAnswer);
         }
 

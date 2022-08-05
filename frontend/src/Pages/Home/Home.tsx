@@ -80,6 +80,7 @@ const Home = ({ socket }: componentProps) => {
     //???????
     const userVoted = (pollId:string) => {
         socket?.emit("user voted", userId, title, pollId);
+        dispatch(fetchEvent(eventId!));
     }
 
     if (!user) {

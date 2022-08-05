@@ -6,12 +6,13 @@ import EventForm from './EventForm/EventForm';
 import { useMyDispatch, useMySelector } from '../../../hooks/useReduxHooks';
 
 import eventsService from '../../../services/eventService';
-import styles from './EventsTab.module.css';
 import { setMessage } from '../../../store/messageSlice';
 import EventCard from './EventCard/EventCard';
 import EventDetails from './EventDetails/EventDetails';
 import { IUserCompact } from '../../../Interfaces/IUser';
 import { IEventCompact } from '../../../Interfaces/IEvent';
+
+import styles from './EventsTab.module.css';
 
 type componentProps = {
     socket: Socket | null,
@@ -76,6 +77,7 @@ const EventsTab = ({ socket }:componentProps) => {
     const handleDetailViewClose = (eventId: string) => (ev: any) => {
         setCurrentEvent(null);
     }
+    
     const handleEditUser = (eventId: string) => (user: IUserCompact) => {
         const eventToModify = events.find((event: IEventCompact) => event.id === eventId);
         if (eventToModify) {
@@ -104,7 +106,7 @@ const EventsTab = ({ socket }:componentProps) => {
 
             <div className={styles.divider}></div>
 
-            <h2>Your events</h2>
+            <h2>You have created the following events</h2>
             <p>Click on active events for details</p>
             {!events && <p>You have no events yet.</p>}
             <div className={styles.eventsHolder}>

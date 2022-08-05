@@ -84,18 +84,22 @@ io.sockets.on('connect', socket => {
     socket.on('chat message', (userId, title) => {
         console.log('received new message');
         const users = getEventUsers(title);
+        console.log('current users are: ', users);
 
         //Broadcast to room to get data
         users.forEach(user => {
+            console.log('broadcasting order to fetch messages')
             io.to(user.sid).emit('fetch messages', title);
         })
     });
 
     //When user leaves event
     socket.on('leave event', (userId, title) => {
-        console.log(`${userId} left ${title}`);
-        const user = userLeaveEvent(socket.id, title);
-        socket.leave(user.eventTitle);
+        if (title) {
+            console.log(`${userId} left ${title}`);
+            const user = userLeaveEvent(socket.id, title);
+            socket.leave(user.eventTitle);
+        }
     });
 
     //Runs when client disconnects
