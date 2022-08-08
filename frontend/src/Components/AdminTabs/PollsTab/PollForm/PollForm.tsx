@@ -23,6 +23,9 @@ const pollTypes = {
 
 const PollForm = ({ hidePollForm }: formProps) => {
 
+  const [form, setForm] = useState<Form>({ title: '' });
+  const debouncedFormValue = useDebounce(form, 500);
+
   const [pollType, setPollType] = useState('');
   const [options, setOptions] = useState<string[]>([]);
 
@@ -30,11 +33,19 @@ const PollForm = ({ hidePollForm }: formProps) => {
   const { user } = useMySelector(state => state.auth);
   const userId = user?.id;
 
-  const [form, setForm] = useState<Form>({ title: '' });
-
   const [formValid, setFormValid] = useState(false);
 
   const pollValid = formValid && pollType !== '';
+
+  let {
+    errors,
+    validateForm,
+    onBlurField,
+  }: {
+    errors: IErrors,
+    validateForm: Function,
+    onBlurField: FocusEventHandler,
+  } = useLoginFormValidator(form);
 
   useEffect(() => {
     console.log(form);
@@ -43,6 +54,14 @@ const PollForm = ({ hidePollForm }: formProps) => {
   useEffect(() => {
     console.log(options);
   }, [options]);
+
+  useEffect(() => {
+    const { isFormValid } = validateForm({
+      form,
+      errors,
+    });
+    setFormValid(isFormValid);
+  }, [form]);
 
   const manageStateWithNewOptions = (newOptions: string[]) => {
     setOptions(newOptions);
@@ -67,35 +86,68 @@ const PollForm = ({ hidePollForm }: formProps) => {
       const newOptions = [...options];
       newOptions[index] = value;
       manageStateWithNewOptions(newOptions);
+      errors[field].dirty = true;
+      return;
     }
 
     const nextFormState = {
       ...form,
       [field]: value,
     };
+    errors[field].dirty = true;
     setForm(nextFormState);
   };
 
-  const onValidateField = () => {
+  useEffect(() => {
+    console.log(debouncedFormValue);
+    onValidateField();
+  }, [debouncedFormValue]);
 
+  const onValidateField = () => {
+    const { isFormValid } =
+      validateForm({
+        form,
+        errors,
+      });
+    setFormValid(isFormValid);
   };
 
-  const onBlurField = () => { };
+  const onSubmitForm = (e: any) => { 
+    e.preventDefault();
 
-  const onSubmitForm = (e: any) => { };
+    const { isFormValid } =
+      validateForm({
+        form,
+        errors,
+      });
+    setFormValid(isFormValid);
+    console.log(form.title, options);
+  };
 
   //poll type handling
 
   const handleSetMCPoll = (ev: any) => {
     ev.preventDefault();
     setPollType(pollTypes.mc);
-    setOptions(options => [''])
+    setOptions(options => ['']);
+    errors.option0 = {
+        dirty: false,
+        error: false,
+        message: '',
+      };
   }
 
-  const handleMCOptionAdd = (ev: any) => {
+  const handleMCOptionAdd = (index:number) => (ev: any) => {
     ev.preventDefault();
-    const newOptions = [...options, ''];
+    const newOptions = [...options];
+    newOptions.splice(index+1, 0, '');
     manageStateWithNewOptions(newOptions);
+    const optionName = `option${newOptions.length - 1}`;
+    errors[optionName] = {
+      dirty: false,
+      error: false,
+      message: '',
+    };
   }
 
   const handleMCOptionRemove = (index: number) => (ev: any) => {
@@ -103,6 +155,7 @@ const PollForm = ({ hidePollForm }: formProps) => {
     const newOptions = [...options];
     newOptions.splice(index, 1);
     manageStateWithNewOptions(newOptions);
+    errors = { ...errors };
   }
 
   return (
@@ -170,6 +223,7 @@ const PollForm = ({ hidePollForm }: formProps) => {
                   index={index}
                   name={`option${index}`}
                   value={option}
+                  errors={errors}
                   onUpdateField={onUpdateField}
                   onBlurField={onBlurField}
                   onMcOptionAdd={handleMCOptionAdd}

@@ -10,9 +10,10 @@ type componentProps = {
     name: string,
     index: number,
     value: string,
+    errors: IErrors,
     onUpdateField: (e: any) => void,
     onBlurField: FocusEventHandler,
-    onMcOptionAdd: (ev: any) => void,
+    onMcOptionAdd: (index:number) => (ev: any) => void,
     onMcOptionRemove: (index: number) => (ev: any) => void,
 }
 
@@ -20,14 +21,15 @@ const PollOptionInput = ({
     name,
     index,
     value,
+    errors,
     onUpdateField,
     onBlurField,
     onMcOptionAdd,
     onMcOptionRemove }: componentProps) => {
 
-    // useEffect(() => {
-    //     console.log(name);
-    // }, [])
+    useEffect(() => {
+        console.log(name);
+    }, [])
     const [option, setOption] = React.useState('');
     return (
         <div className={styles.formOptionGroup}>
@@ -44,10 +46,10 @@ const PollOptionInput = ({
 
                 <label className={styles.formLabel}>Type an option</label>
                 <input
-                    // className={clsx(
-                    //     styles.formField,
-                    //     errors[name].dirty && errors[name].error && styles.formFieldError,
-                    // )}
+                    className={clsx(
+                        styles.formField,
+                        errors[name].dirty && errors[name].error && styles.formFieldError,
+                    )}
                     type="text"
                     aria-label='Option field'
                     name={name}
@@ -55,14 +57,14 @@ const PollOptionInput = ({
                     onChange={onUpdateField}
                     onBlur={onBlurField}
                 />
-                {/* {errors.option.dirty && errors.option.error
+                {errors[name].dirty && errors[name].error
                 ? (<p className={styles.formFieldErrorMessage}>{errors[name].message}</p>)
-                : null} */}
+                : null}
             </div>
 
             <button 
             type="button" 
-            onClick={ onMcOptionAdd }
+            onClick={ onMcOptionAdd(index) }
             className={styles.inputARButton}
             >
                 <FontAwesomeIcon icon={faPlusCircle}/>

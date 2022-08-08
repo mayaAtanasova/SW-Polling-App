@@ -46,14 +46,13 @@ export const useLoginFormValidator = (form: IForm) => {
         'title': nameValidator,
         'description': nameValidator,
         'type': nameValidator,
-        'option': nameValidator,
     });
 
 
     const validateForm = ({ form, errors, forceTouchErrors }: { form: IForm, errors: IErrors, forceTouchErrors: boolean }) => {
 
         //create a deep copy of the errors object
-        let nextErrors:IErrors = JSON.parse(JSON.stringify(errors));
+        let nextErrors: IErrors = JSON.parse(JSON.stringify(errors));
 
         //force validate all the fields on submit form
         if (forceTouchErrors) {
@@ -63,10 +62,15 @@ export const useLoginFormValidator = (form: IForm) => {
         fieldNames.forEach(fieldName => {
             const fieldValue = form[fieldName];
             if (nextErrors[fieldName].dirty) {
-                const error = validatorsDict[fieldName](fieldValue, form.password);
-                nextErrors[fieldName].error = !!error;
-                nextErrors[fieldName].message = error;
-            };
+                let error;
+                if (fieldName in validatorsDict) {
+                    error = validatorsDict[fieldName](fieldValue, form.password);
+                } else {
+                    error = nameValidator(fieldValue);
+                }
+                    nextErrors[fieldName].error = !!error;
+                    nextErrors[fieldName].message = error;
+            }
         });
         const formErrors = Object.values(nextErrors);
         const isFormValid = formErrors.every(error => error.dirty) && formErrors.every(field => !field.error);
