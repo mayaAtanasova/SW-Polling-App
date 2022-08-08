@@ -18,9 +18,9 @@ const PollDetails = ({ poll, onDetailsClose }: componentProps) => {
         <div className={styles.pollDetailsTitle}>
           <h2>{poll.title}</h2>
         </div>
-        <div className={styles.eventDetailsDescription}>
-          <h4>Event: {poll.event.title}</h4>
-          <h4>Type: {poll.type}</h4>
+        <div className={styles.pollDetailsDescription}>
+          <h4>In event: <span>{poll.event.title}</span></h4>
+          <h4>Poll type: <span>{poll.type}</span></h4>
         </div>
         <p>Created by: <span>{poll.createdBy.displayName}</span></p>
         <p>Created on: <span>{moment(poll.createdAt).format('DD.MM.YYYY')}</span></p>

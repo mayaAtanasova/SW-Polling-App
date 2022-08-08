@@ -13,8 +13,13 @@ type componentProps = {
     errors: IErrors,
     onUpdateField: (e: any) => void,
     onBlurField: FocusEventHandler,
+<<<<<<< HEAD
     onMcOptionAdd: (index:string) => (ev: any) => void,
     onMcOptionRemove: (index: string) => (ev: any) => void,
+=======
+    onMcOptionAdd: (index:number) => (ev: any) => void,
+    onMcOptionRemove: (index: number) => (ev: any) => void,
+>>>>>>> 91d2995baddd80986e6fd892f4d5e5501484bbe6
 }
 
 const PollOptionInput = ({

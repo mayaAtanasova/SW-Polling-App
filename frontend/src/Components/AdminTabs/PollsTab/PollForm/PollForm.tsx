@@ -119,6 +119,7 @@ const PollForm = ({ hidePollForm }: formProps) => {
     setFormValid(isFormValid);
   };
 
+
   const onSubmitForm = (e: any) => {
     e.preventDefault();
     setLoading(true);

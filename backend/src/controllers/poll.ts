@@ -175,7 +175,7 @@ const getPollsByCreator = async (req: Request, res: Response, next: NextFunction
                     select: 'option user createdAt',
                     populate: {
                         path: 'user',
-                        select: '_id displayName',
+                        select: '_id displayName vpoints',
                     }
                 }
             ])
