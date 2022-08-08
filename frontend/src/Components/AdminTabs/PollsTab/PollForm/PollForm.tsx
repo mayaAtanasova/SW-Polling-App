@@ -44,7 +44,21 @@ const PollForm = ({ hidePollForm }: formProps) => {
     console.log(options);
   }, [options]);
 
-  const onUpdateField = (ev: any) => { 
+  const manageStateWithNewOptions = (newOptions: string[]) => {
+    setOptions(newOptions);
+    const title = form.title;
+    const mappedOptions = newOptions.reduce((acc: any, curr, i) => {
+      acc[`option${i}`] = curr;
+      return acc;
+    }, {});
+    const nextFormState = {
+      title,
+      ...mappedOptions,
+    };
+    setForm(nextFormState);
+  }
+
+  const onUpdateField = (ev: any) => {
     const field = ev.target.name;
     const value = ev.target.value;
 
@@ -52,17 +66,7 @@ const PollForm = ({ hidePollForm }: formProps) => {
       const index = Number(field.slice(6));
       const newOptions = [...options];
       newOptions[index] = value;
-      setOptions(newOptions);
-      const title = form.title;
-      const mappedOptions = newOptions.reduce((acc:any, curr, i) => {
-        acc[`option${i}`] = curr;
-        return acc;
-      } , {});
-      const nextFormState = {
-        title,
-        ...mappedOptions,
-      };
-      setForm(nextFormState);
+      manageStateWithNewOptions(newOptions);
     }
 
     const nextFormState = {
@@ -91,39 +95,14 @@ const PollForm = ({ hidePollForm }: formProps) => {
   const handleMCOptionAdd = (ev: any) => {
     ev.preventDefault();
     const newOptions = [...options, ''];
-    setOptions(newOptions);
-
-    const title = form.title;
-    const mappedOptions = newOptions.reduce((acc:any, curr, i) => {
-      acc[`option${i}`] = curr;
-      return acc;
-    } , {});
-    console.log(mappedOptions);
-    const newFormState = {
-      title,
-      ...mappedOptions,
-    }
-    setForm(newFormState);
-    console.log(newFormState);
+    manageStateWithNewOptions(newOptions);
   }
 
-  const handleMCOptionRemove = (index:number) => (ev: any) => {
+  const handleMCOptionRemove = (index: number) => (ev: any) => {
     ev.preventDefault();
     const newOptions = [...options];
     newOptions.splice(index, 1);
-    setOptions(newOptions);
-
-    const title = form.title;
-    const mappedOptions = newOptions.reduce((acc:any, curr, i) => {
-      acc[`option${i}`] = curr;
-      return acc;
-    } , {});
-    console.log(mappedOptions);
-    const newFormState = {
-      title,
-      ...mappedOptions,
-    }
-    console.log(newFormState);
+    manageStateWithNewOptions(newOptions);
   }
 
   return (
@@ -185,17 +164,17 @@ const PollForm = ({ hidePollForm }: formProps) => {
         <div className={styles.optionGroup}>
           {pollType === pollTypes.mc && options.length > 0 &&
             options
-              .map((option: string, index: number) => 
-              <PollOptionInput
-              key={index}
-              index={index}
-              name={`option${index}`}
-              value={option}
-              onUpdateField={onUpdateField}
-              onBlurField={onBlurField}
-              onMcOptionAdd={handleMCOptionAdd}
-              onMcOptionRemove={handleMCOptionRemove}
-              />
+              .map((option: string, index: number) =>
+                <PollOptionInput
+                  key={index}
+                  index={index}
+                  name={`option${index}`}
+                  value={option}
+                  onUpdateField={onUpdateField}
+                  onBlurField={onBlurField}
+                  onMcOptionAdd={handleMCOptionAdd}
+                  onMcOptionRemove={handleMCOptionRemove}
+                />
               )
           }
         </div>
