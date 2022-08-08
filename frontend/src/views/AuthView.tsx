@@ -28,6 +28,7 @@ const AuthView = () => {
         let response;
         try {
             response = await authService.verifyUser(id, token);
+            console.log(response);
         } catch (err: any) {
             console.log('error verifying user' + err);
             return;

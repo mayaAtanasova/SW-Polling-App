@@ -10,6 +10,8 @@
   }
   
   .formTitle {
+    width: 80%;
+    margin: 0 auto;
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: 1rem;
@@ -104,7 +106,6 @@
   .formActions {
     text-align: center;
     display: flex;
-    flex-direction: column;
     justify-content: center;
   }
   
@@ -142,7 +143,7 @@
   
   .formSubmitBtn {
     min-width: 5rem;
-    width: 100%;
+    width: 65%;
     background-color: var(--color-accent);
     color: white;
     text-transform: uppercase;
@@ -168,7 +169,7 @@
 
   .formCancelBtn {
     min-width: 5rem;
-    width: 100%;
+    width: 33%;
     background-color: #e11d48;
     color: white;
     text-transform: uppercase;

@@ -123,8 +123,7 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
     // Verify Token
     const tokenIsValid = verifyJwt(id, token);
     if (!tokenIsValid) {
-        res.json({ message: 'Access denied, invalid token.', access: false });
-        return next();
+        return res.json({ message: 'Access denied, invalid token.', access: false });
     }
 
     // Send response

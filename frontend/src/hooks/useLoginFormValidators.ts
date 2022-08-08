@@ -19,6 +19,7 @@ const touchErrors = (errors: IErrors): IErrors => {
 };
 
 export const useLoginFormValidator = (form: IForm) => {
+    console.log(form);
 
     const fieldNames = Object.keys(form);
 
@@ -30,6 +31,9 @@ export const useLoginFormValidator = (form: IForm) => {
             message: '',
         },
     }), {});
+    const [errors, setErrors] = useState(initialState);
+    console.log(initialState);
+    console.log(errors)
 
     const validatorsDict: {
         [key: string]: Function,
@@ -42,9 +46,9 @@ export const useLoginFormValidator = (form: IForm) => {
         'title': nameValidator,
         'description': nameValidator,
         'type': nameValidator,
+        'option': nameValidator,
     });
 
-    const [errors, setErrors] = useState(initialState);
 
     const validateForm = ({ form, errors, forceTouchErrors }: { form: IForm, errors: IErrors, forceTouchErrors: boolean }) => {
 

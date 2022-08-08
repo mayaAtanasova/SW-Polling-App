@@ -12,6 +12,7 @@ import { IPoll } from '../../../Interfaces/IPoll';
 import styles from './PollsTab.module.css';
 import PollCard from './PollCard/PollCard';
 import PollDetails from './PollDetails/PollDetails';
+import PollForm from './PollForm/PollForm';
 
 type componentProps = {
   socket: Socket | null,
@@ -62,11 +63,14 @@ const hidePollForm = () => {
 
       <div className={styles.newButtonHolder}>
 
-        <LargeButton
+        {!showPollForm && <LargeButton
           text="create new poll"
-          onClick={() => console.log('create poll')}
-        />
+          onClick={revealPollForm}
+        />}
       </div>
+
+      {showPollForm && <PollForm hidePollForm={hidePollForm} />}
+
 
       <div className={styles.divider}></div>
 

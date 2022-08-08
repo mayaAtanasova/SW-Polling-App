@@ -26,8 +26,14 @@ export const issueJwt = (
 };
 
 export const verifyJwt = (id: string, token: string) => {
+    try{
     const decodedToken = verify(token, process.env.JWT_SECRET);
     if (typeof decodedToken !== 'string') {
         return decodedToken.id === id;
     }
+    } catch (err) {
+        console.log(err);
+        return false;
+    }
+
 }
