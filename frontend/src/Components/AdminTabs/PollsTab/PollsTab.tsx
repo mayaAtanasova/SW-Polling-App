@@ -5,14 +5,16 @@ import LargeButton from '../../UI/LargeButton/LargeButton';
 import { useMyDispatch, useMySelector } from '../../../hooks/useReduxHooks';
 
 import pollsService from '../../../services/pollsService';
+import eventsService from '../../../services/eventService';
 import { setMessage } from '../../../store/messageSlice';
 import { IUserCompact } from '../../../Interfaces/IUser';
-import { IPoll } from '../../../Interfaces/IPoll';
+import { IPoll, IPollCompact } from '../../../Interfaces/IPoll';
 
 import styles from './PollsTab.module.css';
 import PollCard from './PollCard/PollCard';
 import PollDetails from './PollDetails/PollDetails';
 import PollForm from './PollForm/PollForm';
+import { IEventCompact } from '../../../Interfaces/IEvent';
 
 type componentProps = {
   socket: Socket | null,
@@ -21,8 +23,9 @@ type componentProps = {
 const PollsTab = ({ socket }: componentProps) => {
   const [showPollForm, setShowPollForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [polls, setPolls] = useState<IPoll[]>([]);
-  const [currentPoll, setCurrentPoll] = useState<IPoll | null>();
+  const [polls, setPolls] = useState<IPollCompact[]>([]);
+  const [events, setEvents] = useState<IEventCompact[]>([]);
+  const [currentPoll, setCurrentPoll] = useState<IPollCompact | null>();
   const { user } = useMySelector(state => state.auth);
   const userId = user?.id;
 
@@ -30,9 +33,47 @@ const PollsTab = ({ socket }: componentProps) => {
 
   useEffect(() => {
     getCurrentPolls();
+    getAdminEvents();
   }, []);
 
-  const getCurrentPolls = () => { }
+  const getCurrentPolls = () => {
+    console.log('getting polls in polls tab')
+    if (userId) {
+        setLoading(true);
+        pollsService
+            .getPollsByCreator(userId)
+            .then((data) => {
+                if (data) {
+                    setPolls(data.polls);
+                    console.log(data.polls);
+                    setLoading(false);
+                }
+            })
+            .catch(err => {
+                dispatch(setMessage(err.message));
+                setLoading(false);
+            });
+    }
+  }
+
+  const getAdminEvents = () => {
+    console.log('getting events in polls tab')
+    if (userId) {
+        setLoading(true);
+        eventsService
+            .getEventsByCreator(userId)
+            .then((data) => {
+                if (data) {
+                    setEvents(data.events);
+                    setLoading(false);
+                }
+            })
+            .catch(err => {
+                dispatch(setMessage(err.message));
+                setLoading(false);
+            });
+    }
+};
 
   const revealPollForm = (event: any) => {
     event.preventDefault();

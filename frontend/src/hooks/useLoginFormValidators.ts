@@ -19,7 +19,6 @@ const touchErrors = (errors: IErrors): IErrors => {
 };
 
 export const useLoginFormValidator = (form: IForm) => {
-    console.log(form);
 
     const fieldNames = Object.keys(form);
 
@@ -32,8 +31,6 @@ export const useLoginFormValidator = (form: IForm) => {
         },
     }), {});
     const [errors, setErrors] = useState(initialState);
-    console.log(initialState);
-    console.log(errors)
 
     const validatorsDict: {
         [key: string]: Function,

@@ -5,6 +5,7 @@ import polls from '../controllers/poll';
 export const pollsRouter = Router();
 
 pollsRouter.get('/:pollId', polls.getPollById);
+pollsRouter.get('/creators/:userId', polls.getPollsByCreator);
 
 pollsRouter.post('/vote', 
 body('pollId').isLength({ min: 1 }).withMessage('PollId is required'),

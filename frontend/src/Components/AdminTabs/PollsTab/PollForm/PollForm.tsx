@@ -1,5 +1,6 @@
-import clsx from 'clsx';
 import { FocusEventHandler, useEffect, useState } from 'react';
+import clsx from 'clsx';
+import { idGenerator } from '../../../../helpers/idGenerator';
 import useDebounce from '../../../../hooks/useDebounce';
 import { useLoginFormValidator } from '../../../../hooks/useLoginFormValidators';
 import { useMySelector } from '../../../../hooks/useReduxHooks';
@@ -11,6 +12,11 @@ import styles from './PollForm.module.css';
 
 type formProps = {
   hidePollForm: (ev?: any) => void,
+}
+
+type Option = {
+  id: string,
+  value: string,
 }
 
 type Form = { [key: string]: string }
@@ -27,7 +33,7 @@ const PollForm = ({ hidePollForm }: formProps) => {
   const debouncedFormValue = useDebounce(form, 500);
 
   const [pollType, setPollType] = useState('');
-  const [options, setOptions] = useState<string[]>([]);
+  const [options, setOptions] = useState<Option[]>([]);
 
   const [loading, setLoading] = useState(false);
   const { user } = useMySelector(state => state.auth);
@@ -63,11 +69,11 @@ const PollForm = ({ hidePollForm }: formProps) => {
     setFormValid(isFormValid);
   }, [form]);
 
-  const manageStateWithNewOptions = (newOptions: string[]) => {
+  const manageStateWithNewOptions = (newOptions: Option[]) => {
     setOptions(newOptions);
     const title = form.title;
-    const mappedOptions = newOptions.reduce((acc: any, curr, i) => {
-      acc[`option${i}`] = curr;
+    const mappedOptions = newOptions.reduce((acc: any, curr,) => {
+      acc[`option${curr.id}`] = curr.value;
       return acc;
     }, {});
     const nextFormState = {
@@ -82,9 +88,10 @@ const PollForm = ({ hidePollForm }: formProps) => {
     const value = ev.target.value;
 
     if (field.includes('option')) {
-      const index = Number(field.slice(6));
+      const id = field.slice(6);
+      const index = options.findIndex(option => option.id === id);
       const newOptions = [...options];
-      newOptions[index] = value;
+      newOptions[index].value = value;
       manageStateWithNewOptions(newOptions);
       errors[field].dirty = true;
       return;
@@ -112,9 +119,9 @@ const PollForm = ({ hidePollForm }: formProps) => {
     setFormValid(isFormValid);
   };
 
-  const onSubmitForm = (e: any) => { 
+  const onSubmitForm = (e: any) => {
     e.preventDefault();
-
+    setLoading(true);
     const { isFormValid } =
       validateForm({
         form,
@@ -129,20 +136,24 @@ const PollForm = ({ hidePollForm }: formProps) => {
   const handleSetMCPoll = (ev: any) => {
     ev.preventDefault();
     setPollType(pollTypes.mc);
-    setOptions(options => ['']);
-    errors.option0 = {
-        dirty: false,
-        error: false,
-        message: '',
-      };
+    const newId = idGenerator();
+    setOptions(options => [...options, { id: newId, value: '' }]);
+
+    errors[`option${newId}`] = {
+      dirty: false,
+      error: false,
+      message: '',
+    };
   }
 
-  const handleMCOptionAdd = (index:number) => (ev: any) => {
+  const handleMCOptionAdd = (index: string) => (ev: any) => {
     ev.preventDefault();
     const newOptions = [...options];
-    newOptions.splice(index+1, 0, '');
+    const insertIndex = newOptions.findIndex(option => option.id === index);
+    const newId = idGenerator();
+    newOptions.splice(insertIndex + 1, 0, { id: newId, value: '' });
     manageStateWithNewOptions(newOptions);
-    const optionName = `option${newOptions.length - 1}`;
+    const optionName = `option${newId}`;
     errors[optionName] = {
       dirty: false,
       error: false,
@@ -150,12 +161,13 @@ const PollForm = ({ hidePollForm }: formProps) => {
     };
   }
 
-  const handleMCOptionRemove = (index: number) => (ev: any) => {
+  const handleMCOptionRemove = (index: string) => (ev: any) => {
     ev.preventDefault();
     const newOptions = [...options];
-    newOptions.splice(index, 1);
+    const spliceIndex = newOptions.findIndex(option => option.id === index);
+    newOptions.splice(spliceIndex, 1);
     manageStateWithNewOptions(newOptions);
-    errors = { ...errors };
+    // errors = { ...errors };
   }
 
   return (
@@ -177,6 +189,7 @@ const PollForm = ({ hidePollForm }: formProps) => {
           <input
             className={clsx(
               styles.formField,
+              errors.title.dirty && errors.title.error && styles.formFieldError,
             )}
             type="text"
             aria-label='Title field'
@@ -186,7 +199,9 @@ const PollForm = ({ hidePollForm }: formProps) => {
             onChange={onUpdateField}
             onBlur={onBlurField}
           />
-
+          {errors.title.dirty && errors.title.error
+            ? (<p className={styles.formFieldErrorMessage}>{errors.title.message}</p>)
+            : null}
         </div>
 
         <p className={styles.formInstructions}>Select a type for your poll</p>
@@ -217,12 +232,12 @@ const PollForm = ({ hidePollForm }: formProps) => {
         <div className={styles.optionGroup}>
           {pollType === pollTypes.mc && options.length > 0 &&
             options
-              .map((option: string, index: number) =>
+              .map((option: Option) =>
                 <PollOptionInput
-                  key={index}
-                  index={index}
-                  name={`option${index}`}
-                  value={option}
+                  key={option.id}
+                  index={option.id}
+                  name={`option${option.id}`}
+                  value={option.value}
                   errors={errors}
                   onUpdateField={onUpdateField}
                   onBlurField={onBlurField}

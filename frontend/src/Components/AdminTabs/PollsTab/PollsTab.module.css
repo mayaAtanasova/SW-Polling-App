@@ -28,6 +28,7 @@
     
     .pollsHolder {
         display: flex;
+        flex-wrap: wrap;
     }
     
     .newButtonHolder {

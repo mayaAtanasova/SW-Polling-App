@@ -124,7 +124,6 @@ const lockPoll = async (req: Request, res: Response, next: NextFunction) => {
 
 const getPollById = async (req: Request, res: Response, next: NextFunction) => {
     const pollId = req.params.pollId;
-
     try {
         Poll
             .findById(pollId)
@@ -154,7 +153,44 @@ const getPollById = async (req: Request, res: Response, next: NextFunction) => {
     } catch (err) {
         return next(new Error('Could not fetch poll: ' + err));
     }
+}
 
+const getPollsByCreator = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.userId;
+    console.log(userId);
+    try {
+        Poll
+            .find({ createdBy: userId })
+            .populate([
+                {
+                    path: 'createdBy',
+                    select: '_id displayName',
+                },
+                {
+                    path: 'event',
+                    select: '_id title',
+                },
+                {
+                    path: 'votes',
+                    select: 'option user createdAt',
+                    populate: {
+                        path: 'user',
+                        select: '_id displayName',
+                    }
+                }
+            ])
+            .exec((err: any, polls: any) => {
+                if (err) {
+                    return next(new Error('Could not find poll: ' + err));
+                }
+                if (!polls) {
+                    return next(new Error('Poll not found'));
+                }
+                return res.status(200).json({ polls });
+            })
+    } catch (err) {
+        return next(new Error('Could not fetch poll: ' + err));
+    }
 }
 
 const voteInPoll = async (req: Request, res: Response, next: NextFunction) => {
@@ -211,4 +247,5 @@ export default {
     lockPoll,
     getPollById,
     voteInPoll,
+    getPollsByCreator,
 }

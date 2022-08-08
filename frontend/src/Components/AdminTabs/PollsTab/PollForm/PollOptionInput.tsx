@@ -8,13 +8,13 @@ import styles from './PollForm.module.css';
 
 type componentProps = {
     name: string,
-    index: number,
+    index: string,
     value: string,
     errors: IErrors,
     onUpdateField: (e: any) => void,
     onBlurField: FocusEventHandler,
-    onMcOptionAdd: (index:number) => (ev: any) => void,
-    onMcOptionRemove: (index: number) => (ev: any) => void,
+    onMcOptionAdd: (index:string) => (ev: any) => void,
+    onMcOptionRemove: (index: string) => (ev: any) => void,
 }
 
 const PollOptionInput = ({
