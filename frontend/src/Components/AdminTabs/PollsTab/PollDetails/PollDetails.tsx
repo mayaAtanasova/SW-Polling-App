@@ -2,6 +2,7 @@
 import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
+import { useEffect } from 'react';
 import { IPoll, IPollCompact } from '../../../../Interfaces/IPoll';
 import styles from './PollDetails.module.css';
 
@@ -12,6 +13,11 @@ type componentProps = {
 }
 
 const PollDetails = ({ poll, onDetailsClose }: componentProps) => {
+  
+  useEffect (() => {
+    console.log('poll details', poll);
+    console.log(poll.votes[0]);
+  }, []) 
   return (
     <div className={styles.pollDetailsBkg} >
       <div className={styles.pollDetailsWrapper}>
@@ -28,13 +34,26 @@ const PollDetails = ({ poll, onDetailsClose }: componentProps) => {
         <div className={styles.divider}></div>
         <h3>Votes: </h3>
         {poll.votes.length < 1 && <h4>No one has voted yet.</h4>}
-        <div className={styles.attendeeTableWrapper}>
+        <div className={styles.voteTableWrapper}>
+          <table className={styles.votesTable}>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Vote</th>
+              <th>Vpoints</th>
+            </tr>
+          </thead>
+          <tbody>
           {poll.votes.length > 0 &&
             poll.votes.map((vote: any, index:number) => (
-            <div key={index}>
-              <p>{vote.user.displayName} - {vote.option}</p>
-            </div>
+            <tr key={index}>
+              <td>{vote.user.displayName}</td>
+              <td>{vote.option}</td>
+              <td>{vote.user.vpoints}</td>
+            </tr>
             ))}
+            </tbody>
+            </table>
         </div>
         <div className={styles.divider}></div>
         <button className={styles.closeBtn} onClick={onDetailsClose(poll._id)}>
