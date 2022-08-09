@@ -3,6 +3,7 @@ import { setMessage } from './messageSlice';
 
 import EventService from '../services/eventService';
 import MessageService from '../services/messageService'
+import PollService from '../services/pollsService';
 import { IEvent } from '../Interfaces/IEvent';
 import { IUser } from '../Interfaces/IUser';
 import jwtDecoder from "../helpers/jwtDecoder";
@@ -11,11 +12,11 @@ const eventId = localStorage.getItem("eventId");
 const emptyEvent: IEvent = {
     id: '',
     title: '',
-    description:'',
-    host:'',
+    description: '',
+    host: '',
     attendees: [],
     messages: [],
-    polls:[],
+    polls: [],
 }
 const event: IEvent = emptyEvent;
 
@@ -71,6 +72,25 @@ export const fetchMessages = createAsyncThunk(
         }
     });
 
+export const fetchPolls = createAsyncThunk(
+    "event/fetchPolls",
+    async (eventId: string, thunkAPI) => {
+        try {
+            const response = await PollService.getPollsByEvent(eventId);
+            console.log(response);
+            thunkAPI.dispatch(setMessage(response!.message))
+            return response!;
+        } catch (error: any) {
+            const message =
+                (error.response && error.response.data && error.response.data.message)
+                || error.message
+                || error.toString();
+            thunkAPI.dispatch(setMessage(message));
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
 const initialState = {
     eventId,
     event,
@@ -86,13 +106,13 @@ const eventSlice = createSlice({
             state.eventId = action.payload;
         },
         setVote: (state, action) => {
-            const pollId=action.payload.currentPollId;
-            const selectedPoll= state.event.polls.find(poll => poll._id === pollId);
-            if(selectedPoll) {
+            const pollId = action.payload.currentPollId;
+            const selectedPoll = state.event.polls.find(poll => poll._id === pollId);
+            if (selectedPoll) {
                 selectedPoll.votes.push(action.payload.userId);
             }
         },
-        setUserVPoints : (state, action) => {
+        setUserVPoints: (state, action) => {
             const user = action.payload;
             const userIndex = state.event.attendees.findIndex((attendee: IUser) => attendee.id === user.id);
             state.event.attendees[userIndex] = user;
@@ -130,6 +150,13 @@ const eventSlice = createSlice({
                 state.loading = false;
             })
             .addCase(fetchMessages.pending, (state, action) => {
+                state.loading = true;
+            })
+            .addCase(fetchPolls.fulfilled, (state, action) => {
+                state.event.polls = action.payload.polls;
+                state.loading = false;
+            })
+            .addCase(fetchPolls.pending, (state, action) => {
                 state.loading = true;
             })
     }

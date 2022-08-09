@@ -153,38 +153,6 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
             return res.status(200).json({ message: 'Event data fetched', event: modifiedEvent });
         });
 }
-const getPollsByEvent = async (req: Request, res: Response, next: NextFunction) => {
-    const event = req.params.eventId;
-
-    try {
-        Poll
-            .find({event})
-            .populate('createdBy votes')
-            .exec((err: any, polls: any) => {
-                if (err) {
-                    return next(new Error('Could not find event: ' + err));
-                }
-                if (!event) {
-                    return next(new Error('Event not found'));
-                }
-                const modifiedPolls = polls.map((poll: any) => {
-                    return {
-                        id: poll._id,
-                        type: poll.type,
-                        title: poll.title,
-                        options: poll.options,
-                        createdBy: poll.creator,
-                        createdAt: poll.createdAt,
-                        editedAt: poll.editedAt,
-                        votes: poll.votes,
-                    }
-                });
-                return res.status(200).json({ modifiedPolls })
-            })
-    } catch (err) {
-        return next(new Error('Could not fetch polls: ' + err));
-    }
-}
 
 const editEvent = async (req: Request, res: Response, next: NextFunction) => {
     const eventId = req.params.eventId;
@@ -295,7 +263,6 @@ const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
 
 export default {
     getEventsByCreator,
-    getPollsByEvent,
     fetchEventData,
     createEvent,
     joinEvent,

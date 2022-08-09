@@ -8,6 +8,7 @@ import UserInterface from 'src/interfaces/userInterface';
 
 const createPoll = async (req: Request, res: Response, next: NextFunction) => {
     const { type, title, userId, eventId, options } = req.body;
+    console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
@@ -192,6 +193,34 @@ const getPollsByCreator = async (req: Request, res: Response, next: NextFunction
         return next(new Error('Could not fetch poll: ' + err));
     }
 }
+const getPollsInEvent = async (req: Request, res: Response, next: NextFunction) => {
+    const event = req.params.eventId;
+
+    try {
+        Poll
+            .find({event})
+            .exec((err: any, polls: any) => {
+                if (err) {
+                    return next(new Error('Could not find event: ' + err));
+                }
+                if (!event) {
+                    return next(new Error('Event not found'));
+                }
+                const eventPolls = polls.map((poll: any) => {
+                    return {
+                        _id: poll._id,
+                        type: poll.type,
+                        title: poll.title,
+                        options: poll.options,
+                        votes: poll.votes,
+                    }
+                });
+                return res.status(200).json({ polls: eventPolls })
+            })
+    } catch (err) {
+        return next(new Error('Could not fetch polls: ' + err));
+    }
+}
 
 const voteInPoll = async (req: Request, res: Response, next: NextFunction) => {
     const { pollId, userId, option } = req.body;
@@ -248,4 +277,5 @@ export default {
     getPollById,
     voteInPoll,
     getPollsByCreator,
+    getPollsInEvent
 }

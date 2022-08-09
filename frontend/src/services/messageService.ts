@@ -39,7 +39,6 @@ const sendMessage = async (msg: IMessage) => {
             || error.toString();
         console.log(message);
     }
-
 }
 
 export default {

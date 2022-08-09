@@ -10,10 +10,10 @@
 }
 
 p.formInstructions {
-    margin: 0;
-    margin-bottom: 0.3rem;
-    padding: 0;
-    text-align: left;
+  margin: 0;
+  margin-bottom: 0.3rem;
+  padding: 0;
+  text-align: left;
 }
 
 .formTitle {
@@ -25,24 +25,24 @@ p.formInstructions {
   text-align: center;
 }
 .selectGroup {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 
   display: flex;
   gap: 1%;
 }
 
-.selectGroup button{
-    width: 32%;
-    background-color: var(--color-dark-transparent);
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0.5rem;
-    color: white;
-    font-size: 1rem;
+.selectGroup button {
+  width: 32%;
+  background-color: var(--color-dark-transparent);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  color: white;
+  font-size: 1rem;
 }
 
 button.typeSelected {
-    background-color: var(--color-light-transparent);
+  background-color: var(--color-light-transparent);
 }
 
 .formGroup {
@@ -50,10 +50,47 @@ button.typeSelected {
   flex-direction: column;
   margin-bottom: 1rem;
 }
+
 .formGroupError {
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
+}
+
+.selectInput {
+  position: relative;
+  margin: 0.5rem 0;
+}
+
+.selectInput select {
+  appearance: none;
+  background-color: white;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.selectInput select option:hover,
+.selectInput select option:focus,
+.selectInput select option:active {
+  width: 100%;
+  background-color: var(--color-light-transparent);
+}
+
+.selectInput::after{
+  position: absolute;
+  content: "";
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0.5rem;
+  width: 0.8rem;
+  height: 0.5rem;
+  background-color: var(--color-bkg);
+  clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+  z-index: 2;
 }
 
 .inputGroup {

@@ -4,7 +4,7 @@ import { Socket } from 'socket.io-client';
 import styles from './Home.module.css';
 
 import { useMySelector, useMyDispatch } from '../../hooks/useReduxHooks';
-import { joinEvent, fetchEvent, fetchMessages } from '../../store/eventSlice';
+import { joinEvent, fetchEvent, fetchMessages, fetchPolls } from '../../store/eventSlice';
 import Welcome from '../../Components/Welcome/Welcome';
 import { Navigate } from 'react-router-dom';
 import Messages from '../../Components/Chat/Messages';
@@ -22,12 +22,9 @@ type componentProps = {
 const Home = ({ socket }: componentProps) => {
 
     const { user, isAuthenticated } = useMySelector((state: RootState) => state.auth);
-    const { loading, loggedInChat, eventId, event } = useMySelector((state: RootState) => state.event);
+    const { loading, loggedInChat, eventId, event, event: { title, messages, polls} } = useMySelector((state: RootState) => state.event);
     const userId = user?.id;
     const displayName = user?.displayName;
-    const title = event?.title;
-    const messages = event?.messages;
-    const polls = event?.polls;
 
     const dispatch = useMyDispatch();
 
@@ -35,6 +32,7 @@ const Home = ({ socket }: componentProps) => {
         if (!socket) return;
         socket.on('fetch messages', (title: string) => fetchEventMessages(title));
         socket.on('fetch event data', fetchEventData);
+        socket.on('fetch polls', (title: string) => fetchEventPolls(title));
 
         if (loggedInChat && !title) {
             const title = localStorage.getItem('eventTitle');
@@ -50,6 +48,12 @@ const Home = ({ socket }: componentProps) => {
     const fetchEventMessages = (title: string) => {
         console.log('rcvd order to fetch messages');
         dispatch(fetchMessages(title));
+    }
+
+    const fetchEventPolls = (eventTitle: string) => {
+        console.log('rcvd order to fetch polls');
+        console.log(eventTitle, title);
+        dispatch(fetchPolls(eventId!));
     }
 
     const handleJoinEvent = (title: string) => async (event: any) => {

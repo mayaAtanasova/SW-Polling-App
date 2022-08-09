@@ -80,9 +80,14 @@ const PollsTab = ({ socket }: componentProps) => {
     setShowPollForm(true);
 }
 
-const hidePollForm = () => {
+const hidePollForm = (successfulPublish:boolean, eventId:string) => {
+  console.log('i should close the form');
   setShowPollForm(false);
-  getCurrentPolls();
+  if(successfulPublish){
+    const eventTitle = events.find((event: IEventCompact) => event.id === eventId)?.title;
+    socket?.emit('new poll published', eventTitle);
+    getCurrentPolls();
+  }
 }
 
   const selectPoll = (pollId: string) => (ev:any) => { 
@@ -110,7 +115,7 @@ const hidePollForm = () => {
         />}
       </div>
 
-      {showPollForm && <PollForm hidePollForm={hidePollForm} />}
+      {showPollForm && <PollForm hidePollForm={hidePollForm} events={events}/>}
 
 
       <div className={styles.divider}></div>

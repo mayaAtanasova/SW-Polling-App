@@ -9,9 +9,13 @@ import { IPoll } from '../../../../Interfaces/IPoll';
 import PollOptionInput from './PollOptionInput';
 
 import styles from './PollForm.module.css';
+import { IEventCompact } from '../../../../Interfaces/IEvent';
+import pollsService from '../../../../services/pollsService';
+import { Socket } from 'socket.io-client';
 
 type formProps = {
-  hidePollForm: (ev?: any) => void,
+  events: IEventCompact[];
+  hidePollForm: (successfulPublish: boolean, eventId: string) => void,
 }
 
 type Option = {
@@ -27,9 +31,10 @@ const pollTypes = {
   rating: 'rating',
 }
 
-const PollForm = ({ hidePollForm }: formProps) => {
+const PollForm = ({ events, hidePollForm }: formProps) => {
 
   const [form, setForm] = useState<Form>({ title: '' });
+  const [eventId, setEventId] = useState<string>('');
   const debouncedFormValue = useDebounce(form, 500);
 
   const [pollType, setPollType] = useState('');
@@ -41,7 +46,9 @@ const PollForm = ({ hidePollForm }: formProps) => {
 
   const [formValid, setFormValid] = useState(false);
 
-  const pollValid = formValid && pollType !== '';
+  const pollMCValid = pollType === 'multiple choice' ? options.length > 0 : true;
+
+  const pollValid = formValid && eventId !== '' && pollType !== '' && pollMCValid;
 
   let {
     errors,
@@ -52,14 +59,6 @@ const PollForm = ({ hidePollForm }: formProps) => {
     validateForm: Function,
     onBlurField: FocusEventHandler,
   } = useLoginFormValidator(form);
-
-  useEffect(() => {
-    console.log(form);
-  }, [form]);
-
-  useEffect(() => {
-    console.log(options);
-  }, [options]);
 
   useEffect(() => {
     const { isFormValid } = validateForm({
@@ -106,7 +105,6 @@ const PollForm = ({ hidePollForm }: formProps) => {
   };
 
   useEffect(() => {
-    console.log(debouncedFormValue);
     onValidateField();
   }, [debouncedFormValue]);
 
@@ -122,17 +120,41 @@ const PollForm = ({ hidePollForm }: formProps) => {
 
   const onSubmitForm = (e: any) => {
     e.preventDefault();
-    setLoading(true);
+
     const { isFormValid } =
       validateForm({
         form,
         errors,
       });
     setFormValid(isFormValid);
-    console.log(form.title, options);
+
+    setLoading(true);
+    if (userId && pollValid) {
+      const poll = {
+        title: form.title,
+        type: pollType,
+        options: options.map(option => option.value),
+        eventId,
+        userId,
+      };
+      console.log(poll);
+      pollsService
+        .createPoll(poll)
+        .then((data) => {
+          console.log(data);
+          hidePollForm(true, eventId);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.log(err);
+          setLoading(false);
+        });
+    }
+    // hidePollForm(false);
+    setLoading(false);
   };
 
-  //poll type handling
+  //poll setup handling
 
   const handleSetMCPoll = (ev: any) => {
     ev.preventDefault();
@@ -171,6 +193,11 @@ const PollForm = ({ hidePollForm }: formProps) => {
     // errors = { ...errors };
   }
 
+  const handleEventSelect = (ev: any) => {
+    const value = ev.target.value;
+    setEventId(value);
+  }
+
   return (
     <>
       <div className={styles.formTitle}>
@@ -184,7 +211,14 @@ const PollForm = ({ hidePollForm }: formProps) => {
         className={styles.form}
         onSubmit={onSubmitForm}
       >
-
+        <div className={styles.selectInput}>
+          <select value={eventId} name="eventSelect" onChange={handleEventSelect}>
+            <option value=''>Select an event for your poll</option>
+            {events.map(event => (
+              <option key={event.id} value={event.id}>{event.title}</option>
+            ))}
+          </select>
+        </div>
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>Type a question</label>
           <input
@@ -260,7 +294,7 @@ const PollForm = ({ hidePollForm }: formProps) => {
           </button>
           <button
             className={styles.formCancelBtn}
-            onClick={hidePollForm}
+            onClick={() => hidePollForm(false, eventId)}
           >
             Cancel
           </button>

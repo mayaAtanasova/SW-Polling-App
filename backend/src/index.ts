@@ -93,6 +93,19 @@ io.sockets.on('connect', socket => {
         })
     });
 
+    //Listen for new polls
+    socket.on('new poll published', title => {
+        console.log(`received new poll submission for event ${title}`);
+        const users = getEventUsers(title);
+        console.log('current users are: ', users);
+
+        //Broadcast to room to get data
+        users.forEach(user => {
+            console.log('broadcasting order to fetch polls')
+            io.to(user.sid).emit('fetch polls', title);
+        })
+    })
+
     //When user leaves event
     socket.on('leave event', (userId, title) => {
         if (title) {

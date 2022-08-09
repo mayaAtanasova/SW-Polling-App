@@ -23,6 +23,9 @@ const Polls = ({ polls, onVoteComplete }: componentProps) => {
 
     const dispatch = useMyDispatch();
 
+    useEffect(()=>{
+        console.log(polls)
+    }, []);
     //set the poll to be desplayed in detail view
     useEffect(() => {
         console.log(currentPollId);

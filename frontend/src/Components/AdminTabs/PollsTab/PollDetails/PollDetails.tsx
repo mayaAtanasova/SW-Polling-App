@@ -35,6 +35,7 @@ const PollDetails = ({ poll, onDetailsClose }: componentProps) => {
         <h3>Votes: </h3>
         {poll.votes.length < 1 && <h4>No one has voted yet.</h4>}
         <div className={styles.voteTableWrapper}>
+          {poll.votes.length > 0 &&
           <table className={styles.votesTable}>
           <thead>
             <tr>
@@ -44,8 +45,7 @@ const PollDetails = ({ poll, onDetailsClose }: componentProps) => {
             </tr>
           </thead>
           <tbody>
-          {poll.votes.length > 0 &&
-            poll.votes.map((vote: any, index:number) => (
+            {poll.votes.map((vote: any, index:number) => (
             <tr key={index}>
               <td>{vote.user.displayName}</td>
               <td>{vote.option}</td>
@@ -54,6 +54,7 @@ const PollDetails = ({ poll, onDetailsClose }: componentProps) => {
             ))}
             </tbody>
             </table>
+            }
         </div>
         <div className={styles.divider}></div>
         <button className={styles.closeBtn} onClick={onDetailsClose(poll._id)}>

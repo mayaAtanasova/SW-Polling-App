@@ -31,6 +31,24 @@ const getPollsByCreator = async (creatorId: string) => {
     }
 }
 
+const getPollsByEvent = async (eventId: string) => {
+    try {
+        const response = await fetch(`${pollsUrl}/events/${eventId}`);
+        const data = await response.json();
+        console.log(data);
+        return {
+            polls: data.polls,
+            message: 'Polls fetched successfully'
+        }
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.log(message);
+    }
+}
+
 const voteInPoll = async (pollId: string, userId: string, option: string) => {
     try {
         const response = await fetch(`${pollsUrl}/vote`, {
@@ -55,16 +73,14 @@ const voteInPoll = async (pollId: string, userId: string, option: string) => {
     }
 }
 
-const createPoll = async (poll: IPollCompact) => {
+const createPoll = async (poll: { type: string, title: string, userId: string, eventId: string, options: string[] }) => {
     try {
         const response = await fetch(`${pollsUrl}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                poll,
-            })
+            body: JSON.stringify(poll)
         })
         const data = await response.json();
         return data;
@@ -80,6 +96,7 @@ const createPoll = async (poll: IPollCompact) => {
 export default {
     getPollbyId,
     getPollsByCreator,
+    getPollsByEvent,
     voteInPoll,
     createPoll,
 }

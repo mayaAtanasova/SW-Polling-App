@@ -74,8 +74,8 @@ const EventForm = ({ hideEventForm }: formProps) => {
                 errors,
             });
         setFormValid(isFormValid);
-        setLoading(true)
-        console.log(form);
+
+        setLoading(true);
         if(userId){
             eventsService
             .createEvent({...form, userId})
@@ -92,7 +92,6 @@ const EventForm = ({ hideEventForm }: formProps) => {
             });
 
         }
-
         hideEventForm();
         setLoading(false);
 
