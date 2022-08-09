@@ -41,7 +41,13 @@ const sendMessage = async (msg: IMessage) => {
     }
 }
 
+const deleteMessage = async (messageId: string) => {}
+
+const answerMessage = async (messageId: number) => {}
+
 export default {
     fetchMessages,
-    sendMessage
+    sendMessage,
+    deleteMessage,
+    answerMessage,
 }

@@ -27,12 +27,10 @@ const PollDetails = ({ poll, onPollClose, onVote }: componentProps) => {
     }, [answer])
 
     const MCList = (options?: string[]) => {
-
         const selectOption = (option:string, id:number) => {
             setAnswer(option);
             setSelectedId(id);
         }
-
         if (options) {
             return (
             <div className={styles.mcOptionsWrapper}>
@@ -63,14 +61,12 @@ const PollDetails = ({ poll, onPollClose, onVote }: componentProps) => {
 
     const RatingList = () => {
         const [rating, setRating] = useState(1);
-
         const getRating = (id: number) => (ev: any) => {
             const curRating = id + 1;
             const curAnswer = curRating.toString();
             setRating(curRating);
             setAnswer(curAnswer);
         }
-
         return (
             <div className={styles.ratingList}>
                 {ratingArray.map((item: any, id: number) =>

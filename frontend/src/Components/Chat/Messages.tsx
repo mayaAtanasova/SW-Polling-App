@@ -7,9 +7,10 @@ import styles from "./Messages.module.css";
 
 type componentProps = {
   messages: IMessage[],
+  onDeleteButtonPressed: (id: string) => void,
 };
 
-const Messages = ({ messages }: componentProps) => {
+const Messages = ({ messages, onDeleteButtonPressed }: componentProps) => {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -29,7 +30,7 @@ const Messages = ({ messages }: componentProps) => {
         <div className={styles.messageArea}>
           {messages &&
             messages.map((message: any) => (
-              <Message key={message.id} message={message} />
+              <Message key={message.id} message={message} onDeleteButtonPressed={onDeleteButtonPressed}/>
             ))}
           <div ref={messagesEndRef}></div>
         </div>

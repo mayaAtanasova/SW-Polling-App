@@ -23,21 +23,21 @@ const Polls = ({ polls, onVoteComplete }: componentProps) => {
 
     const dispatch = useMyDispatch();
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(polls)
     }, []);
     //set the poll to be desplayed in detail view
     useEffect(() => {
         console.log(currentPollId);
-        if(currentPollId !== '') {
-        pollsService.getPollbyId(currentPollId)
-        .then(poll => {
-            setSelectedPoll(poll);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-    }
+        if (currentPollId !== '') {
+            pollsService.getPollbyId(currentPollId)
+                .then(poll => {
+                    setSelectedPoll(poll);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
     }, [currentPollId])
 
     //open detailed view of selected poll
@@ -53,49 +53,49 @@ const Polls = ({ polls, onVoteComplete }: componentProps) => {
     }
 
     //vote in selected poll
-    const onVote = (option: string) => (ev:any) => {
+    const onVote = (option: string) => (ev: any) => {
         console.log(currentPollId, userId, option);
         pollsService.voteInPoll(currentPollId, userId, option)
-        .then(() => {
-            const castVote = {currentPollId, userId, option};
-            dispatch(setVote(castVote));
-            onVoteComplete(currentPollId);
-        })
-        .catch((err) => {
-            console.log(err);
-        })
-        .finally(() => {
-            setSelectedPoll(null);
-            setCurrentPollId('');
-        })
+            .then(() => {
+                const castVote = { currentPollId, userId, option };
+                dispatch(setVote(castVote));
+                onVoteComplete(currentPollId);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+            .finally(() => {
+                setSelectedPoll(null);
+                setCurrentPollId('');
+            })
     }
 
     return (
         <>
-        <div className={styles.pollsContainer}>
-            <div className={styles.pollsHeading}>
-                <h4>EVENT POLLS</h4>
-            </div>
-            <div className={styles.pollsWrapper}>
-                <div className={styles.pollsArea}>
-                    {!polls && <h4>No polls are available for this event yet.</h4>}
-                    {polls && 
-                        <>
-                            <p>Click an active poll to vote</p>
+            <div className={styles.pollsContainer}>
+                <div className={styles.pollsHeading}>
+                    <h4>EVENT POLLS</h4>
+                </div>
+                <div className={styles.pollsWrapper}>
+                    <div className={styles.pollsArea}>
+                        {!polls && <h4>No polls are available for this event yet.</h4>}
+                        {polls &&
+                            <>
+                                <p>Click an active poll to vote</p>
 
-                            {polls.map((poll: any) => (
-                            <Poll 
-                            key={poll._id} 
-                            poll={poll} 
-                            onPollClicked={handlePollSelect}
-                            />
-                            ))}
-                        </>
-                    }
+                                {polls.map((poll: any) => (
+                                    <Poll
+                                        key={poll._id}
+                                        poll={poll}
+                                        onPollClicked={handlePollSelect}
+                                    />
+                                ))}
+                            </>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
-{selectedPoll && <PollDetails poll={selectedPoll} onVote={onVote}  onPollClose={onPollClose}/>}
+            {selectedPoll && <PollDetails poll={selectedPoll} onVote={onVote} onPollClose={onPollClose} />}
         </>
     )
 }

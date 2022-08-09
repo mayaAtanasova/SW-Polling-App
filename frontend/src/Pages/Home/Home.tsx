@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 
 import styles from './Home.module.css';
@@ -13,6 +13,7 @@ import { IMessage } from '../../Interfaces/IMessage';
 import messageService from '../../services/messageService';
 import MessageInput from '../../Components/Chat/MessageInput';
 import Polls from '../../Components/Poll/Polls/Polls';
+import ConfirmDialog from '../../Components/Shared/ConfirmDialog/ConfirmDialog';
 
 
 type componentProps = {
@@ -22,11 +23,14 @@ type componentProps = {
 const Home = ({ socket }: componentProps) => {
 
     const { user, isAuthenticated } = useMySelector((state: RootState) => state.auth);
-    const { loading, loggedInChat, eventId, event, event: { title, messages, polls} } = useMySelector((state: RootState) => state.event);
+    const { loading, loggedInChat, eventId, event, event: { title, messages, polls } } = useMySelector((state: RootState) => state.event);
     const userId = user?.id;
     const displayName = user?.displayName;
 
     const dispatch = useMyDispatch();
+
+    const [idToDetele, setIdToDelete] = useState('');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     useEffect(() => {
         if (!socket) return;
@@ -78,11 +82,28 @@ const Home = ({ socket }: componentProps) => {
             date: new Date().toISOString(),
         }
         const sentMessage = await messageService.sendMessage(newMessage);
-        socket?.emit("chat message", userId, title);
+        socket?.emit('chat message', userId, title);
+    }
+
+    const handleDeleteMessagePressed = (messageId: string) => {
+        if (!userId) return;
+        setIdToDelete(messageId);
+        setIsDialogOpen(true);
+    }
+
+    const onDialogClose = (answer: boolean) => {
+        if (answer) {
+            // messageService.deleteMessage(idToDetele);
+            console.log('should delete message ' + idToDetele);
+            // socket?.emit('chat message', userId, title)
+        } else {
+            setIdToDelete('');
+        }
+        setIsDialogOpen(false);
     }
 
     //???????
-    const userVoted = (pollId:string) => {
+    const userVoted = (pollId: string) => {
         socket?.emit("user voted", userId, title, pollId);
         dispatch(fetchEvent(eventId!));
     }
@@ -93,29 +114,31 @@ const Home = ({ socket }: componentProps) => {
 
     return (
         <div className={styles.homeContainer}>
-                <img src="/assets/hero_bkg.png" alt="" />
+            <img src="/assets/hero_bkg.png" alt="" />
 
-                {isAuthenticated && !loggedInChat &&
-                    <Welcome
-                        user={user}
-                        isAuthenticated={isAuthenticated}
-                        onJoinEvent={handleJoinEvent}
-                    />}
+            {isAuthenticated && !loggedInChat &&
+                <Welcome
+                    user={user}
+                    isAuthenticated={isAuthenticated}
+                    onJoinEvent={handleJoinEvent}
+                />}
 
-                <div className={styles.homeContainer}>
-                    {isAuthenticated && loggedInChat && messages &&
-                        <div className={styles.chatArea}>
-                            <Messages messages={messages} />
-                            <MessageInput onChatMessage={sendChatMessage} />
-                        </div>
-                    }
+            <div className={styles.homeContainer}>
+                {isAuthenticated && loggedInChat && messages &&
+                    <div className={styles.chatArea}>
+                        <Messages messages={messages} onDeleteButtonPressed={handleDeleteMessagePressed} />
+                        <MessageInput onChatMessage={sendChatMessage} />
+                    </div>
+                }
 
-                    {isAuthenticated && loggedInChat && polls && polls.length > 0 &&
-                        <div className={styles.pollsArea}>
-                            <Polls polls={polls} 
-                            onVoteComplete={userVoted}/>
-                        </div>}
-                </div>
+                {isAuthenticated && loggedInChat && polls && polls.length > 0 &&
+                    <div className={styles.pollsArea}>
+                        <Polls polls={polls}
+                            onVoteComplete={userVoted} />
+                    </div>}
+            </div>
+
+            {isDialogOpen && <ConfirmDialog itemType='message' onDialogClose={onDialogClose} />}
         </div>
     );
 };

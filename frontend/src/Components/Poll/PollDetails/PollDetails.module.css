@@ -63,13 +63,15 @@ width: 80%;
 
 .pollOptionItem:hover {
     cursor: pointer;
+    background-color: var(--color-dark-transparent);
 }
 
 .pollOptionItem p {
     margin: 0;
 }
 
-.selected {
+.selected,
+.selected:hover {
     background-color: var(--color-accent);
 }
 
