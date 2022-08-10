@@ -86,39 +86,40 @@
   background-color: var(--color-accent);
 }
 
-.voteTableWrapper {
-  padding: 1rem;
+.votesTableWrapper {
+  margin: 2rem;
   border-radius: 0.5rem 0.5rem 0 0;
   overflow: hidden;
 }
 
 .votesTable {
-    width: 100%;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .votesTable thead {
-    background-color: var(--color-accent);
-    color: var(--color-bkg-dark-transparent);
-    font-weight: 600;
-    font-size: 1rem;
-    text-align: center;
+  background-color: var(--color-accent);
+  color: var(--color-bkg-dark-transparent);
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
 }
 
 .votesTable thead th {
-    padding: 0.5rem;
+  padding: 0.5rem;
 }
 
 .votesTable tbody tr:nth-child(even) {
-    background-color: var(--color-dark-transparent);
+  background-color: var(--color-dark-transparent);
 }
 
 .votesTable tbody tr:nth-child(odd) {
-    background-color: var(--color-light-transparent);
+  background-color: var(--color-light-transparent);
 }
 
 .votesTable tbody td {
-    text-align: center;
-    padding: 0.5rem;
+  text-align: center;
+  padding: 0.5rem;
 }
 
 .closeBtn {

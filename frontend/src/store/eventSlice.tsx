@@ -105,13 +105,6 @@ const eventSlice = createSlice({
         setEventId: (state, action) => {
             state.eventId = action.payload;
         },
-        setVote: (state, action) => {
-            const pollId = action.payload.currentPollId;
-            const selectedPoll = state.event.polls.find(poll => poll._id === pollId);
-            if (selectedPoll) {
-                selectedPoll.votes.push(action.payload.userId);
-            }
-        },
         setUserVPoints: (state, action) => {
             const user = action.payload;
             const userIndex = state.event.attendees.findIndex((attendee: IUser) => attendee.id === user.id);
@@ -163,5 +156,5 @@ const eventSlice = createSlice({
 });
 
 const { reducer, actions } = eventSlice;
-export const { setEventId, setVote, setUserVPoints, clearEventData } = actions;
+export const { setEventId, setUserVPoints, clearEventData } = actions;
 export default reducer;

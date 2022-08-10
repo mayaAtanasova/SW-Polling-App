@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useMySelector, useMyDispatch } from "../../../hooks/useReduxHooks";
-import { setVote } from "../../../store/eventSlice";
 import { IPoll } from "../../../Interfaces/IPoll";
 import Poll from '../PollItem/PollItem';
 import pollsService from '../../../services/pollsService';
@@ -58,7 +57,6 @@ const Polls = ({ polls, onVoteComplete }: componentProps) => {
         pollsService.voteInPoll(currentPollId, userId, option)
             .then(() => {
                 const castVote = { currentPollId, userId, option };
-                dispatch(setVote(castVote));
                 onVoteComplete(currentPollId);
             })
             .catch((err) => {

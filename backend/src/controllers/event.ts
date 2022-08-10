@@ -13,7 +13,7 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
         .populate([
             {
                 path: 'polls',
-                select: '_id title votes',
+                select: '_id title type votes',
                 populate: {
                     path: 'votes',
                     select: 'option user createdAt',
@@ -114,7 +114,7 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
         .populate([
             {
                 path: 'polls',
-                select: '_id title votes',
+                select: '_id title type votes',
                 populate: {
                     path: 'votes',
                     select: 'option user createdAt',

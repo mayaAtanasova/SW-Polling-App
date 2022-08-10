@@ -110,9 +110,9 @@ gap: 1rem;
 }
 
 .closeBtn {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  position: fixed;
+  top: 6vh;
+  right: 10.5vw;
   font-size: 2rem;
   background-color: transparent;
   border: none;

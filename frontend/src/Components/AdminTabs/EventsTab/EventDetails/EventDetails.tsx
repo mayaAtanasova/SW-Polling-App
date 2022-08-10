@@ -6,6 +6,7 @@ import UsersTable from '../../../Shared/UsersTable/UsersTable';
 import { IUserCompact } from '../../../../Interfaces/IUser';
 import { IEventCompact } from '../../../../Interfaces/IEvent';
 import { useEffect, useState } from 'react';
+import EventPollsTable from '../EventPollsTable/EventPollsTable';
 
 type componentProps = {
     event: IEventCompact;
@@ -58,6 +59,11 @@ const EventDetails = ({ event, onDetailsClose, handleEditUser }: componentProps)
                 <div className={styles.divider}></div>
                 <h3>Polls:</h3>
                 {event.polls.length === 0 && <h4>No polls for this event yet.</h4>}
+                <div className={styles.pollTableWrapper}>
+                    {event.polls.length > 0 && <EventPollsTable
+                        polls={event.polls}
+                    />}
+                </div>
                 <button className={styles.closeBtn} onClick={onDetailsClose(event.id)}>
                     <FontAwesomeIcon icon={faClose} />
                 </button>
