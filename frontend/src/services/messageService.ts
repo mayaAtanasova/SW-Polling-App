@@ -41,7 +41,28 @@ const sendMessage = async (msg: IMessage) => {
     }
 }
 
-const deleteMessage = async (messageId: string) => {}
+const deleteMessage = async (messageId: string, eventId: string) => {
+    try {
+        const response = await fetch(`${msgUrl}/${messageId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ eventId })
+        });
+        const data = await response.json();
+        return {
+            message: data.message,
+            success: data.success,
+        }
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.log(message);
+    }
+}
 
 const answerMessage = async (messageId: number) => {}
 

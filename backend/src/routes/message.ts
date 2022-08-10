@@ -7,3 +7,5 @@ msgRouter.get('/:eventTitle', messages.fetchMessages);
 
 msgRouter.post('/', messages.sendMessage);
 
+msgRouter.delete('/:messageId', messages.deleteMessage);
+

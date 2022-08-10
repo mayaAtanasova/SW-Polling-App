@@ -91,11 +91,14 @@ const Home = ({ socket }: componentProps) => {
         setIsDialogOpen(true);
     }
 
-    const onDialogClose = (answer: boolean) => {
+    const onDialogClose = async (answer: boolean) => {
         if (answer) {
-            // messageService.deleteMessage(idToDetele);
             console.log('should delete message ' + idToDetele);
-            // socket?.emit('chat message', userId, title)
+            const result = await messageService.deleteMessage(idToDetele, eventId!);
+            console.log(result);
+            if (result?.success){
+                socket?.emit('chat message', userId, title)
+            }
         } else {
             setIdToDelete('');
         }

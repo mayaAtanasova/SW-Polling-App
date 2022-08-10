@@ -14,6 +14,7 @@ type Message = {
 
 const fetchMessages = async (req: Request, res: Response, next: NextFunction) => {
     const eventTitle = req.params.eventTitle;
+    console.log('event title' + eventTitle);
     try {
         Event
             .findOne({ eventTitle })
@@ -36,50 +37,83 @@ const fetchMessages = async (req: Request, res: Response, next: NextFunction) =>
                 });
                 return res.status(200).json({ messages, });
             })
-        } catch(err) {
-                return next(new Error('Could not fetch messages: ' + err));
-            }
+    } catch (err) {
+        return next(new Error('Could not fetch messages: ' + err));
     }
+}
 
 const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
-        const { evid, username, text, userId, date } = req.body;
-        let event;
-        try {
-            event = await Event.findById(evid).populate('attendees messages');
-        } catch (err) {
-            return next(new Error('Could not find event by id: ' + err));
-        }
-
-        // check if is attendee
-        if (!event.attendees.some((user: UserInterface) => user._id.toString() === userId)) {
-            return next(new Error('User is not an attendee'));
-        }
-
-        //create message
-        const newMessage = new Message({
-            username,
-            userId,
-            text,
-            event: evid,
-            date
-        });
-        // Transaction
-        try {
-            const sess = await mongoose.startSession();
-            sess.startTransaction();
-            await newMessage.save({ session: sess });
-            event.messages.push(newMessage);
-            await event.save({ session: sess });
-            await sess.commitTransaction();
-        } catch (err) {
-            return next(new Error(`DB transaction failed: ${err}`));
-        }
-
-        // Send Response
-        res.json({ message: 'Message sent!' });
+    const { evid, username, text, userId, date } = req.body;
+    let event;
+    try {
+        event = await Event.findById(evid).populate('attendees messages');
+    } catch (err) {
+        return next(new Error('Could not find event by id: ' + err));
     }
 
-    export default {
-        fetchMessages,
-        sendMessage
+    // check if is attendee
+    if (!event.attendees.some((user: UserInterface) => user._id.toString() === userId)) {
+        return next(new Error('User is not an attendee'));
     }
+
+    //create message
+    const newMessage = new Message({
+        username,
+        userId,
+        text,
+        event: evid,
+        date
+    });
+    // Transaction
+    try {
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await newMessage.save({ session: sess });
+        event.messages.push(newMessage);
+        await event.save({ session: sess });
+        await sess.commitTransaction();
+    } catch (err) {
+        return next(new Error(`DB transaction failed: ${err}`));
+    }
+
+    // Send Response
+    res.json({ message: 'Message sent!' });
+}
+
+const deleteMessage = async (req: Request, res: Response, next: NextFunction) => {
+    const { messageId } = req.params;
+    const { eventId } = req.body;
+    console.log(messageId, eventId);
+    let event;
+    try {
+        event = await Event.findById(eventId).populate('messages');
+    } catch (err) {
+        return next(new Error('Could not find event by id: ' + err));
+    }
+
+    // check if message is in event
+    if (!event.messages.some((message: Message) => message._id.toString() === messageId)) {
+        return next(new Error('Message not found'));
+    }
+
+    // Transaction
+    try {
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await Message.findByIdAndDelete(messageId, { session: sess });
+        event.messages = event.messages.filter((message: Message) => message._id.toString() !== messageId);
+        await event.save({ session: sess });
+        await sess.commitTransaction();
+    } catch (err) {
+        return next(new Error(`DB transaction failed: ${err}`));
+    }
+
+    // Send Response
+    res.json({ message: 'Message deleted!', success: true });
+}
+
+export default {
+    fetchMessages,
+    sendMessage,
+    deleteMessage,
+}
