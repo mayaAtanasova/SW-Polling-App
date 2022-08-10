@@ -23,8 +23,11 @@ type componentProps = {
 const Home = ({ socket }: componentProps) => {
 
     const { user, isAuthenticated } = useMySelector((state: RootState) => state.auth);
-    const { loading, loggedInChat, eventId, event, event: { title, messages, polls } } = useMySelector((state: RootState) => state.event);
+    const { loading, loggedInChat, eventId, event } = useMySelector((state: RootState) => state.event);
     const userId = user?.id;
+    const title = event?.title;
+    const messages = event?.messages;
+    const polls = event?.polls;
     const displayName = user?.displayName;
 
     const dispatch = useMyDispatch();
@@ -51,7 +54,7 @@ const Home = ({ socket }: componentProps) => {
 
     const fetchEventMessages = (title: string) => {
         console.log('rcvd order to fetch messages');
-        dispatch(fetchMessages(title));
+        dispatch(fetchMessages(eventId!));
     }
 
     const fetchEventPolls = (eventTitle: string) => {
@@ -105,10 +108,9 @@ const Home = ({ socket }: componentProps) => {
         setIsDialogOpen(false);
     }
 
-    //???????
     const userVoted = (pollId: string) => {
-        socket?.emit("user voted", userId, title, pollId);
-        dispatch(fetchEvent(eventId!));
+        socket?.emit("user vote", userId, title, pollId);
+        dispatch(fetchPolls(eventId!));
     }
 
     if (!user) {
@@ -134,7 +136,7 @@ const Home = ({ socket }: componentProps) => {
                     </div>
                 }
 
-                {isAuthenticated && loggedInChat && polls && polls.length > 0 &&
+                {isAuthenticated && loggedInChat &&
                     <div className={styles.pollsArea}>
                         <Polls polls={polls}
                             onVoteComplete={userVoted} />

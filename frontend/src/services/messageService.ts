@@ -3,9 +3,9 @@ import { IMessage } from "../Interfaces/IMessage";
 const baseUrl = process.env.REACT_APP_BASE_URL;
 const msgUrl = `${baseUrl}/messages`;
 
-const fetchMessages = async (title:string) => {
+const fetchMessages = async (eventId:string) => {
     try {
-        const response = await fetch(`${msgUrl}/${title}`);
+        const response = await fetch(`${msgUrl}/${eventId}`);
         const data = await response.json();
         return {
             messages: data.messages,

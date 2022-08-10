@@ -58,9 +58,9 @@ export const fetchEvent = createAsyncThunk(
 
 export const fetchMessages = createAsyncThunk(
     "event/fetchMessages",
-    async (title: string, thunkAPI) => {
+    async (eventId: string, thunkAPI) => {
         try {
-            const response = await MessageService.fetchMessages(title);
+            const response = await MessageService.fetchMessages(eventId);
             return response;
         } catch (error: any) {
             const message =

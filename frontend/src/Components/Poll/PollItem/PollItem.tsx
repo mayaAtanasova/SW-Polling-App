@@ -11,7 +11,7 @@ const Poll = ({ poll, onPollClicked }: componentProps) => {
 
     const { _id, title, votes } = poll;
     const { user: { id } } = useMySelector(state => state.auth);
-    const voted = votes.some(vote => vote.user === id);
+    const voted = votes.some(vote => vote.user._id === id);
 
     if (!_id) return <p>Loading...</p>
     return (

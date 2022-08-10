@@ -9,7 +9,22 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
     console.log(createdBy);
     Event
         .find({ createdBy })
-        .populate("attendees polls createdBy")
+        .populate("attendees createdBy")
+        .populate([
+            {
+                path: 'polls',
+                select: '_id title votes',
+                populate: {
+                    path: 'votes',
+                    select: 'option user createdAt',
+                    populate: {
+                        path: 'user',
+                        select: '_id displayName',
+
+                    }
+                }
+            }
+        ])
         .exec((err: any, events: any) => {
             if (err) {
                 return next(err);
@@ -26,21 +41,12 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
                         vpoints: attendee.vpoints,
                     };
                 });
-                const polls = event.polls.map((poll: any) => {
-                    return {
-                        id: poll._id,
-                        title: poll.title,
-                        description: poll.description,
-                        options: poll.options,
-                        voted: poll.voted,
-                    };
-                });
                 return {
                     id: event._id,
                     title: event.title,
                     description: event.description,
                     attendees,
-                    polls,
+                    polls: event.polls,
                     host: event.createdBy.displayName,
                     date: event.createdAt,
                     archived: event.archived,
@@ -111,7 +117,12 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
                 select: '_id title votes',
                 populate: {
                     path: 'votes',
-                    select: 'user',
+                    select: 'option user createdAt',
+                    populate: {
+                        path: 'user',
+                        select: '_id displayName',
+
+                    }
                 }
             }
         ])
@@ -140,14 +151,14 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
                     date: message.date,
                 };
             });
-            
+
             const modifiedEvent = {
                 id: event._id,
                 title: event.title,
                 description: event.description,
                 attendees,
                 messages,
-                polls:event.polls,
+                polls: event.polls,
                 host: event.createdBy.displayName
             }
             return res.status(200).json({ message: 'Event data fetched', event: modifiedEvent });

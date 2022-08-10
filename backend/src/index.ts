@@ -106,6 +106,20 @@ io.sockets.on('connect', socket => {
         })
     })
 
+    //when user votes
+    socket.on('user vote', (userId, title, pollId) => {
+        console.log(`${userId} voted in poll ${pollId}`);
+        const users = getEventUsers(title);
+        console.log('current users are: ', users);
+
+        //Broadcast to room to get data
+        users.forEach(user => {
+            console.log('broadcasting order to fetch polls')
+            io.to(user.sid).emit('fetch polls', title);
+        })
+    })
+
+
     //When user leaves event
     socket.on('leave event', (userId, title) => {
         if (title) {

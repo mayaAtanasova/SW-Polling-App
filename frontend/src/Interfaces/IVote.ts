@@ -2,7 +2,7 @@ export interface IVote {
     _id?: string;
     poll?: string;
     option?: string;
-    user: string | {
+    user: {
         _id: string;
         displayName: string;
     };

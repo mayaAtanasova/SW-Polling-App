@@ -13,11 +13,11 @@ type Message = {
 }
 
 const fetchMessages = async (req: Request, res: Response, next: NextFunction) => {
-    const eventTitle = req.params.eventTitle;
-    console.log('event title' + eventTitle);
+    const eventId = req.params.eventId;
+    console.log('event id ' + eventId);
     try {
         Event
-            .findOne({ eventTitle })
+            .findById(eventId)
             .populate('messages')
             .exec((err: any, event: any) => {
                 if (err) {

@@ -3,7 +3,7 @@ import messages from  '../controllers/message';
 
 export const msgRouter = Router();
 
-msgRouter.get('/:eventTitle', messages.fetchMessages);
+msgRouter.get('/:eventId', messages.fetchMessages);
 
 msgRouter.post('/', messages.sendMessage);
 

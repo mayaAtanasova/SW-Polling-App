@@ -198,7 +198,17 @@ const getPollsInEvent = async (req: Request, res: Response, next: NextFunction) 
 
     try {
         Poll
-            .find({event})
+            .find({ event })
+            .populate([
+                {
+                    path: 'votes',
+                    select: 'option user createdAt',
+                    populate: {
+                        path: 'user',
+                        select: '_id displayName vpoints',
+                    }
+                }
+            ])
             .exec((err: any, polls: any) => {
                 if (err) {
                     return next(new Error('Could not find event: ' + err));
@@ -206,16 +216,7 @@ const getPollsInEvent = async (req: Request, res: Response, next: NextFunction) 
                 if (!event) {
                     return next(new Error('Event not found'));
                 }
-                const eventPolls = polls.map((poll: any) => {
-                    return {
-                        _id: poll._id,
-                        type: poll.type,
-                        title: poll.title,
-                        options: poll.options,
-                        votes: poll.votes,
-                    }
-                });
-                return res.status(200).json({ polls: eventPolls })
+                return res.status(200).json({ polls })
             })
     } catch (err) {
         return next(new Error('Could not fetch polls: ' + err));
