@@ -11,6 +11,7 @@ import { useMySelector } from '../hooks/useReduxHooks';
 import './AppView.css';
 import { RootState } from '../store/store';
 import NotFound from '../Pages/NotFound/NotFound';
+import ProtectedAdminRoute from '../Components/Shared/ProtectedAdminRoute/ProtectedAdminRoute';
 
 const socketURL = process.env.REACT_APP_BAS_URL ?? 'http://localhost:4000'
 const socket = io(socketURL, { transports: ['websocket'] });
@@ -33,8 +34,8 @@ const AppView = () => {
     socket.on('pong', () => {
       setLastPong(new Date().toISOString());
     });
-    if(id && displayName) {
-        socket.emit('new user', id, displayName);
+    if (id && displayName) {
+      socket.emit('new user', id, displayName);
     }
 
     return () => {
@@ -49,15 +50,22 @@ const AppView = () => {
   }
 
   return (
-        <BrowserRouter>
-          <Navbar socket={socket}/>
-          <Routes>
-            <Route path="/" element={<Home socket={socket} />} />
-            <Route path="/admin" element={<AdminDashboard socket={socket} />} />
-            <Route path='/profile' element={<Profile socket={ socket }/>} />
-            <Route path='/*' element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+    <BrowserRouter>
+      <Navbar socket={socket} />
+      <Routes>
+        <Route path="/" element={<Home socket={socket} />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedAdminRoute>
+              <AdminDashboard socket={socket} />
+            </ProtectedAdminRoute>
+          }
+        />
+        <Route path='/profile' element={<Profile socket={socket} />} />
+        <Route path='/*' element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
