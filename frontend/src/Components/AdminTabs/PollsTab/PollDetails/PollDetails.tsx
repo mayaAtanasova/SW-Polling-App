@@ -14,10 +14,6 @@ type componentProps = {
 
 const PollDetails = ({ poll, onDetailsClose }: componentProps) => {
 
-  useEffect(() => {
-    console.log('poll details', poll);
-    console.log(poll.votes[0]);
-  }, [])
   return (
     <div className={styles.pollDetailsBkg} >
       <div className={styles.pollDetailsWrapper}>

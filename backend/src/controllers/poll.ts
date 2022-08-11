@@ -133,12 +133,16 @@ const getPollById = async (req: Request, res: Response, next: NextFunction) => {
                     path: 'createdBy',
                     select: '_id displayName',
                 },
+                                {
+                    path: 'event',
+                    select: '_id title',
+                },
                 {
                     path: 'votes',
                     select: 'option user createdAt',
                     populate: {
                         path: 'user',
-                        select: '_id displayName',
+                        select: '_id displayName vpoints',
                     }
                 }
             ])
@@ -200,6 +204,10 @@ const getPollsInEvent = async (req: Request, res: Response, next: NextFunction) 
         Poll
             .find({ event })
             .populate([
+                {
+                    path: 'event',
+                    select: '_id title',
+                },
                 {
                     path: 'votes',
                     select: 'option user createdAt',

@@ -56,6 +56,20 @@ const fetchEventData = async (eventId: string) => {
     }
 }
 
+const fetchEventPolls = async (eventId: string) => {
+    try {
+        const response = await fetch(`${eventUrl}/${eventId}/polls`);
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.error(message);
+    }
+}
+
 const createEvent = async ({ title, description, userId }: EventCredentials) => {
     try {
         const response = await fetch(`${eventUrl}`, {

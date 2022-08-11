@@ -125,7 +125,9 @@ io.sockets.on('connect', socket => {
         if (title) {
             console.log(`${userId} left ${title}`);
             const user = userLeaveEvent(socket.id, title);
-            socket.leave(user.eventTitle);
+            if(user.eventTitle){
+                socket.leave(user.eventTitle);
+            }
         }
     });
 

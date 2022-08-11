@@ -21,7 +21,7 @@ export interface IPollCompact {
         _id: string,
         title: string,
         type: string,
-        event: { title: string },
+        event: { _id:string, title: string },
         createdBy: { displayName: string },
         createdAt: string,
         editedAt: string,

@@ -77,6 +77,9 @@ const EventsTab = ({ socket }:componentProps) => {
                     dispatch(setMessage(err.message));
                     setLoading(false);
                 });
+        } else {
+            dispatch(setMessage('Event not found'));
+            setLoading(false);
         }
     }
 

@@ -19,7 +19,7 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
                     select: 'option user createdAt',
                     populate: {
                         path: 'user',
-                        select: '_id displayName',
+                        select: '_id displayName vpoints',
                     }
                 }
             },
@@ -124,7 +124,7 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
                     select: 'option user createdAt',
                     populate: {
                         path: 'user',
-                        select: '_id displayName',
+                        select: '_id displayName vpoints',
 
                     }
                 }
@@ -168,6 +168,40 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
             }
             return res.status(200).json({ message: 'Event data fetched', event: modifiedEvent });
         });
+}
+
+const fetchEventPolls = async (req: Request, res: Response, next: NextFunction) => {
+    const evid = req.params.evid;
+
+    try {
+        Event
+            .findById(evid)
+            .populate([
+                {
+                    path: 'polls',
+                    select: '_id title type votes',
+                    populate: {
+                        path: 'votes',
+                        select: 'option user createdAt',
+                        populate: {
+                            path: 'user',
+                            select: '_id displayName vpoints',
+                        }
+                    }
+                }
+            ])
+            .exec((err: any, polls: any) => {
+                if (err) {
+                    return next(new Error('Could not find event: ' + err));
+                }
+                if (!polls) {
+                    return next(new Error('Event not found'));
+                }
+                return res.status(200).json({ polls })
+            })
+    } catch (err) {
+        return next(new Error('Could not fetch polls: ' + err));
+    }
 }
 
 const editEvent = async (req: Request, res: Response, next: NextFunction) => {
@@ -280,6 +314,7 @@ const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
 export default {
     getEventsByCreator,
     fetchEventData,
+    fetchEventPolls,
     createEvent,
     joinEvent,
     archiveEvent,
