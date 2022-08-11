@@ -10,6 +10,7 @@ import { useMySelector } from '../hooks/useReduxHooks';
 
 import './AppView.css';
 import { RootState } from '../store/store';
+import NotFound from '../Pages/NotFound/NotFound';
 
 const socketURL = process.env.REACT_APP_BAS_URL ?? 'http://localhost:4000'
 const socket = io(socketURL, { transports: ['websocket'] });
@@ -54,6 +55,7 @@ const AppView = () => {
             <Route path="/" element={<Home socket={socket} />} />
             <Route path="/admin" element={<AdminDashboard socket={socket} />} />
             <Route path='/profile' element={<Profile socket={ socket }/>} />
+            <Route path='/*' element={<NotFound />} />
           </Routes>
         </BrowserRouter>
   );

@@ -27,18 +27,32 @@
 }
 
 .sortActionsHolder {
-    margin: 2rem;
+  margin: 2rem;
+
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  gap: 1%;
+  gap: 10px;
+}
+
+.sortActionsHolder div {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.sortActionsHolder h4 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0.5rem;
 }
 
 .sortActionsHolder button {
-  width: 32%;
+  flex: 1;
   background-color: var(--color-light-transparent);
   border: none;
   border-radius: 0.5rem;
-  padding: 0.5rem;
+  padding: 0.25rem;
   color: white;
   font-weight: 600;
   font-size: 1rem;
@@ -47,7 +61,7 @@
 
 .sortActionsHolder button:hover {
   background-color: var(--color-accent);
-  cursor:pointer;
+  cursor: pointer;
 }
 
 button.sortSelected {

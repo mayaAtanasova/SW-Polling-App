@@ -40,6 +40,10 @@ const pollSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    concluded: {
+        type: Boolean,
+        default: false,
+    }
 })
 
 export const Poll = mongoose.model('Poll', pollSchema);

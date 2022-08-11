@@ -14,6 +14,7 @@ export interface IPoll {
     options: string[];
     votes: IVote[];
     locked: boolean;
+    concluded: boolean;
 }
 
 export interface IPollCompact {
@@ -27,4 +28,5 @@ export interface IPollCompact {
         options: string[],
         votes: [{ option: string, user: { displayName: string, vpoints: number } }],
         locked: boolean,
+        concluded: boolean,
 }
