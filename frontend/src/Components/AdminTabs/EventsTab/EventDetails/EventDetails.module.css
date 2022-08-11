@@ -72,6 +72,25 @@
   margin: 0  0 0.5rem 0;
 }
 
+.headingGroup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.headingGroup button {
+  border: none;
+  background-color: transparent;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.headingGroup button:hover {
+  cursor: pointer;
+}
+
 .divider {
   margin: 1.5rem auto;
   width: 80%;
@@ -85,6 +104,11 @@ display: flex;
 align-items: center;
 justify-content: center;
 gap: 1rem;
+}
+
+.messagesWrapper {
+  display: flex;
+  gap: 1rem;
 }
 
 .attendeesNavigationWrapper button {

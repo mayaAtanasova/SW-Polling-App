@@ -64,11 +64,56 @@ const deleteMessage = async (messageId: string, eventId: string) => {
     }
 }
 
-const answerMessage = async (messageId: number) => {}
+const answerMessage = async (messageId: string) => {
+    try {
+        const response = await fetch(`${msgUrl}/answer`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ messageId })
+        });
+        const data = await response.json();
+        return {
+            message: data.message,
+            success: data.success,
+        }
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.log(message);
+    }
+}
+
+const restoreMessage = async (messageId: string) => {
+    try {
+        const response = await fetch(`${msgUrl}/restore`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ messageId })
+        });
+        const data = await response.json();
+        return {
+            message: data.message,
+            success: data.success,
+        }
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.log(message);
+    }
+}
 
 export default {
     fetchMessages,
     sendMessage,
     deleteMessage,
     answerMessage,
+    restoreMessage,
 }

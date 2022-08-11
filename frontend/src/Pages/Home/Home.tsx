@@ -108,6 +108,15 @@ const Home = ({ socket }: componentProps) => {
         setIsDialogOpen(false);
     }
 
+    const handleAnswerMessage = async (messageId: string) => {
+        console.log(messageId);
+        if (!userId) return;
+        const result = await messageService.answerMessage(messageId);
+        if (result?.success) {
+            socket?.emit('chat message', userId, title)
+        }
+    }
+
     const userVoted = (pollId: string) => {
         socket?.emit("user vote", userId, title, pollId);
         dispatch(fetchPolls(eventId!));
@@ -131,7 +140,11 @@ const Home = ({ socket }: componentProps) => {
             <div className={styles.homeContainer}>
                 {isAuthenticated && loggedInChat && messages &&
                     <div className={styles.chatArea}>
-                        <Messages messages={messages} onDeleteButtonPressed={handleDeleteMessagePressed} />
+                        <Messages 
+                        messages={messages} 
+                        onDeleteButtonPressed={handleDeleteMessagePressed}
+                        onAnswerButtonPressed={handleAnswerMessage} 
+                        />
                         <MessageInput onChatMessage={sendChatMessage} />
                     </div>
                 }

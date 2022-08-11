@@ -3,5 +3,6 @@ export default interface Message {
     text: string,
     username: string,
     userId: string,
-    date: string
+    date: string,
+    answered: boolean,
 }

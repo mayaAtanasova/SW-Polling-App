@@ -6,7 +6,6 @@ import pollsService from '../../../services/pollsService';
 import PollDetails from "../PollDetails/PollDetails";
 
 import styles from "./Polls.module.css";
-import { Socket } from "socket.io-client";
 
 type componentProps = {
     polls: IPoll[],

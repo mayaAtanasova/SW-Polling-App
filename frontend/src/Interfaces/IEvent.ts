@@ -18,6 +18,7 @@ title: string;
 description: string;
 attendees: IUserCompact[];
 polls: IPoll[];
+messages: IMessage[];
 host: string;
 date: string;
 archived: boolean;

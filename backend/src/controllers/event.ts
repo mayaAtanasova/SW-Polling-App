@@ -20,9 +20,12 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
                     populate: {
                         path: 'user',
                         select: '_id displayName',
-
                     }
                 }
+            },
+            {
+                path: 'messages',
+                select: '_id text username userId date answered',
             }
         ])
         .exec((err: any, events: any) => {
@@ -47,6 +50,7 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
                     description: event.description,
                     attendees,
                     polls: event.polls,
+                    messages: event.messages,
                     host: event.createdBy.displayName,
                     date: event.createdAt,
                     archived: event.archived,
@@ -149,6 +153,7 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
                     username: message.username,
                     userId: message.userId,
                     date: message.date,
+                    answered: message.answered,
                 };
             });
 

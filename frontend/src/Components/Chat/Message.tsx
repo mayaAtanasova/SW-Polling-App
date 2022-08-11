@@ -10,9 +10,10 @@ import { faCheck, faCheckCircle, faX } from "@fortawesome/free-solid-svg-icons";
 type messageComponentProps = {
     message: IMessage,
     onDeleteButtonPressed: (messageId: string) => void,
+    onAnswerButtonPressed: (messageId: string) => void,
 }
 
-const Message = ({ message, onDeleteButtonPressed }: messageComponentProps) => {
+const Message = ({ message, onDeleteButtonPressed, onAnswerButtonPressed }: messageComponentProps) => {
 
     const [showActions, setShowActions] = useState(false);
     const { user: {id}, isAdmin } = useMySelector((state: any) => state.auth);
@@ -36,7 +37,7 @@ const Message = ({ message, onDeleteButtonPressed }: messageComponentProps) => {
             <div>{message.text}</div>
             <div className={styles.msgDateGroup}>
                 { isAdmin && <div className={`${styles.actionsGroup} ${showActions && styles.visible} `}>
-                    <FontAwesomeIcon className={styles.actionBtn} icon={faCheck} />
+                    <FontAwesomeIcon className={styles.actionBtn} icon={faCheck} onClick={() => onAnswerButtonPressed(message.id!)}/>
                     <FontAwesomeIcon className={styles.actionBtn} icon={faX} onClick={() => onDeleteButtonPressed(message.id!)}/>
                 </div>}
                 <p>{postDate}</p>

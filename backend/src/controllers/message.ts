@@ -9,7 +9,8 @@ type Message = {
     text: string,
     username: string,
     userId: string,
-    date: string
+    date: string,
+    answered: boolean,
 }
 
 const fetchMessages = async (req: Request, res: Response, next: NextFunction) => {
@@ -33,6 +34,7 @@ const fetchMessages = async (req: Request, res: Response, next: NextFunction) =>
                         username: message.username,
                         userId: message.userId,
                         date: message.date,
+                        answered: message.answered,
                     };
                 });
                 return res.status(200).json({ messages, });
@@ -80,6 +82,42 @@ const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
     res.json({ message: 'Message sent!' });
 }
 
+const answerMessage = async (req: Request, res: Response, next: NextFunction) => {
+    const { messageId } = req.body;
+    console.log(messageId);
+    Message
+        .findById(messageId)
+        .exec((err: any, message: any) => {
+            if (err) {
+                return next(new Error('Error finding message: ' + err));
+            }
+            if (!message) {
+                return next(new Error('Message not found'));
+            }
+            message.answered = true;
+            message.save();
+            res.json({ message: 'Message answered!', success: true });
+        })
+}
+
+const restoreMessage = async (req: Request, res: Response, next: NextFunction) => {
+    const { messageId } = req.body;
+    console.log(messageId);
+    Message
+        .findById(messageId)
+        .exec((err: any, message: any) => {
+            if (err) {
+                return next(new Error('Error finding message: ' + err));
+            }
+            if (!message) {
+                return next(new Error('Message not found'));
+            }
+            message.answered = false;
+            message.save();
+            res.json({ message: 'Message restored!', success: true });
+        })
+}
+
 const deleteMessage = async (req: Request, res: Response, next: NextFunction) => {
     const { messageId } = req.params;
     const { eventId } = req.body;
@@ -115,5 +153,7 @@ const deleteMessage = async (req: Request, res: Response, next: NextFunction) =>
 export default {
     fetchMessages,
     sendMessage,
+    answerMessage,
+    restoreMessage,
     deleteMessage,
 }

@@ -8,9 +8,10 @@ import styles from "./Messages.module.css";
 type componentProps = {
   messages: IMessage[],
   onDeleteButtonPressed: (id: string) => void,
+  onAnswerButtonPressed: (id: string) => void,
 };
 
-const Messages = ({ messages, onDeleteButtonPressed }: componentProps) => {
+const Messages = ({ messages, onDeleteButtonPressed, onAnswerButtonPressed }: componentProps) => {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -29,8 +30,13 @@ const Messages = ({ messages, onDeleteButtonPressed }: componentProps) => {
       <div className={styles.chatWrapper}>
         <div className={styles.messageArea}>
           {messages &&
-            messages.map((message: any) => (
-              <Message key={message.id} message={message} onDeleteButtonPressed={onDeleteButtonPressed}/>
+            messages.filter(message => !message.answered).map((message: any) => (
+              <Message 
+              key={message.id} 
+              message={message} 
+              onDeleteButtonPressed={onDeleteButtonPressed}
+              onAnswerButtonPressed={onAnswerButtonPressed}
+              />
             ))}
           <div ref={messagesEndRef}></div>
         </div>

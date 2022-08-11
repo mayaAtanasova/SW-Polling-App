@@ -5,4 +5,5 @@ export interface IMessage {
     username: string;
     userId: string;
     date: string;
+    answered?: boolean;
 }

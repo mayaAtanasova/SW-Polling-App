@@ -1,0 +1,62 @@
+.messagesTableContainer {
+  flex: 1;
+  border-radius: 0.5rem 0.5rem 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.messagesTableContainer h5 {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 0.5rem;
+  margin: 0;
+  text-transform: capitalize;
+  background-color: var(--color-light-transparent);
+}
+
+.messagesTableContainer table {
+  width: 100%;
+  padding: 0.5rem;
+  border-collapse: collapse;
+}
+
+.eventMessagesTable thead {
+  width: 100%;
+  text-align: left;
+  background-color: var(--color-accent);
+  color: var(--color-bkg);
+}
+
+.eventMessagesTable thead th {
+  padding: 0.25rem;
+  border: 1px solid var(--color-grey-transparent);
+}
+
+.eventMessagesTable tbody tr:nth-child(even) {
+  background-color: var(--color-dark-transparent);
+}
+
+.eventMessagesTable tbody tr:nth-child(odd) {
+  background-color: var(--color-light-transparent);
+}
+
+.eventMessagesTable tbody td {
+  padding: 0.5rem 0.25rem;
+  border: 1px solid var(--color-grey-transparent);
+}
+
+.eventMessagesTable tbody td button {
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.5rem;
+    background-color: var(--color-accent);
+    color: var(--color-bkg);
+    font-size: 0.8rem;
+}
+
+.eventMessagesTable tbody td button:hover {
+    cursor: pointer;
+}
