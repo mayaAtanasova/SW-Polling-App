@@ -8,7 +8,6 @@ z-index: -1;
 }
 
 .introTextWrapper {
-  background-image: url();
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -17,8 +16,13 @@ z-index: -1;
   justify-content: center;
 }
 
+.introTextWrapper h1 {
+  margin: 1rem;
+}
+
 .introPageContainer {
   font-size: 2rem;
+  text-align: center;
 }
 
 .altLink {
@@ -33,7 +37,7 @@ z-index: -1;
 .or {
     position: relative;
     margin: 1rem 0;
-    width: 10%;
+    width: 20%;
     text-align: center;
   }
   

@@ -1,0 +1,13 @@
+.authInfoMessage {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 20vw;
+    z-index: 100;
+    background: var(--color-darkbkg);
+    opacity: 0.9;
+    color: var(--color-text);
+    border-radius: 1rem 2rem;
+    padding: 1rem 2rem;
+    box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.1);
+}

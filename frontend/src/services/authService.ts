@@ -15,9 +15,9 @@ const register = async (user: IUser) => {
             },
             body: JSON.stringify(user)
         })
-        if (response.status === 401) {
+        if (response.status !== 200) {
             const errorData = await response.json();
-            throw new Error(errorData.message);
+            throw new Error(errorData.message); 
         }
         const data = await response.json();
         let loggedUser = null;
@@ -43,14 +43,14 @@ const login = async (user: { email: string, password: string }) => {
     try {
         const response = await fetch(api_url + '/login', {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(user)
         })
-        if (response.status === 401) {
+        if (response.status !== 200) {
             const errorData = await response.json();
-            throw new Error(errorData.message);
+            throw new Error(errorData.message); 
         }
         const data = await response.json();
         let loggedUser = null;
@@ -113,7 +113,7 @@ const googleLogin = async (tokenResponse: TokenResponse): Promise<{ message: str
     }
 };
 
-const verifyUser = async (id: string, token:string) => {
+const verifyUser = async (id: string, token: string) => {
     try {
         const response = await fetch(api_url + '/verify', {
             method: 'POST',

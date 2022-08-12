@@ -2,7 +2,6 @@ import { Provider } from 'react-redux';
 import store from './store/store';
 import { useMySelector } from './hooks/useReduxHooks';
 
-import './App.css';
 import AppView from './views/AppView';
 import AuthView from './views/AuthView';
 

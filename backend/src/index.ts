@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import http from "http";
 import cors from "cors";
 import 'dotenv/config';
@@ -38,6 +38,12 @@ app.use(cors(
     }
 ));
 
+// Error Handler
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+    console.log('An error occured:', error);
+    res.json({ message: error.message || 'An unknown error occured.', error: true });
+});
+
 // const chatAdmin = 'SW admin';
 app.use('/auth', authRouter);
 app.use('/messages', msgRouter);
@@ -45,7 +51,7 @@ app.use('/events', eventRouter);
 app.use('/polls', pollsRouter);
 
 app.use('/', (req, res) => {
-    res.send({message: 'app is operational'});
+    res.send({ message: 'app is operational' });
 });
 
 //socket.io
@@ -122,10 +128,11 @@ io.sockets.on('connect', socket => {
 
     //When user leaves event
     socket.on('leave event', (userId, title) => {
-        if (title) {
+        if (userId && title) {
             console.log(`${userId} left ${title}`);
             const user = userLeaveEvent(socket.id, title);
-            if(user.eventTitle){
+            if (user.eventTitle) {
+                console.log('user leaving event title: ', user.eventTitle);
                 socket.leave(user.eventTitle);
             }
         }

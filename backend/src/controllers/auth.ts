@@ -57,16 +57,10 @@ const login = (req: Request, res: Response, next: NextFunction) => {
             res.status(500).send(err);
             return;
         }
-        if (!user) {
-            res.status(401).send({ message: 'User not found' });
-            return;
-        }
-        if (!user.hashedp) {
-            res.status(401).send({ message: 'You are not registered, try a google sign-in.' });
-            return;
-        }
-        if (!bcrypt.compareSync(password, user.hashedp)) {
-            res.status(401).send({ message: 'Incorrect username/password combination' });
+        if (!user
+            || !user.hashedp
+            || !bcrypt.compareSync(password, user.hashedp)) {
+            res.status(401).send({ message: 'Invalid email or password', user: null });
             return;
         }
         const token = issueJwt(user._id, user.displayName, user.role, user.vpoints);
