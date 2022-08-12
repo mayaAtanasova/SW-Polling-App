@@ -147,3 +147,9 @@ gap: 1rem;
 .closeBtn:hover {
   cursor: pointer;
 }
+
+@media (max-width: 900px) {
+  .messagesWrapper {
+    flex-direction: column-reverse;
+  }
+}

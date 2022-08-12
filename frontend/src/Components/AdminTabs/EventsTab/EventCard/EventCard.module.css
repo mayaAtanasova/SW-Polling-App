@@ -46,3 +46,9 @@
   text-align: center;
   margin: 1rem 0;
 }
+
+@media (max-width: 900px) {
+  .eventCard {
+    width: 100%;
+  }
+}

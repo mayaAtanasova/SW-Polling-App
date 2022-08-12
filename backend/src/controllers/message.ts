@@ -15,7 +15,7 @@ type Message = {
 
 const fetchMessages = async (req: Request, res: Response, next: NextFunction) => {
     const eventId = req.params.eventId;
-    console.log('event id ' + eventId);
+    console.log('[Fetch messages] event id ' + eventId);
     try {
         Event
             .findById(eventId)
@@ -29,7 +29,7 @@ const fetchMessages = async (req: Request, res: Response, next: NextFunction) =>
                 }
                 const messages = event.messages.map((message: Message) => {
                     return {
-                        id: message._id,
+                        _id: message._id,
                         text: message.text,
                         username: message.username,
                         userId: message.userId,

@@ -70,6 +70,7 @@ const EventsTab = ({ socket }:componentProps) => {
                     if (data) {
                         console.log(data.messages);
                         setCurrentEvent({ ...currentEvent, messages: data.messages });
+                        console.log(currentEvent);
                         setLoading(false);
                     }
                 })
@@ -119,6 +120,9 @@ const EventsTab = ({ socket }:componentProps) => {
     const handleRestoreMessage = () => {
         console.log('restore clicked');
         console.log(currentEvent?.title);
+        if(currentEvent){
+        getCurrentMessages(currentEvent.title);
+        }
         socket?.emit('chat message', userId, currentEvent?.title);
     }
 

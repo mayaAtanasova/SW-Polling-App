@@ -3,7 +3,7 @@ import { IPoll, IPollCompact } from '../Interfaces/IPoll';
 const baseUrl = process.env.REACT_APP_BASE_URL;
 const pollsUrl = `${baseUrl}/polls`;
 
-const getPollbyId = async (pollId: string) => {
+const getPollById = async (pollId: string) => {
     try {
         const response = await fetch(`${pollsUrl}/${pollId}`);
         const data = await response.json();
@@ -94,7 +94,7 @@ const createPoll = async (poll: { type: string, title: string, userId: string, e
 }
 
 export default {
-    getPollbyId,
+    getPollById,
     getPollsByCreator,
     getPollsByEvent,
     voteInPoll,

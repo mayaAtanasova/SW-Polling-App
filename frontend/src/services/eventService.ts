@@ -25,7 +25,10 @@ const joinEvent = async (eventCredentials: EventCredentials) => {
         });
         if (response.status !== 200) {
             const errorData = await response.json();
-            throw new Error(errorData.message); 
+            return {
+                message: errorData.message,
+                event: null,
+            } 
         }
         const data = await response.json();
         localStorage.setItem('eventId', data.evid);

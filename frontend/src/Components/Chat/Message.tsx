@@ -37,8 +37,8 @@ const Message = ({ message, onDeleteButtonPressed, onAnswerButtonPressed }: mess
             <div>{message.text}</div>
             <div className={styles.msgDateGroup}>
                 { isAdmin && <div className={`${styles.actionsGroup} ${showActions && styles.visible} `}>
-                    <FontAwesomeIcon className={styles.actionBtn} icon={faCheck} onClick={() => onAnswerButtonPressed(message.id!)}/>
-                    <FontAwesomeIcon className={styles.actionBtn} icon={faX} onClick={() => onDeleteButtonPressed(message.id!)}/>
+                    <FontAwesomeIcon className={styles.actionBtn} icon={faCheck} onClick={() => onAnswerButtonPressed(message._id!)}/>
+                    <FontAwesomeIcon className={styles.actionBtn} icon={faX} onClick={() => onDeleteButtonPressed(message._id!)}/>
                 </div>}
                 <p>{postDate}</p>
             </div>

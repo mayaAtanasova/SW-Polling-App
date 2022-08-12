@@ -45,9 +45,14 @@ const PollsTab = ({ socket }: componentProps) => {
   const [currentPoll, setCurrentPoll] = useState<IPollCompact | null>(null);
   const { user } = useMySelector(state => state.auth);
   const userId = user?.id;
-  const { eventId } = useMySelector(state => state.event);
+  const { event } = useMySelector(state => state.event);
 
   const dispatch = useMyDispatch();
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on('fetch polls', (title: string) => updatePolls(title));
+  }, [socket]);
 
   useEffect(() => {
     getAdminUserPolls();
@@ -57,11 +62,6 @@ const PollsTab = ({ socket }: componentProps) => {
   useEffect(() => {
     console.log(currentPoll);
   }, [currentPoll]);
-
-  useEffect(() => {
-    if (!socket) return;
-    socket.on('fetch polls', (title:string) => getCurrentPollStatus(title));
-}, [socket]);
 
   const getAdminUserPolls = () => {
     console.log('getting polls in polls tab')
@@ -101,46 +101,22 @@ const PollsTab = ({ socket }: componentProps) => {
     }
   };
 
-  const getCurrentPollStatus = (title:string) => {
-    console.log('getting current poll status details')
-    const currentPollId = currentPoll?._id;
-    setLoading(true);
-    // if (title === currentPoll?.event.title) {
-    //   const pollId = currentPoll._id;
-    //   pollsService
-    //     .getPollbyId(pollId)
-    //     .then((data) => {
-    //       if (data) {
-    //         console.log(data);
-    //         setCurrentPoll(data);
-    //         setLoading(false);
-    //       }
-    //     })
-    //     .catch(err => {
-    //       dispatch(setMessage(err.message));
-    //       setLoading(false);
-    //     });
-    // } else {
-    //   setLoading(false);
+  const updatePolls = async (title: string) => {
+    console.log('received order to fetch polls in ' + title);
+    // if (title === event?.title && currentPoll) {
+    //   console.log('updating polls}');
+    //   await getCurrentPollStatus(currentPoll?._id);
+    //   getAdminUserPolls();
     // }
-    pollsService.getPollsByEvent(eventId!)
-      .then((data) => {
-        if (data) {
-          console.log(data.polls);
-          const newCurrentPoll = data.polls.find((poll:IPollCompact) => poll._id === currentPollId);
-          setCurrentPoll(newCurrentPoll);
-          const foreignPolls = polls.filter(poll => poll.event._id !== eventId);
-          console.log(foreignPolls);
-          const newPolls = foreignPolls.concat(data.polls);
-          console.log(newPolls);
-          setPolls(newPolls);
-        }
-      }).catch(err => {
-        dispatch(setMessage(err.message));
-        setLoading(false);
-      }).finally(() => {
-        setLoading(false);
-      })
+  }
+
+  const getCurrentPollStatus = async (pollId: string) => {
+    console.log('getting current poll status details')
+    const newPoll = await pollsService.getPollById(pollId);
+    console.log(newPoll);
+    if (newPoll) {
+      setCurrentPoll(newPoll);
+    }
   }
 
   const revealPollForm = (event: any) => {
@@ -193,7 +169,7 @@ const PollsTab = ({ socket }: componentProps) => {
       {!polls && <p>You have not created any polls yet.</p>}
       <h2>You have created the following polls</h2>
       <div className={styles.sortActionsHolder}>
-        <div> 
+        <div>
           <h4>Sort polls by event and date: </h4>
           <button type="button" className={sortType === 'titleAsc' ? styles.sortSelected : ''} onClick={() => setSortType('titleAsc')}>Sort by Event Asc</button>
           <button type="button" className={sortType === 'titleDesc' ? styles.sortSelected : ''} onClick={() => setSortType('titleDesc')}>Sort by Event Desc</button>
@@ -202,10 +178,10 @@ const PollsTab = ({ socket }: componentProps) => {
         </div>
         <div>
           <h4>Filter polls by status: </h4>
-        <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>Show all polls</button>
-        <button type="button" className={filterType === 'activeOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('activeOnly')}>Show active only</button>
-        <button type="button" className={filterType === 'lockedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('lockedOnly')}>Show inactive only</button>
-      </div>
+          <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>Show all polls</button>
+          <button type="button" className={filterType === 'activeOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('activeOnly')}>Show active only</button>
+          <button type="button" className={filterType === 'lockedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('lockedOnly')}>Show inactive only</button>
+        </div>
       </div>
       <p>Click on a poll for details</p>
 

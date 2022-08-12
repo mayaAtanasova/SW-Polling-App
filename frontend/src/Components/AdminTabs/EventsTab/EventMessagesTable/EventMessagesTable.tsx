@@ -18,6 +18,7 @@ const EventMessagesTable = ({ messages, answered, onRestoreMessage }: componentP
     const onRestoreClicked = (messageId: string) => async (ev:any) => {
         ev.preventDefault();
         ev.stopPropagation();
+        console.log(messageId);
         const restoredMessage = await messageService.restoreMessage(messageId);
         if(restoredMessage && restoredMessage.success) {
             console.log('message restored');
@@ -44,14 +45,14 @@ const EventMessagesTable = ({ messages, answered, onRestoreMessage }: componentP
                     <tbody>
                         {messages.map(message => (
                             <tr
-                                key={message.id}>
+                                key={message._id}>
                                 <td>{message.username}</td>
                                 <td>{message.text}</td>
                                 <td>{moment(message.date).format('HH:mm')}</td>
                                 {answered && (
                                     <td>
                                         <button
-                                        onClick={onRestoreClicked(message.id!)}
+                                        onClick={onRestoreClicked(message._id!)}
                                         >
                                             Restore
                                         </button>

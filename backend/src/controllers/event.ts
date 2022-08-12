@@ -6,7 +6,7 @@ import PollInterface from '../interfaces/pollInterface'
 
 const getEventsByCreator = async (req: Request, res: Response, next: NextFunction) => {
     const createdBy = req.params.createdBy;
-    console.log(createdBy);
+    console.log('Created by ' + createdBy);
     Event
         .find({ createdBy })
         .populate("attendees createdBy")
@@ -64,7 +64,7 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
     const { title, description, userId } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(errors);
+        console.log('Validation errors ' + errors);
         return res.status(401).send({ message: 'Invalid fields sent' });
     }
     const newEvent = new Event({
@@ -96,26 +96,33 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
         .findOne({ title })
         .populate('attendees')
         .then(async (event: any) => {
-            if(!event) {
+            if (!event) {
                 return res.status(404).json({ message: 'No such event' });
             }
-            const index = event.attendees.findIndex((attendee: any) => attendee._id.toString() === userId);
+            let index = event.attendees.findIndex((attendee: any) => attendee._id.toString() === userId);
             if (index === -1) {
                 event.attendees.push(userId);
+                await event.save();
+                index = event.attendees.length - 1;
             }
-            await event.save();
             return res.status(200).json({ message: `User ${event.attendees[index].displayName} joined event`, evid: event._id, eventTitle: event.title });
+
         })
         .catch((err: any) => {
-            console.log(err);
-            return res.status(404).json({message: 'No such event'});
+            console.log('Error in join event ' + err);
+            return res.status(404).json({ message: 'Error joing event' });
         });
 
 }
 
 const fetchEventData = async (req: Request, res: Response, next: NextFunction) => {
     const evid = req.params.evid;
-    console.log(evid)
+    console.log('Event id ' + evid);
+
+    if (!evid || evid === '' || evid === 'undefined') {
+        return res.status(404).json({ message: 'No event id provided' });
+    }
+
     Event
         .findById(evid)
         .populate("attendees messages createdBy")
@@ -136,8 +143,8 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
         ])
         .exec((err: any, event: any) => {
             if (err) {
-                console.log('Error while joining event ' + err)
-                return res.json({message: 'No such event'});
+                console.log('Error while fetching event ' + err)
+                return res.json({ message: 'No such event' });
             }
             if (!event) {
                 return res.status(404).json({ message: 'Event not found' });
@@ -153,7 +160,7 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
 
             const messages = event.messages.map((message: Message) => {
                 return {
-                    id: message._id,
+                    _id: message._id,
                     text: message.text,
                     username: message.username,
                     userId: message.userId,
@@ -214,7 +221,7 @@ const editEvent = async (req: Request, res: Response, next: NextFunction) => {
     const { title, description } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(errors);
+        console.log('Validation errors ' + errors);
         return res.status(401).send({ message: 'Invalid fields sent' });
     }
     try {
@@ -290,7 +297,7 @@ const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
     const { eventId } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(errors);
+        console.log('Validation errors ' + errors);
         return res.status(401).send({ message: 'Invalid fields sent' });
     }
     try {

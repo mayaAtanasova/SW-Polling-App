@@ -32,13 +32,13 @@ const Messages = ({ messages, onDeleteButtonPressed, onAnswerButtonPressed }: co
           {messages &&
             messages.filter(message => !message.answered).map((message: any) => (
               <Message 
-              key={message.id} 
+              key={message._id} 
               message={message} 
               onDeleteButtonPressed={onDeleteButtonPressed}
               onAnswerButtonPressed={onAnswerButtonPressed}
               />
             ))}
-          <div ref={messagesEndRef}></div>
+          <div className={styles.refDiv} ref={messagesEndRef}></div>
         </div>
       </div>
     </>

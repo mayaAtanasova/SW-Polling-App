@@ -25,7 +25,7 @@ const Home = ({ socket }: componentProps) => {
     const { user, isAuthenticated } = useMySelector((state: RootState) => state.auth);
     const { loading, loggedInChat, eventId, event } = useMySelector((state: RootState) => state.event);
     const userId = user?.id;
-    const title = event?.title;
+    const eventTitle = event?.title;
     const messages = event?.messages;
     const polls = event?.polls;
     const displayName = user?.displayName;
@@ -41,11 +41,21 @@ const Home = ({ socket }: componentProps) => {
         socket.on('fetch event data', fetchEventData);
         socket.on('fetch polls', (title: string) => fetchEventPolls(title));
 
-        if (loggedInChat && !title) {
+        if (loggedInChat && !eventTitle) {
             const title = localStorage.getItem('eventTitle');
             socket.emit('join event', { userId, displayName, title });
         }
     }, []);
+
+    useEffect(() => {
+        console.log(eventId);
+        if (!loading && eventId) {
+            const title = localStorage.getItem('eventTitle');
+            socket?.emit('join event', { userId, displayName, title });
+            fetchEventData();
+            console.log('after emit event and user ' + displayName + ' ' + title);
+        }
+    }, [eventId]);
 
     const fetchEventData = () => {
         console.log('fetching event data');
@@ -54,12 +64,15 @@ const Home = ({ socket }: componentProps) => {
 
     const fetchEventMessages = (title: string) => {
         console.log('rcvd order to fetch messages');
-        dispatch(fetchMessages(eventId!));
+        if(eventId){
+            console.log(eventId);
+        dispatch(fetchMessages(eventId));
+        }
     }
 
     const fetchEventPolls = (eventTitle: string) => {
         console.log('rcvd order to fetch polls');
-        console.log(eventTitle, title);
+        console.log(eventTitle, eventTitle);
         dispatch(fetchPolls(eventId!));
     }
 
@@ -67,13 +80,8 @@ const Home = ({ socket }: componentProps) => {
         event.preventDefault();
         event.stopPropagation();
         if (userId) {
-            await dispatch(joinEvent({ title, userId }));
-            if (!loading && title) {
-            socket?.emit('join event', { userId, displayName, title });
-            }
-            fetchEventData();
+            dispatch(joinEvent({ title, userId }));
         }
-        console.log('after emit event and user ' + displayName + ' ' + title);
     }
 
     const sendChatMessage = (message: string) => async (ev: any) => {
@@ -88,7 +96,8 @@ const Home = ({ socket }: componentProps) => {
             date: new Date().toISOString(),
         }
         const sentMessage = await messageService.sendMessage(newMessage);
-        socket?.emit('chat message', userId, title);
+        console.log('sent message ' + sentMessage);
+        socket?.emit('chat message', userId, eventTitle);
     }
 
     const handleDeleteMessagePressed = (messageId: string) => {
@@ -102,8 +111,8 @@ const Home = ({ socket }: componentProps) => {
             console.log('should delete message ' + idToDetele);
             const result = await messageService.deleteMessage(idToDetele, eventId!);
             console.log(result);
-            if (result?.success){
-                socket?.emit('chat message', userId, title)
+            if (result?.success) {
+                socket?.emit('chat message', userId, eventTitle)
             }
         } else {
             setIdToDelete('');
@@ -116,12 +125,12 @@ const Home = ({ socket }: componentProps) => {
         if (!userId) return;
         const result = await messageService.answerMessage(messageId);
         if (result?.success) {
-            socket?.emit('chat message', userId, title)
+            socket?.emit('chat message', userId, eventTitle)
         }
     }
 
     const userVoted = (pollId: string) => {
-        socket?.emit("user vote", userId, title, pollId);
+        socket?.emit("user vote", userId, eventTitle, pollId);
         dispatch(fetchPolls(eventId!));
     }
 
@@ -141,12 +150,12 @@ const Home = ({ socket }: componentProps) => {
                 />}
 
             <div className={styles.homeContainer}>
-                {isAuthenticated && loggedInChat && messages &&
+                {isAuthenticated && loggedInChat && 
                     <div className={styles.chatArea}>
-                        <Messages 
-                        messages={messages} 
-                        onDeleteButtonPressed={handleDeleteMessagePressed}
-                        onAnswerButtonPressed={handleAnswerMessage} 
+                        <Messages
+                            messages={messages}
+                            onDeleteButtonPressed={handleDeleteMessagePressed}
+                            onAnswerButtonPressed={handleAnswerMessage}
                         />
                         <MessageInput onChatMessage={sendChatMessage} />
                     </div>

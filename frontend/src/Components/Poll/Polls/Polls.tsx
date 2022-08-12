@@ -28,7 +28,7 @@ const Polls = ({ polls, onVoteComplete }: componentProps) => {
     useEffect(() => {
         console.log(currentPollId);
         if (currentPollId !== '') {
-            pollsService.getPollbyId(currentPollId)
+            pollsService.getPollById(currentPollId)
                 .then(poll => {
                     setSelectedPoll(poll);
                 })

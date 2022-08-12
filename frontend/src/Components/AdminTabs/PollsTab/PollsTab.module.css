@@ -36,9 +36,9 @@
 }
 
 .sortActionsHolder div {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .sortActionsHolder h4 {
@@ -71,9 +71,26 @@ button.sortSelected {
 .pollsHolder {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .newButtonHolder {
   width: 80%;
   margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+
+.pollsTabWrapper h2 {
+  margin: 1.5rem;
+  padding: 0 2rem;
+}
+
+  .sortActionsHolder h4 {
+    font-size: 1.2rem;
+  }
+
+  .sortActionsHolder button {
+    font-size: 0.8rem;
+  }
 }

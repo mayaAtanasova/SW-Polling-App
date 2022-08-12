@@ -75,20 +75,22 @@ io.sockets.on('connect', socket => {
 
     //When user joins event
     socket.on('join event', async ({ userId, displayName, title }) => {
-        console.log(`${displayName} joined ${title}`);
+        console.log(`${displayName} is joining ${title}`);
         const user = userJoinEvent(socket.id, userId, displayName, title);
         socket.join(user.eventTitle);
 
         //get users to fetch the event data
         const users = getEventUsers(title);
+        console.log(users);
         users.forEach(user => {
+            console.log('emitting fetch data to user', user.uid);
             io.to(user.sid).emit('fetch event data', title);
         })
     });
 
     //Listen for chat msgs
     socket.on('chat message', (userId, title) => {
-        console.log('received new message');
+        console.log('received new message from user ', userId, ' for event ', title);
         const users = getEventUsers(title);
         console.log('current users are: ', users);
 

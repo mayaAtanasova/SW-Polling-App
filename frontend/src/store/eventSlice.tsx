@@ -112,7 +112,7 @@ const eventSlice = createSlice({
         },
         clearEventData: (state) => {
             state.event = emptyEvent;
-            state.eventId = '';
+            state.eventId = null;
             state.loggedInChat = false;
         },
     },
