@@ -5,6 +5,7 @@ export interface IVote {
     user: {
         _id: string;
         displayName: string;
+        vpoints: number;
     };
     createdAt?: string;
 }

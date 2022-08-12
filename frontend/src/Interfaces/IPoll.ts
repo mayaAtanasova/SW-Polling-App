@@ -26,7 +26,7 @@ export interface IPollCompact {
         createdAt: string,
         editedAt: string,
         options: string[],
-        votes: [{ option: string, user: { displayName: string, vpoints: number } }],
+        votes: IVote[],
         locked: boolean,
         concluded: boolean,
 }

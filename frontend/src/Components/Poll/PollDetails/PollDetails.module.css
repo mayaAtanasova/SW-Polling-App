@@ -114,6 +114,12 @@ width: 80%;
     font-size: 1.5rem;
 }
 
+.plotButton {
+    border: none;
+    color: var(--color-accent);
+    font-size: 1.5rem;
+}
+
 .closeButton:hover {
     cursor: pointer;
     opacity: 0.8;
