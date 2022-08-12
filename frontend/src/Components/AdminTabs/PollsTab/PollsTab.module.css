@@ -35,19 +35,27 @@
   gap: 10px;
 }
 
-.sortActionsHolder div {
+.sortActionGroup {
   display: flex;
   flex-direction: row;
+  justify-content: center;
   gap: 10px;
 }
 
-.sortActionsHolder h4 {
-  font-size: 1.5rem;
+.sortActionGroup h4 {
+  font-size: 1.25rem;
   font-weight: 600;
   margin: 0.5rem;
 }
 
-.sortActionsHolder button {
+.buttonsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+}
+
+.buttonsContainer button {
   flex: 1;
   background-color: var(--color-light-transparent);
   border: none;
@@ -59,7 +67,7 @@
   transition: all 0.3s ease-in-out;
 }
 
-.sortActionsHolder button:hover {
+.buttonsContainer button:hover {
   background-color: var(--color-accent);
   cursor: pointer;
 }
@@ -80,17 +88,21 @@ button.sortSelected {
 }
 
 @media (max-width: 900px) {
-
-.pollsTabWrapper h2 {
-  margin: 1.5rem;
-  padding: 0 2rem;
-}
-
+  .pollsTabWrapper h2 {
+    margin: 1.5rem;
+    padding: 0 2rem;
+  }
   .sortActionsHolder h4 {
     font-size: 1.2rem;
   }
-
   .sortActionsHolder button {
     font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .sortActionGroup {
+    display: flex;
+    flex-direction: column;
   }
 }

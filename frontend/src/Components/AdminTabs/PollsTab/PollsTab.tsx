@@ -169,18 +169,22 @@ const PollsTab = ({ socket }: componentProps) => {
       {!polls && <p>You have not created any polls yet.</p>}
       <h2>You have created the following polls</h2>
       <div className={styles.sortActionsHolder}>
-        <div>
+        <div className={styles.sortActionGroup}>
           <h4>Sort polls by event and date: </h4>
-          <button type="button" className={sortType === 'titleAsc' ? styles.sortSelected : ''} onClick={() => setSortType('titleAsc')}>Sort by Event Asc</button>
-          <button type="button" className={sortType === 'titleDesc' ? styles.sortSelected : ''} onClick={() => setSortType('titleDesc')}>Sort by Event Desc</button>
-          <button type="button" className={sortType === 'dateAsc' ? styles.sortSelected : ''} onClick={() => setSortType('dateAsc')}>Sort newest first</button>
-          <button type="button" className={sortType === 'dateDesc' ? styles.sortSelected : ''} onClick={() => setSortType('dateDesc')}>Sort oldest first</button>
+          <div className={styles.buttonsContainer}>
+            <button type="button" className={sortType === 'titleAsc' ? styles.sortSelected : ''} onClick={() => setSortType('titleAsc')}>Sort by Event Asc</button>
+            <button type="button" className={sortType === 'titleDesc' ? styles.sortSelected : ''} onClick={() => setSortType('titleDesc')}>Sort by Event Desc</button>
+            <button type="button" className={sortType === 'dateAsc' ? styles.sortSelected : ''} onClick={() => setSortType('dateAsc')}>Sort newest first</button>
+            <button type="button" className={sortType === 'dateDesc' ? styles.sortSelected : ''} onClick={() => setSortType('dateDesc')}>Sort oldest first</button>
+          </div>
         </div>
-        <div>
+        <div className={styles.sortActionGroup}>
           <h4>Filter polls by status: </h4>
-          <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>Show all polls</button>
-          <button type="button" className={filterType === 'activeOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('activeOnly')}>Show active only</button>
-          <button type="button" className={filterType === 'lockedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('lockedOnly')}>Show inactive only</button>
+          <div className={styles.buttonsContainer}>
+            <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>Show all polls</button>
+            <button type="button" className={filterType === 'activeOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('activeOnly')}>Show active only</button>
+            <button type="button" className={filterType === 'lockedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('lockedOnly')}>Show inactive only</button>
+          </div>
         </div>
       </div>
       <p>Click on a poll for details</p>
