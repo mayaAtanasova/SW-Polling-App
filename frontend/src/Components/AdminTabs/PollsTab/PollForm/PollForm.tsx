@@ -46,7 +46,7 @@ const PollForm = ({ events, hidePollForm }: formProps) => {
 
   const [formValid, setFormValid] = useState(false);
 
-  const pollMCValid = pollType === 'multiple choice' ? options.length > 0 : true;
+  const pollMCValid = pollType === 'multiple choice' ? options.length > 1 : true;
 
   const pollValid = formValid && eventId !== '' && pollType !== '' && pollMCValid;
 

@@ -96,6 +96,9 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
         .findOne({ title })
         .populate('attendees')
         .then(async (event: any) => {
+            if(!event) {
+                return res.status(404).json({ message: 'No such event' });
+            }
             const index = event.attendees.findIndex((attendee: any) => attendee._id.toString() === userId);
             if (index === -1) {
                 event.attendees.push(userId);
@@ -104,7 +107,8 @@ const joinEvent = async (req: Request, res: Response, next: NextFunction) => {
             return res.status(200).json({ message: `User ${event.attendees[index].displayName} joined event`, evid: event._id, eventTitle: event.title });
         })
         .catch((err: any) => {
-            return next(new Error('Could not join event: ' + err));
+            console.log(err);
+            return res.status(404).json({message: 'No such event'});
         });
 
 }
@@ -132,7 +136,8 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
         ])
         .exec((err: any, event: any) => {
             if (err) {
-                return next(new Error('Could not join event: ' + err));
+                console.log('Error while joining event ' + err)
+                return res.json({message: 'No such event'});
             }
             if (!event) {
                 return res.status(404).json({ message: 'Event not found' });

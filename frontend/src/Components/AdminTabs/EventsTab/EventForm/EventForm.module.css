@@ -107,38 +107,11 @@
     text-align: center;
     display: flex;
     justify-content: center;
+    gap: 1rem;
   }
   
   .formActions * {
     margin: 0;
-  }
-  .formActions .or {
-    position: relative;
-    margin: 1rem 0;
-  }
-  
-  .formActions .or::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 45%;
-    height: 1px;
-    opacity: 0.5;
-    background-color:var(--color-accent);
-    margin-bottom: 0.5rem;
-  }
-  
-  .formActions .or::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: 0;
-    width: 45%;
-    height: 1px;
-    opacity: 0.5;
-    background-color:var(--color-accent);
-    margin-bottom: 0.5rem;
   }
   
   .formSubmitBtn {

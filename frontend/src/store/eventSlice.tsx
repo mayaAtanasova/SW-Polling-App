@@ -119,8 +119,10 @@ const eventSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(joinEvent.fulfilled, (state, action) => {
+                if(action.payload.event){
                 state.loggedInChat = true;
                 state.eventId = action.payload.event.id;
+                }
                 state.loading = false;
             })
             .addCase(joinEvent.pending, (state, action) => {
