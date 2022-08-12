@@ -2,10 +2,10 @@
 
 The application has a server built on Node.js with Express and MongoDB as a database.
 The frontend is React.  Both BE and FE use TypeScript.
-The FE is split into an authentication and application part, and uses Redux (with ReduxToolkit for applicationwide state management).
+The FE is split into an authentication and application part, and uses Redux (with ReduxToolkit) for applicationwide state management.
 
 ## Authentication
-The authentication part covers registration, login with registeres credentials and Google OAuth2 authentication.
+The authentication part covers registration, login with registered credentials and Google OAuth2 authentication.
 Error checking on the FE is done by means of a custom hook.
 User is informed of any errors during the authentication process.
 When the user logs out he leaves both the event and the application.
@@ -18,7 +18,7 @@ After successful joining of the event, the Event Hall is populated with a "Chat 
 
 ### Chat area
 In this area the users can send messages addressed to the event admin/host.
-Only the admin has the authority to answer/delete messages.  The correspondin buttons appear in each message area ONLY when the ADMIN hovers upon the message, and are not visible for regular users.
+Only the admin has the authority to answer/delete messages.  The corresponding buttons appear in each message area ONLY when the ADMIN hovers upon the message, and are not visible for regular users.
 Each message contains the name of the author, the actual text, and the time of sending.
 
 ### Poll area
@@ -30,7 +30,7 @@ There are three kinds of polls: Multiple choice (the user has to select one of t
 This tab contains a brief summary of the event the user has joined - title, description, host, user display name and voting points, and the other users that have joined in attendance.
 
 ## Admin dashboard
-The admin dashboard is divided into an "Event Tab" and a "Poll Tab", for groupint the respective admin activities.
+The admin dashboard is divided into an "Event Tab" and a "Poll Tab", for grouping the respective admin activities.
 The admin does not have to be joined in an event to work in his/her dashboard.
 
 ### Event Tab
@@ -41,21 +41,21 @@ In this tab the admin can create new events or view an event particulars.
 * Upon successful creation the new Event appears in the list of events
 * Upon clicking on an event card the admin can view the event particulars in a details pop-up
 
-#### Details window
+#### Event Details popup window
 The details window is divided into sections, for Attendees, Polls and Messages, respectively.  By default they are contracted, but can be expanded by clicking the arrow next to the title.
-* The attendees are displayed in a table, on three rows, and can be browsed by clicking on the next and prev buttons.
+* The attendees are displayed in a table, on three rows, and can be browsed by clicking on the "next" and "prev" buttons.
 The admin can edit the voting points for each attendee by clicking on the small pencil icon next to the points number.  When the icon is clicked, two arrows appear next to the number for increasing or decreasing it.  When the edit is finished, it should be confirmed by clicking on the checkmark.
 
 * The polls for the event appear in a table, which lists the poll title, type, and all the voters with their respective answers
  * The messages for the event are listed in tables, one for the open (unanswered) messages, and one for the answered ones.  Each answered message has a "Restore" button next to it, in case the admin accidentally answered a question and wants to restore it to the chat.
 
  ### Polls Tab
- In this tab the admin can create new polls or view a poll particulars.
+ In this tab the admin can create new polls or view a poll's particulars.
 
- New polls can be created by clicking on the "New poll" button, which shows the new poll form.  The admin has to choose one of teh existing events (from a drop-down list) to add his/her poll to, type a question and choose the poll type.  Multiple choice polls have to ave at lease two options added to be valid.  All of teh input fields are also validated dynamically by the custom validation hook.
+ New polls can be created by clicking on the "New poll" button, which shows the new poll form.  The admin has to choose one of the existing events (from a drop-down list) to add his/her poll to, type a question and choose the poll type.  Multiple choice polls have to have at lease two options added to be valid.  All of the input fields are also validated dynamically by the custom validation hook.
 
- Upon successful creation the new poll appears in teh list of polls.
+ Upon successful creation the new poll appears in the list of polls.
 
  The polls the admin has created can be sorted by event title and date (ascending or descending), and can be filtered by status (active or conscluded).
 
- When clicking on a poll card, the admin can view its details and alist of the users that have already voted, with their respective votes and voting points.
+ When clicking on a poll card, the admin can view its details and a list of the users that have already voted, with their respective votes and voting points.
