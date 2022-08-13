@@ -77,15 +77,12 @@ io.sockets.on('connect', socket => {
     socket.on('join event', async ({ userId, displayName, title }) => {
         console.log(`${displayName} is joining ${title}`);
         const user = userJoinEvent(socket.id, userId, displayName, title);
-        socket.join(user.eventTitle);
+        socket.join(title);
 
         //get users to fetch the event data
         const users = getEventUsers(title);
         console.log(users);
-        users.forEach(user => {
-            console.log('emitting fetch data to user', user.uid);
-            io.to(user.sid).emit('fetch event data', title);
-        })
+        io.to(title).emit('fetch event data', title);
     });
 
     //Listen for chat msgs
@@ -95,10 +92,8 @@ io.sockets.on('connect', socket => {
         console.log('current users are: ', users);
 
         //Broadcast to room to get data
-        users.forEach(user => {
             console.log('broadcasting order to fetch messages')
-            io.to(user.sid).emit('fetch messages', title);
-        })
+            io.to(title).emit('fetch messages', title);
     });
 
     //Listen for new polls
@@ -108,10 +103,8 @@ io.sockets.on('connect', socket => {
         console.log('current users are: ', users);
 
         //Broadcast to room to get data
-        users.forEach(user => {
             console.log('broadcasting order to fetch polls')
-            io.to(user.sid).emit('fetch polls', title);
-        })
+            io.to(title).emit('fetch polls', title);
     })
 
     //when user votes
@@ -121,10 +114,8 @@ io.sockets.on('connect', socket => {
         console.log('current users are: ', users);
 
         //Broadcast to room to get data
-        users.forEach(user => {
             console.log('broadcasting order to fetch polls')
-            io.to(user.sid).emit('fetch polls', title);
-        })
+            io.to(title).emit('fetch polls', title);
     })
 
 
@@ -133,7 +124,7 @@ io.sockets.on('connect', socket => {
         if (userId && title) {
             console.log(`${userId} left ${title}`);
             const user = userLeaveEvent(socket.id, title);
-            if (user.eventTitle) {
+            if (user) {
                 console.log('user leaving event title: ', user.eventTitle);
                 socket.leave(user.eventTitle);
             }
@@ -143,18 +134,6 @@ io.sockets.on('connect', socket => {
     //Runs when client disconnects
     socket.on('disconnect', async () => {
         console.log(`user id ${socket.id} disconnected`);
-        const user = userDisconnect(socket.id);
-        if (user) {
-            const event = user.eventTitle;
-
-            const currentEvent = await Event.findOne({ event }).populate('createdBy');
-            const { _id: adminId, displayName: chatAdmin } = currentEvent.createdBy;
-
-            const adminLeaveMessage = formatMessage(chatAdmin, `${user.displayName} has left the chat`);
-
-            io.in(user.eventTitle)
-                .emit('leave message', adminLeaveMessage);
-        }
     });
 });
 

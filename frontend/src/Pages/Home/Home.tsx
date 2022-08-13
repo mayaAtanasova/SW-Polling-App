@@ -45,7 +45,13 @@ const Home = ({ socket }: componentProps) => {
             const title = localStorage.getItem('eventTitle');
             socket.emit('join event', { userId, displayName, title });
         }
-    }, []);
+
+        return () => {
+            socket.off('fetch messages');
+            socket.off('fetch event data');
+            socket.off('fetch polls');
+        }
+    }, [socket]);
 
     useEffect(() => {
         console.log(eventId);
@@ -59,7 +65,9 @@ const Home = ({ socket }: componentProps) => {
 
     const fetchEventData = () => {
         console.log('fetching event data');
-        dispatch(fetchEvent(eventId!));
+        if(eventId){
+            dispatch(fetchEvent(eventId!));
+        }
     }
 
     const fetchEventMessages = (title: string) => {
