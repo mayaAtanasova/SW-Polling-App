@@ -115,7 +115,7 @@ io.sockets.on('connect', socket => {
 
         //Broadcast to room to get data
             console.log('broadcasting order to fetch polls')
-            io.to(title).emit('fetch polls', title);
+            io.to(title).emit('fetch polls', title, pollId);
     })
 
 

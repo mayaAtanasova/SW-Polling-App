@@ -51,7 +51,7 @@ const PollsTab = ({ socket }: componentProps) => {
 
   useEffect(() => {
     if (!socket) return;
-    socket.on('fetch polls', (title: string) => updatePolls(title));
+    socket.on('fetch polls', (title: string, pollId: string) => updatePolls(title, pollId));
   }, [socket]);
 
   useEffect(() => {
@@ -101,13 +101,13 @@ const PollsTab = ({ socket }: componentProps) => {
     }
   };
 
-  const updatePolls = async (title: string) => {
+  const updatePolls = async (title: string, pollId: string) => {
     console.log('received order to fetch polls in ' + title);
-    // if (title === event?.title && currentPoll) {
-    //   console.log('updating polls}');
-    //   await getCurrentPollStatus(currentPoll?._id);
-    //   getAdminUserPolls();
-    // }
+    if (title === event?.title) {
+      console.log('updating polls for ' + title);
+      await getCurrentPollStatus(pollId);
+      getAdminUserPolls();
+    }
   }
 
   const getCurrentPollStatus = async (pollId: string) => {

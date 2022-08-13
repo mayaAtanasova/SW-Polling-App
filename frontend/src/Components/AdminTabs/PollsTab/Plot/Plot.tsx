@@ -1,5 +1,5 @@
 import { PureComponent, useEffect, useState } from 'react';
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LabelList } from 'recharts';
 import { IPollCompact } from '../../../../Interfaces/IPoll';
 import { IVote } from '../../../../Interfaces/IVote';
 import './Plot.css';
@@ -43,6 +43,17 @@ const PlotComponent = ({ poll }: componentProps) => {
 
       const dataArray = Object.entries(votesObject).map(el => ({ name: el[0] + " star", vote: el[1] }));
       return dataArray;
+
+    } else if (voteType === 'multiple choice') {
+      const optionsAcc = Object.fromEntries(poll.options.map(el => [el, 0]));
+      const votesObject = votes.reduce((acc: VotesObj, curr: IVote) => {
+        acc[curr.option!] = acc[curr.option!] + curr.user.vpoints;
+        return acc;
+      }, optionsAcc);
+
+      const dataArray = Object.entries(votesObject).map(el => ({ name: el[0], vote: el[1] }));
+      return dataArray;
+      
     } else {
       return [] as PlotData;
     }
@@ -77,7 +88,8 @@ const PlotComponent = ({ poll }: componentProps) => {
 
       {plotTypes.pie && 
       <PieChart width={1200} height={700}>
-        <Pie data={plotData} dataKey="vote" nameKey="name" cx="50%" cy="50%" outerRadius={300} fill="#71caeb" label />
+        <Pie data={plotData} dataKey="vote" nameKey="name" cx="50%" cy="50%" outerRadius={300} fill="#71caeb" legendType="line" label />
+        <Legend />
       </PieChart>
       }
 
