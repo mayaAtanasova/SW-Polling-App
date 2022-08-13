@@ -34,6 +34,7 @@ const PlotComponent = ({ poll }: componentProps) => {
     setPlotData(newPlotData);
   }, []);
 
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AB63FA'];
   const processData = (voteType: string, votes: IVote[]): PlotData => {
     if (voteType === 'rating') {
       const votesObject = votes.reduce((acc: VotesObj, curr: IVote) => {
@@ -82,13 +83,19 @@ const PlotComponent = ({ poll }: componentProps) => {
         <YAxis />
         <Tooltip contentStyle={{ backgroundColor: "#1b1b1b" }} />
         <Legend />
-        <Bar dataKey="vote" fill="#71caeb" />
+        <Bar dataKey="vote">
+          {plotData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+          </Bar>
       </BarChart>
       }
 
       {plotTypes.pie && 
       <PieChart width={1200} height={700}>
-        <Pie data={plotData} dataKey="vote" nameKey="name" cx="50%" cy="50%" outerRadius={300} fill="#71caeb" legendType="line" label />
+        <Pie data={plotData} dataKey="vote" nameKey="name" cx="50%" cy="50%" outerRadius={300} fill="#71caeb" legendType="line" label>
+        {plotData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+        </Pie>
         <Legend />
       </PieChart>
       }
