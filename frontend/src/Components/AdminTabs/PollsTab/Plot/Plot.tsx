@@ -1,5 +1,6 @@
 import { PureComponent, useEffect, useState } from 'react';
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LabelList } from 'recharts';
+import { genColor, genColourfulColor } from '../../../../helpers/colorGenerator';
 import { IPollCompact } from '../../../../Interfaces/IPoll';
 import { IVote } from '../../../../Interfaces/IVote';
 import './Plot.css';
@@ -34,7 +35,14 @@ const PlotComponent = ({ poll }: componentProps) => {
     setPlotData(newPlotData);
   }, []);
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AB63FA'];
+  // const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AB63FA'];
+  const colorsLength = poll.options.length || 5;
+  let colours:string[] = [];
+
+  for (let i = 0; i < colorsLength; i++) {
+    colours.push(genColourfulColor());
+  }
+
   const processData = (voteType: string, votes: IVote[]): PlotData => {
     if (voteType === 'rating') {
       const votesObject = votes.reduce((acc: VotesObj, curr: IVote) => {
@@ -70,9 +78,9 @@ const PlotComponent = ({ poll }: componentProps) => {
         <h1>Plot Results for poll "{poll.title}"" in event "{poll.event.title}"</h1> 
         <p>Choose plot type: </p>
       <div onChange={onChangePlotType}>
-        <input type="radio" value="bar" name="plotType" checked={plotType==="bar"} /> Bar Chart
-        <input type="radio" value="pie" name="plotType" checked={plotType==="pie"} /> Pie Chart
-        <input type="radio" value="radar" name="plotType" checked={plotType==="radar"} /> Radar Chart
+        <input type="radio" value="bar" name="plotType" readOnly checked={plotType==="bar"} /> Bar Chart
+        <input type="radio" value="pie" name="plotType" readOnly checked={plotType==="pie"} /> Pie Chart
+        <input type="radio" value="radar" name="plotType" readOnly checked={plotType==="radar"} /> Radar Chart
       </div>
       </div>
 
@@ -81,10 +89,10 @@ const PlotComponent = ({ poll }: componentProps) => {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />
-        <Tooltip contentStyle={{ backgroundColor: "#1b1b1b" }} />
+        <Tooltip contentStyle={{ backgroundColor: "rgba(81, 140, 161, 0.5)" }} />
         <Legend />
         <Bar dataKey="vote">
-          {plotData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+          {plotData.map((entry, index) => <Cell key={`cell-${index}`} fill={colours[index % colours.length]} />)}
           </Bar>
       </BarChart>
       }
@@ -93,10 +101,10 @@ const PlotComponent = ({ poll }: componentProps) => {
       <PieChart width={1200} height={700}>
         <Pie data={plotData} dataKey="vote" nameKey="name" cx="50%" cy="50%" outerRadius={300} fill="#71caeb" legendType="line" label>
         {plotData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Cell key={`cell-${index}`} fill={colours[index % colours.length]} />
             ))}
         </Pie>
-        <Legend />
+        <Legend iconSize={35} iconType="diamond"/>
       </PieChart>
       }
 

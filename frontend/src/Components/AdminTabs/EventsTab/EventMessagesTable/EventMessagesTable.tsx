@@ -9,24 +9,11 @@ import { setMessage } from '../../../../store/messageSlice';
 type componentProps = {
     messages: IMessage[],
     answered: boolean,
-    onRestoreMessage?: () => void,
+    onRestoreMessage?: (messageId: string) => (ev:any) => void,
 }
 
 const EventMessagesTable = ({ messages, answered, onRestoreMessage }: componentProps) => {
     const dispatch = useMyDispatch();
-
-    const onRestoreClicked = (messageId: string) => async (ev:any) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        console.log(messageId);
-        const restoredMessage = await messageService.restoreMessage(messageId);
-        if(restoredMessage && restoredMessage.success) {
-            console.log('message restored');
-            onRestoreMessage?.();
-        } else {
-            dispatch(setMessage(restoredMessage?.message));
-        }
-    }
     
     return (
         <div className={styles.messagesTableContainer}>
@@ -52,7 +39,7 @@ const EventMessagesTable = ({ messages, answered, onRestoreMessage }: componentP
                                 {answered && (
                                     <td>
                                         <button
-                                        onClick={onRestoreClicked(message._id!)}
+                                        onClick={onRestoreMessage && onRestoreMessage(message._id!)}
                                         >
                                             Restore
                                         </button>

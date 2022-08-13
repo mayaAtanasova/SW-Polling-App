@@ -31,9 +31,9 @@
 
 @media (max-width: 900px) {
   .homeContainer {
-    flex-direction: column;
+    flex-direction: column-reverse;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end;
   }
   .chatArea {
     width: 90%;

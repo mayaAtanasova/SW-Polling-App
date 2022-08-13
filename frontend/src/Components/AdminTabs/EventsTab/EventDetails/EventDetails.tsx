@@ -1,5 +1,6 @@
 import styles from './EventDetails.module.css';
 import moment from 'moment';
+import { Socket } from 'socket.io-client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowUpAZ, faClose } from '@fortawesome/free-solid-svg-icons';
 import UsersTable from '../../../Shared/UsersTable/UsersTable';
@@ -8,16 +9,21 @@ import { IEventCompact } from '../../../../Interfaces/IEvent';
 import { useEffect, useState } from 'react';
 import EventPollsTable from '../EventPollsTable/EventPollsTable';
 import EventMessagesTable from '../EventMessagesTable/EventMessagesTable';
+import messageService from '../../../../services/messageService';
+import { useMySelector, useMyDispatch } from '../../../../hooks/useReduxHooks';
+import { setMessage } from '../../../../store/messageSlice';
 
 type componentProps = {
     event: IEventCompact;
+    socket: Socket | null;
     onDetailsClose: (eventId: string) => (ev: any) => void,
     handleEditUser: (eventId: string) => (user: IUserCompact) => void,
-    handleRestoreMessage: () => void;
 }
 
-const EventDetails = ({ event, onDetailsClose, handleEditUser, handleRestoreMessage }: componentProps) => {
+const EventDetails = ({ event, socket, onDetailsClose, handleEditUser }: componentProps) => {
 
+    const [loading, setLoading] = useState(false);
+    const [eventData, setEventData ] = useState<IEventCompact>(event);
     const [sliceIndex, setSliceIndex] = useState<number>(0);
     const attendeeSlice = event.attendees.slice(sliceIndex, sliceIndex + 3);
     const lessAvailable = sliceIndex > 0;
@@ -26,6 +32,55 @@ const EventDetails = ({ event, onDetailsClose, handleEditUser, handleRestoreMess
     const [showAttendees, setShowAttendees] = useState(false);
     const [showPolls, setShowPolls] = useState(false);
     const [showMessages, setShowMessages] = useState(false);
+    const { user } = useMySelector(state => state.auth);
+    const userId = user?.id;
+
+    const dispatch = useMyDispatch();
+
+    useEffect(() => {
+        if (!socket) return;
+        socket.on('fetch messages', (title:string) => getCurrentMessages(title));
+    }, [socket]);
+
+    
+    const getCurrentMessages = (title:string) => {
+        console.log('getting messages for current event in events tab')
+        setLoading(true);
+        console.log(title, event?.title);
+        if (title === eventData.title) {
+            const eventId = eventData.id;
+            messageService
+                .fetchMessages(eventId)
+                .then((data) => {
+                    if (data) {
+                        console.log(data.messages);
+                        setEventData(eventData => Object.assign(eventData, { messages: data.messages }));
+                        console.log(eventData);
+                        setLoading(false);
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    setLoading(false);
+                });
+        } else {
+            // dispatch(setMessage('Event not found'));
+            setLoading(false);
+        }
+    }
+
+    const handleRestoreMessage =  (messageId: string) => async (ev:any) => {
+        ev.preventDefault();
+        console.log('restore clicked with message id ', messageId + ' in event ' + eventData.title);
+        const restoredMessage = await messageService.restoreMessage(messageId);
+        if(restoredMessage && restoredMessage.success) {
+            console.log('message restored');
+            getCurrentMessages(eventData.title);
+            socket?.emit('chat message', userId, eventData.title);
+        } else {
+            dispatch(setMessage(restoredMessage?.message));
+        }
+    }
 
     const prevAttendees = () => {
         setSliceIndex(sliceIndex => sliceIndex - 3);

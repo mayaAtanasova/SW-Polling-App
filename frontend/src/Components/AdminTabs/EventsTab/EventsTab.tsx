@@ -13,13 +13,12 @@ import { IUserCompact } from '../../../Interfaces/IUser';
 import { IEventCompact } from '../../../Interfaces/IEvent';
 
 import styles from './EventsTab.module.css';
-import messageService from '../../../services/messageService';
 
 type componentProps = {
     socket: Socket | null,
 }
 
-const EventsTab = ({ socket }:componentProps) => {
+const EventsTab = ({ socket }: componentProps) => {
     const [showEventForm, setShowEventForm] = useState(false);
     const [loading, setLoading] = useState(false);
     const [events, setEvents] = useState<IEventCompact[]>([]);
@@ -31,12 +30,12 @@ const EventsTab = ({ socket }:componentProps) => {
 
     useEffect(() => {
         getCurrentEvents();
+        console.log(currentEvent)
     }, []);
 
     useEffect(() => {
         if (!socket) return;
         socket.on('fetch event data', getCurrentEvents);
-        socket.on('fetch messages', (title:string) => getCurrentMessages(title));
     }, [socket]);
 
     const getCurrentEvents = () => {
@@ -59,32 +58,6 @@ const EventsTab = ({ socket }:componentProps) => {
         }
     };
 
-    const getCurrentMessages = (title:string) => {
-        console.log('getting messages for current event in events tab')
-        setLoading(true);
-        console.log(title, currentEvent?.title);
-        if (title === currentEvent?.title) {
-            const eventId = currentEvent?.id;
-            messageService
-                .fetchMessages(eventId)
-                .then((data) => {
-                    if (data) {
-                        console.log(data.messages);
-                        setCurrentEvent({ ...currentEvent, messages: data.messages });
-                        console.log(currentEvent);
-                        setLoading(false);
-                    }
-                })
-                .catch(err => {
-                    dispatch(setMessage(err.message));
-                    setLoading(false);
-                });
-        } else {
-            dispatch(setMessage('Event not found'));
-            setLoading(false);
-        }
-    }
-
     const revealEventForm = (event: any) => {
         event.preventDefault();
         setShowEventForm(true);
@@ -106,7 +79,7 @@ const EventsTab = ({ socket }:componentProps) => {
     const handleDetailViewClose = (eventId: string) => (ev: any) => {
         setCurrentEvent(null);
     }
-    
+
     const handleEditUser = (eventId: string) => (user: IUserCompact) => {
         const eventToModify = events.find((event: IEventCompact) => event.id === eventId);
         if (eventToModify) {
@@ -114,17 +87,8 @@ const EventsTab = ({ socket }:componentProps) => {
             if (index !== -1) {
                 eventToModify.attendees[index] = user;
             }
-            setEvents((oldEvents: IEventCompact[]) => oldEvents.map((x:IEventCompact) => x.id === eventId ? eventToModify : x));
+            setEvents((oldEvents: IEventCompact[]) => oldEvents.map((x: IEventCompact) => x.id === eventId ? eventToModify : x));
         }
-    }
-
-    const handleRestoreMessage = () => {
-        console.log('restore clicked');
-        console.log(currentEvent?.title);
-        if(currentEvent){
-        getCurrentMessages(currentEvent.title);
-        }
-        socket?.emit('chat message', userId, currentEvent?.title);
     }
 
     return (
@@ -155,9 +119,9 @@ const EventsTab = ({ socket }:componentProps) => {
             {currentEvent &&
                 <EventDetails
                     event={currentEvent}
+                    socket={socket}
                     onDetailsClose={handleDetailViewClose}
                     handleEditUser={handleEditUser}
-                    handleRestoreMessage={handleRestoreMessage}
                 />}
 
         </div>

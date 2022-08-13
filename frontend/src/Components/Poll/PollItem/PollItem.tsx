@@ -5,7 +5,7 @@ import styles from './PollItem.module.css';
 
 type componentProps = {
     poll: IPoll,
-    onPollClicked: (pollId: string) => (ev: any) => void,
+    onPollClicked: (pollId: string, voted: boolean) => (ev: any) => void,
 }
 const Poll = ({ poll, onPollClicked }: componentProps) => {
 
@@ -17,7 +17,8 @@ const Poll = ({ poll, onPollClicked }: componentProps) => {
     return (
         <div
             className={`${styles.pollItem} ${voted && styles.voted}`}
-            onClick={onPollClicked(_id)}>
+            onClick={onPollClicked(_id, voted)}
+            >
             <h3>{title}</h3>
             <div className={styles.pollActions}>
                 {voted && <p>You have voted</p> }

@@ -39,8 +39,9 @@ const Polls = ({ polls, onVoteComplete }: componentProps) => {
     }, [currentPollId])
 
     //open detailed view of selected poll
-    const handlePollSelect = (pollId: string) => (ev: any) => {
+    const handlePollSelect = (pollId: string, voted: boolean) => (ev: any) => {
         ev.preventDefault();
+        if (voted) return;
         setCurrentPollId(pollId);
     }
 
