@@ -62,6 +62,7 @@ const EventsTab = ({ socket }:componentProps) => {
     const getCurrentMessages = (title:string) => {
         console.log('getting messages for current event in events tab')
         setLoading(true);
+        console.log(title, currentEvent?.title);
         if (title === currentEvent?.title) {
             const eventId = currentEvent?.id;
             messageService

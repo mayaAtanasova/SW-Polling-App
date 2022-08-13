@@ -21,6 +21,10 @@
   border-radius: 0.5rem;
   background-color: var(--color-bkg-dark-transparent);
   overflow: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .pollDetailsTitle {
@@ -87,6 +91,7 @@
 }
 
 .votesTableWrapper {
+  width: 90%;
   margin: 2rem;
   border-radius: 0.5rem 0.5rem 0 0;
   overflow: hidden;
@@ -126,6 +131,14 @@
   border: none;
   background-color: var(--color-accent);
   border-radius: 0.5rem;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+}
+
+.plotButton:hover {
+cursor: pointer;
+opacity: 0.8;
 }
 
 .closeBtn {
