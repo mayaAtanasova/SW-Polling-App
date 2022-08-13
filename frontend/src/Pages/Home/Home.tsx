@@ -64,9 +64,10 @@ const Home = ({ socket }: componentProps) => {
 
     const fetchEventMessages = (title: string) => {
         console.log('rcvd order to fetch messages');
-        if(eventId){
-            console.log(eventId);
-        dispatch(fetchMessages(eventId));
+        const evid = localStorage.getItem('eventId');
+        if(evid){
+            console.log(evid);
+        dispatch(fetchMessages(evid));
         }
     }
 

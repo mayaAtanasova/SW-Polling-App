@@ -122,6 +122,12 @@
   padding: 0.5rem;
 }
 
+.plotButton {
+  border: none;
+  background-color: var(--color-accent);
+  border-radius: 0.5rem;
+}
+
 .closeBtn {
   position: absolute;
   top: 0.5rem;
