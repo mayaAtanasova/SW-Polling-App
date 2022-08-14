@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
+import { useContext, useEffect, useState } from 'react';
+import { SocketContext } from '../../store/socketContext';
 
 import styles from './Home.module.css';
 
@@ -15,13 +15,9 @@ import MessageInput from '../../Components/Chat/MessageInput';
 import Polls from '../../Components/Poll/Polls/Polls';
 import ConfirmDialog from '../../Components/Shared/ConfirmDialog/ConfirmDialog';
 
+const Home = () => {
 
-type componentProps = {
-    socket: Socket | null,
-};
-
-const Home = ({ socket }: componentProps) => {
-
+    const socket = useContext(SocketContext);
     const { user, isAuthenticated } = useMySelector((state: RootState) => state.auth);
     const { loading, loggedInChat, eventId, event } = useMySelector((state: RootState) => state.event);
     const userId = user?.id;

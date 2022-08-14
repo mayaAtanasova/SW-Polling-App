@@ -14,17 +14,9 @@ type componentProps = {
   // handleEditPoll: (pollId: string) => void,
 }
 
-type PlotData = {
-  name: string,
-  vote: number,
-}[];
-
 const PollDetails = ({ poll, onDetailsClose }: componentProps) => {
 
   const [showPlot, setShowPlot] = useState(false);
-  const [plotData, setPlotData] = useState<PlotData>([]);
-
-
 
   return (
     <div className={styles.pollDetailsBkg} >
@@ -66,7 +58,7 @@ const PollDetails = ({ poll, onDetailsClose }: componentProps) => {
         </div>
         <div className={styles.divider}></div>
 
-        <button className={styles.plotButton} onClick={() => setShowPlot(true)}>Plot BarChart</button>
+        <button className={styles.plotButton} onClick={() => setShowPlot(true)}>Plot results</button>
         {showPlot && <PlotComponent poll={poll} />}
 
         <button className={styles.closeBtn} onClick={onDetailsClose(poll._id)}>

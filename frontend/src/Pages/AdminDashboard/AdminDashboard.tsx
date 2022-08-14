@@ -1,23 +1,18 @@
-import { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
-
-import { useMyDispatch, useMySelector } from '../../hooks/useReduxHooks';
+import { useEffect, useState, useContext } from 'react';
 
 import EventsTab from '../../Components/AdminTabs/EventsTab/EventsTab';
 import PollsTab from '../../Components/AdminTabs/PollsTab/PollsTab';
 
-import styles from './AdminDashboard.module.css';
+import { useMySelector } from '../../hooks/useReduxHooks';
 import { RootState } from '../../store/store';
-import { fetchEvent } from '../../store/eventSlice';
+import { SocketContext } from '../../store/socketContext';
 
-type componentProps = {
-  socket: Socket | null,
-};
+import styles from './AdminDashboard.module.css';
 
-const AdminDashboard = ({ socket }: componentProps) => {
+const AdminDashboard = () => {
 
-  const dispatch = useMyDispatch();
-  const { loggedInChat, eventId, event } = useMySelector((state: RootState) => state.event);
+  const socket = useContext(SocketContext);
+  const { loggedInChat, event } = useMySelector((state: RootState) => state.event);
   const title = event?.title;
 
   const { user } = useMySelector(state => state.auth);
@@ -52,8 +47,8 @@ const AdminDashboard = ({ socket }: componentProps) => {
         </li>
       </ul>
       <div className={styles.outlet}>
-        {activeTab === 'events' && <EventsTab socket={socket} />}
-        {activeTab === 'polls' && <PollsTab socket={socket} />}
+        {activeTab === 'events' && <EventsTab />}
+        {activeTab === 'polls' && <PollsTab />}
       </div>
     </div>
   )

@@ -1,8 +1,7 @@
 .profileContainer {
-    width: 100vw;
+    width: 100%;
     height: 100%;
-    margin: 0 auto;
-    margin-top: 1rem;
+    margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -11,7 +10,12 @@
 
 .profileContainer img {
     object-fit: cover;
-    position:fixed;
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     z-index: -1;
 }
 

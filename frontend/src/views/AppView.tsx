@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import io from 'socket.io-client';
 
 import Home from '../Pages/Home/Home';
 import Navbar from '../Components/Navbar/Navbar';
 import AdminDashboard from '../Pages/AdminDashboard/AdminDashboard';
 import Profile from '../Pages/EventProfile/Profile';
-import { useMySelector } from '../hooks/useReduxHooks';
-
-import './AppView.css';
-import { RootState } from '../store/store';
 import NotFound from '../Pages/NotFound/NotFound';
 import ProtectedAdminRoute from '../Components/Shared/ProtectedAdminRoute/ProtectedAdminRoute';
 
-const socketURL = process.env.REACT_APP_BAS_URL ?? 'http://localhost:4000'
-const socket = io(socketURL, { transports: ['websocket'] });
+import { SocketContext, socket } from '../store/socketContext';
+import { useMySelector } from '../hooks/useReduxHooks';
+import { RootState } from '../store/store';
+
+import './AppView.css';
+import { Socket } from 'socket.io-client';
+
 
 const AppView = () => {
 
@@ -50,22 +50,24 @@ const AppView = () => {
   }
 
   return (
-    <BrowserRouter>
-      <Navbar socket={socket} />
-      <Routes>
-        <Route path="/" element={<Home socket={socket} />} />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboard socket={socket} />
-            </ProtectedAdminRoute>
-          }
-        />
-        <Route path='/profile' element={<Profile socket={socket} />} />
-        <Route path='/*' element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <SocketContext.Provider value={socket}>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboard />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route path='/profile' element={<Profile />} />
+          <Route path='/*' element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </SocketContext.Provider>
   );
 }
 

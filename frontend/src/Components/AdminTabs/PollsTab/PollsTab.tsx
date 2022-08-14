@@ -1,24 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
-
-import LargeButton from '../../UI/LargeButton/LargeButton';
-import { useMyDispatch, useMySelector } from '../../../hooks/useReduxHooks';
+import { useEffect, useState, useContext } from 'react';
 
 import pollsService from '../../../services/pollsService';
 import eventsService from '../../../services/eventService';
-import { setMessage } from '../../../store/messageSlice';
-import { IUserCompact } from '../../../Interfaces/IUser';
-import { IPoll, IPollCompact } from '../../../Interfaces/IPoll';
 
-import styles from './PollsTab.module.css';
+import { useMyDispatch, useMySelector } from '../../../hooks/useReduxHooks';
+import { setMessage } from '../../../store/messageSlice';
+import { SocketContext } from '../../../store/socketContext';
+
+import { IPollCompact } from '../../../Interfaces/IPoll';
+import { IEventCompact } from '../../../Interfaces/IEvent';
+
+import LargeButton from '../../UI/LargeButton/LargeButton';
 import PollCard from './PollCard/PollCard';
 import PollDetails from './PollDetails/PollDetails';
 import PollForm from './PollForm/PollForm';
-import { IEventCompact } from '../../../Interfaces/IEvent';
 
-type componentProps = {
-  socket: Socket | null,
-}
+import styles from './PollsTab.module.css';
+
 const sortingMethods = {
   titleAsc: { method: (a: IPollCompact, b: IPollCompact) => a.event.title.localeCompare(b.event.title) },
   titleDesc: { method: (a: IPollCompact, b: IPollCompact) => b.event.title.localeCompare(a.event.title) },
@@ -35,7 +33,9 @@ const filteringMethods = {
 type T = keyof typeof sortingMethods;
 type U = keyof typeof filteringMethods;
 
-const PollsTab = ({ socket }: componentProps) => {
+const PollsTab = () => {
+
+  const socket = useContext(SocketContext);
   const [showPollForm, setShowPollForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [polls, setPolls] = useState<IPollCompact[]>([]);

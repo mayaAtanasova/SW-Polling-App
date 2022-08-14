@@ -1,17 +1,16 @@
-import { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
-import UsersTable from '../../Components/Shared/UsersTable/UsersTable';
+import { useEffect, useState, useContext } from 'react';
+
 import { useMySelector, useMyDispatch } from '../../hooks/useReduxHooks';
 import { fetchEvent } from '../../store/eventSlice';
+import { SocketContext } from '../../store/socketContext';
+
+import UsersTable from '../../Components/Shared/UsersTable/UsersTable';
 
 import styles from './Profile.module.css';
 
-type componentProps = {
-  socket: Socket | null,
-};
+const Profile = () => {
 
-const Profile = ({ socket }: componentProps) => {
-
+  const socket = useContext(SocketContext);
   const [ loading, setLoading ] = useState(false);
   const { user } = useMySelector((state: any) => state.auth);
   const { event, eventId, loggedInChat } = useMySelector((state: any) => state.event);

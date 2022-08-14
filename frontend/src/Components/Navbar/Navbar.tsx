@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
-import styles from './Navbar.module.css';
 
 import { useMyDispatch, useMySelector } from '../../hooks/useReduxHooks';
 import { logout } from '../../store/authSlice';
 import { clearMessage } from '../../store/messageSlice';
-import { Socket } from 'socket.io-client';
+import { SocketContext } from '../../store/socketContext';
 
-type componentProps = {
-    socket: Socket | null,
-};
+import styles from './Navbar.module.css';
 
-const Navbar = ({ socket }: componentProps) => {
+const Navbar = () => {
     const [showMessage, setShowMessage] = useState(false);
 
+    const socket = useContext(SocketContext);
     const { loading, isAuthenticated, isAdmin, user } = useMySelector((state: any) => state.auth);
     const { eventId, event } = useMySelector((state: any) => state.event);
     const { message } = useMySelector((state: any) => state.message);

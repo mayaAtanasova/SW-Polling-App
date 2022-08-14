@@ -1,24 +1,23 @@
-import { useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
+import { useEffect, useState, useContext } from 'react';
 
 import LargeButton from '../../UI/LargeButton/LargeButton';
 import EventForm from './EventForm/EventForm';
-import { useMyDispatch, useMySelector } from '../../../hooks/useReduxHooks';
-
-import eventsService from '../../../services/eventService';
-import { setMessage } from '../../../store/messageSlice';
 import EventCard from './EventCard/EventCard';
 import EventDetails from './EventDetails/EventDetails';
+
 import { IUserCompact } from '../../../Interfaces/IUser';
 import { IEventCompact } from '../../../Interfaces/IEvent';
 
+import { useMyDispatch, useMySelector } from '../../../hooks/useReduxHooks';
+import eventsService from '../../../services/eventService';
+import { setMessage } from '../../../store/messageSlice';
+import { SocketContext } from '../../../store/socketContext';
+
 import styles from './EventsTab.module.css';
 
-type componentProps = {
-    socket: Socket | null,
-}
+const EventsTab = () => {
 
-const EventsTab = ({ socket }: componentProps) => {
+    const socket = useContext(SocketContext);
     const [showEventForm, setShowEventForm] = useState(false);
     const [loading, setLoading] = useState(false);
     const [events, setEvents] = useState<IEventCompact[]>([]);
