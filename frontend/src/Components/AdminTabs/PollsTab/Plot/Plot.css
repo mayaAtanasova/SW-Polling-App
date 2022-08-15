@@ -19,3 +19,17 @@
     justify-content: center;
     color: #fff;
 }
+
+.wordCloudWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.recharts-wrapper {
+    padding-top: 2rem;
+}
+
+.recharts-polar-grid-angle {
+    margin: 1rem;
+}
