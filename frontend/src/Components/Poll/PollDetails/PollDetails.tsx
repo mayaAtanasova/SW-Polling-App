@@ -4,10 +4,10 @@ import { IPoll } from '../../../Interfaces/IPoll';
 
 import styles from './PollDetails.module.css';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCross, fas, faX } from '@fortawesome/free-solid-svg-icons';
 import { far } from '@fortawesome/free-regular-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 library.add(fas, far);
 
 
@@ -21,10 +21,6 @@ const PollDetails = ({ poll, onPollClose, onVote }: componentProps) => {
     const [answer, setAnswer,] = useState('');
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const polType = poll.type;
-
-    useEffect(() => {
-        console.log(answer);
-    }, [answer])
 
     const MCList = (options?: string[]) => {
         const selectOption = (option:string, id:number) => {
@@ -60,12 +56,13 @@ const PollDetails = ({ poll, onPollClose, onVote }: componentProps) => {
     const ratingArray = Array(5).fill(1);
 
     const RatingList = () => {
-        const [rating, setRating] = useState(1);
+        const [rating, setRating] = useState(0);
         const getRating = (id: number) => (ev: any) => {
             const curRating = id + 1;
             const curAnswer = curRating.toString();
             setRating(curRating);
             setAnswer(curAnswer);
+            console.log(curAnswer);
         }
         return (
             <div className={styles.ratingList}>

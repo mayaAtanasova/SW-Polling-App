@@ -45,7 +45,7 @@ const PlotComponent = ({ poll }: componentProps) => {
   }, [poll]);
 
   const optionsLength = poll.options.length || poll.votes.length || 5;
-  const colours = ["#71caeb", "#ed6b6a", "#90c78f", "#aeafae", "#a78bc0", "#d4a187"];
+  const colours = ["#71caeb", "#ed6b6a", "#90c78f", "#edb458", "#a78bc0", "#8b1e3f", "#04724d", "#f2d0a9", "#d62839", "#4281a4"];
 
   const processData = (voteType: string, votes: IVote[]): PlotData => {
     if (voteType === 'rating') {
