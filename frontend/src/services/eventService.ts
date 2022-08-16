@@ -178,6 +178,7 @@ const editUserVpoints = async ( userVPoints:userVPoints ) => {
 export default {
     joinEvent,
     fetchEventData,
+    fetchEventPolls,
     createEvent,
     editEvent,
     deleteEvent,

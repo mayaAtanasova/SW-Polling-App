@@ -1,37 +1,41 @@
 .eventsTabWrapper {
-padding: 2rem;
-border: 1px solid var(--color-grey-transparent);
-border-top: 0;
-border-radius: 0 0 1rem 1rem;
+  padding: 2rem;
+  border: 1px solid var(--color-grey-transparent);
+  border-top: 0;
+  border-radius: 0 0 1rem 1rem;
 }
 
 .divider {
-    margin: 1.5rem auto;
-    width: 80%;
-    height: 3px;
-    border-radius: 60%;
-    background-color: var(--color-accent);
+  margin: 1.5rem auto;
+  width: 80%;
+  height: 3px;
+  border-radius: 60%;
+  background-color: var(--color-accent);
 }
 .eventsTabWrapper h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    text-transform: capitalize;
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-transform: capitalize;
 }
 
 .eventsTabWrapper p {
-    font-size: 1rem;
-    text-align: center;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.loadingWrapper {
+  position: relative;
 }
 
 .eventsHolder {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .newButtonHolder {
-    width: 80%;
-    margin: 0 auto;
+  width: 80%;
+  margin: 0 auto;
 }

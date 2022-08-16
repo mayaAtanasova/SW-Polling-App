@@ -14,6 +14,7 @@ import { setMessage } from '../../../store/messageSlice';
 import { SocketContext } from '../../../store/socketContext';
 
 import styles from './EventsTab.module.css';
+import Loader from '../../UI/Loader/Loader';
 
 const EventsTab = () => {
 
@@ -108,11 +109,14 @@ const EventsTab = () => {
 
             <h2>You have created the following events</h2>
             <p>Click on active events for details</p>
-            {!events && <p>You have no events yet.</p>}
-            <div className={styles.eventsHolder}>
-                {events && events.map((event: any) => {
-                    return (<EventCard key={event.id} event={event} onSelectEvent={selectEvent} />)
-                })}
+            <div className={styles.loadingWrapper}>
+                {loading && <Loader />}
+                {!loading && !events && <p>You have no events yet.</p>}
+                {!loading && <div className={styles.eventsHolder}>
+                    {events && events.map((event: any) => {
+                        return (<EventCard key={event.id} event={event} onSelectEvent={selectEvent} />)
+                    })}
+                </div>}
             </div>
 
             {currentEvent &&

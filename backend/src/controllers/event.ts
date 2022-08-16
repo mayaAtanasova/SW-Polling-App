@@ -194,7 +194,7 @@ const fetchEventPolls = async (req: Request, res: Response, next: NextFunction) 
                     select: '_id title type votes',
                     populate: {
                         path: 'votes',
-                        select: 'option user createdAt',
+                        select: '_id option user createdAt',
                         populate: {
                             path: 'user',
                             select: '_id displayName vpoints',
@@ -207,7 +207,7 @@ const fetchEventPolls = async (req: Request, res: Response, next: NextFunction) 
                     return next(new Error('Could not find event: ' + err));
                 }
                 if (!polls) {
-                    return next(new Error('Event not found'));
+                    return next(new Error('No polls found'));
                 }
                 return res.status(200).json({ polls })
             })
@@ -216,6 +216,31 @@ const fetchEventPolls = async (req: Request, res: Response, next: NextFunction) 
     }
 }
 
+const fetchEventAttendees = async (req: Request, res: Response, next: NextFunction) => {
+    const evid = req.params.evid;
+
+    try {
+        Event
+            .findById(evid)
+            .populate([
+                {
+                    path: 'attendees',
+                    select: '_id displayName email vpoints',
+                }
+            ])
+            .exec((err: any, event: any) => {
+                if (err) {
+                    return next(new Error('Could not find event: ' + err));
+                }
+                if (!event) {
+                    return next(new Error('Event not found'));
+                }
+                return res.status(200).json({ attendees: event.attendees })
+            })
+    } catch (err) {
+        return next(new Error('Could not fetch attendees: ' + err));
+    }
+}
 const editEvent = async (req: Request, res: Response, next: NextFunction) => {
     const eventId = req.params.eventId;
     const { title, description } = req.body;
@@ -327,9 +352,11 @@ export default {
     getEventsByCreator,
     fetchEventData,
     fetchEventPolls,
+    fetchEventAttendees,
     createEvent,
     joinEvent,
     archiveEvent,
     updateVpoints,
+    editEvent,
     deleteEvent,
 }
