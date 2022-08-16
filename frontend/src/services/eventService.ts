@@ -65,7 +65,21 @@ const fetchEventData = async (eventId: string) => {
 
 const fetchEventPolls = async (eventId: string) => {
     try {
-        const response = await fetch(`${eventUrl}/${eventId}/polls`);
+        const response = await fetch(`${eventUrl}/polls/${eventId}`);
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.error(message);
+    }
+}
+
+const fetchEventAttendees = async (eventId: string) => {
+    try {
+        const response = await fetch(`${eventUrl}/attendees/${eventId}`);
         const data = await response.json();
         return data;
     } catch (error: any) {
@@ -179,6 +193,7 @@ export default {
     joinEvent,
     fetchEventData,
     fetchEventPolls,
+    fetchEventAttendees,
     createEvent,
     editEvent,
     deleteEvent,

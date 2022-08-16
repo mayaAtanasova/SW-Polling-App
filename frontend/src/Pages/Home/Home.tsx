@@ -65,7 +65,7 @@ const Home = () => {
             dispatch(fetchEvent(eventId!));
         }
     }
-
+    //Look into this scenario!
     const fetchEventMessages = (title: string) => {
         console.log('rcvd order to fetch messages');
         const evid = localStorage.getItem('eventId');
@@ -78,6 +78,7 @@ const Home = () => {
     const fetchEventPolls = (eventTitle: string) => {
         console.log('rcvd order to fetch polls');
         console.log(eventTitle, eventTitle);
+        console.log(eventId);
         dispatch(fetchPolls(eventId!));
     }
 

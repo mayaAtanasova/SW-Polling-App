@@ -202,14 +202,14 @@ const fetchEventPolls = async (req: Request, res: Response, next: NextFunction) 
                     }
                 }
             ])
-            .exec((err: any, polls: any) => {
+            .exec((err: any, event: any) => {
                 if (err) {
                     return next(new Error('Could not find event: ' + err));
                 }
-                if (!polls) {
-                    return next(new Error('No polls found'));
+                if (!event) {
+                    return next(new Error('No event found'));
                 }
-                return res.status(200).json({ polls })
+                return res.status(200).json({ polls: event.polls })
             })
     } catch (err) {
         return next(new Error('Could not fetch polls: ' + err));
@@ -235,7 +235,15 @@ const fetchEventAttendees = async (req: Request, res: Response, next: NextFuncti
                 if (!event) {
                     return next(new Error('Event not found'));
                 }
-                return res.status(200).json({ attendees: event.attendees })
+                const modifiedAttendees = event.attendees.map((attendee: any) => {
+                    return {
+                        id: attendee._id,
+                        displayName: attendee.displayName,
+                        email: attendee.email,
+                        vpoints: attendee.vpoints,
+                    };
+                });
+                return res.status(200).json({ attendees: modifiedAttendees })
             })
     } catch (err) {
         return next(new Error('Could not fetch attendees: ' + err));

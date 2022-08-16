@@ -1,17 +1,22 @@
-import styles from './EventDetails.module.css';
+import { useEffect, useState } from 'react';
 import moment from 'moment';
 import { Socket } from 'socket.io-client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowUpAZ, faClose } from '@fortawesome/free-solid-svg-icons';
-import UsersTable from '../../../Shared/UsersTable/UsersTable';
+
 import { IUserCompact } from '../../../../Interfaces/IUser';
 import { IEventCompact } from '../../../../Interfaces/IEvent';
-import { useEffect, useState } from 'react';
+
+import UsersTable from '../../../Shared/UsersTable/UsersTable';
 import EventPollsTable from '../EventPollsTable/EventPollsTable';
 import EventMessagesTable from '../EventMessagesTable/EventMessagesTable';
 import messageService from '../../../../services/messageService';
+import eventService from '../../../../services/eventService';
+
 import { useMySelector, useMyDispatch } from '../../../../hooks/useReduxHooks';
 import { setMessage } from '../../../../store/messageSlice';
+
+import styles from './EventDetails.module.css';
 
 type componentProps = {
     event: IEventCompact;
@@ -39,7 +44,15 @@ const EventDetails = ({ event, socket, onDetailsClose, handleEditUser }: compone
 
     useEffect(() => {
         if (!socket) return;
-        socket.on('fetch messages', (title:string) => getCurrentMessages(title));
+        socket.on('fetch messages', (title:string) => getCurrentMessages(title));                           
+        socket.on('fetch event data', (title:string) => getCurrentAttendees(title));
+        socket.on('fetch polls', (title:string) => getCurrentPolls(title));
+
+        return () => {
+            socket.off('fetch messages');
+            socket.off('fetch event data');
+            socket.off('fetch polls');
+        }
     }, [socket]);
 
     
@@ -64,10 +77,59 @@ const EventDetails = ({ event, socket, onDetailsClose, handleEditUser }: compone
                     setLoading(false);
                 });
         } else {
-            // dispatch(setMessage('Event not found'));
             setLoading(false);
         }
     }
+
+    const getCurrentAttendees = (title:string) => {
+        console.log('getting attendees for current event in events tab')
+        setLoading(true);
+        console.log(title, event?.title);
+        if (title === eventData.title) {
+            const eventId = eventData.id;
+            eventService
+            .fetchEventAttendees(eventId)
+            .then((data) => {
+                if (data) {
+                    console.log(data.attendees);
+                    setEventData(eventData => Object.assign(eventData, { attendees: data.attendees }));
+                    console.log(eventData);
+                    setLoading(false);
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                setLoading(false);
+            });
+        } else {
+            setLoading(false);
+        }
+    }
+
+        const getCurrentPolls = (title:string) => {
+            console.log('getting polls for current event in events tab')
+            setLoading(true);
+            console.log(title, event?.title);
+            if (title === eventData.title) {
+                const eventId = eventData.id;
+                eventService
+                .fetchEventPolls(eventId)
+                .then((data) => {
+                    if (data) {
+                        console.log(data.polls);
+                        setEventData(eventData => Object.assign(eventData, { polls: data.polls }));
+                        console.log(eventData);
+                        setLoading(false);
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    setLoading(false);
+                });
+            } else {
+                setLoading(false);
+            }
+        }
 
     const handleRestoreMessage =  (messageId: string) => async (ev:any) => {
         ev.preventDefault();
