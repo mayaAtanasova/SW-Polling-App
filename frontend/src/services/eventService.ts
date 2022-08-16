@@ -151,15 +151,45 @@ const editEvent = async (eventId: string, title: string, description: string) =>
     }
 }
 
+const archiveEvent = async (eventId: string) => {
+    try {
+        const response = await fetch(`${eventUrl}/archive/${eventId}`, {
+            method: 'POST',
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.error(message);
+    }
+}
+
+const restoreEvent = async (eventId: string) => {
+try{
+    const response = await fetch(`${eventUrl}/restore/${eventId}`, {
+        method: 'POST',
+    });
+    const data = await response.json();
+    return data;
+} catch (error: any) {
+    const message =
+        (error.response && error.response.data && error.response.data.message)
+        || error.message
+        || error.toString();
+    console.error(message);
+}
+}
+
 const deleteEvent = async (eventId: string) => {
     try {
         const response = await fetch(`${eventUrl}/${eventId}`, {
             method: 'DELETE',
         });
         const data = await response.json();
-        return {
-            message: data.message,
-        };
+        return data;
     } catch (error: any) {
         const message =
             (error.response && error.response.data && error.response.data.message)
@@ -196,6 +226,8 @@ export default {
     fetchEventAttendees,
     createEvent,
     editEvent,
+    archiveEvent,
+    restoreEvent,
     deleteEvent,
     getEventsByCreator,
     editUserVpoints

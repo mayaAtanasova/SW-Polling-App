@@ -10,6 +10,7 @@ type componentProps = {
         host: string,
         polls: string[],
         attendees: IUser[],
+        archived: boolean,
         date: string,
     },
     onSelectEvent: (eventId: string) => (ev:any) => void,
@@ -18,7 +19,7 @@ type componentProps = {
 const EventCard = ({ event, onSelectEvent }: componentProps) => {
     return (
         <div 
-        className={styles.eventCard}
+        className={`${styles.eventCard} ${event.archived ? styles.archivedEvent : ''}`}
         onClick={onSelectEvent(event.id)}>
             <div className={styles.titleHolder}>
                 <h2>{event.title}</h2>

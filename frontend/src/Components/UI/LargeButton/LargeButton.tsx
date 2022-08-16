@@ -4,6 +4,7 @@ type componentProps = {
     text: string,
     onClick: (ev?:any) => void,
 }
+
 const LargeButton = ({ text, onClick }: componentProps) => {
   return (
     <button

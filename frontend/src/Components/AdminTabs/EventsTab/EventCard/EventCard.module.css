@@ -9,6 +9,11 @@
   transition: background-color 0.2s ease-in-out;
 }
 
+.archivedEvent {
+  background-color: var(--color-grey-transparent);
+  border: 2px solid grey;
+}
+
 .eventCard * {
   margin: 0 0 0.5rem 0;
 }
@@ -18,11 +23,20 @@
   cursor: pointer;
 }
 
+.archivedEvent:hover {
+  background-color: rgba(107, 107, 107, 0.5);
+}
+
 .titleHolder {
   margin: 0 auto;
   text-align: center;
   background-color: var(--color-dark-transparent);
   border-bottom: 1px solid var(--color-light-transparent);
+}
+
+.archivedEvent .titleHolder {
+  background-color: var(--color-grey-transparent);
+  border-bottom: 1px solid grey;
 }
 
 .titleHolder h2 {
@@ -33,6 +47,10 @@
   display: inline-block;
   font-size: 1.5rem;
   vertical-align: bottom;
+}
+
+.archivedEvent h2{
+  border-bottom: 4px solid var(--color-text-secondary);
 }
 
 .eventCard p:first-of-type,

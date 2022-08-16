@@ -21,7 +21,8 @@ eventRouter.post('/join',
 body('title').isLength({ min: 1 }).withMessage('Title is required'),
 event.joinEvent);
 
-eventRouter.post('archive/:evid', event.archiveEvent);
+eventRouter.post('/archive/:evid', event.archiveEvent);
+eventRouter.post('/restore/:evid', event.restoreEvent);
 
 eventRouter.post('/vpoints', event.updateVpoints);
 

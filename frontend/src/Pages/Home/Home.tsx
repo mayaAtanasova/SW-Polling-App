@@ -174,7 +174,7 @@ const Home = () => {
                     </div>}
             </div>
 
-            {isDialogOpen && <ConfirmDialog itemType='message' onDialogClose={onDialogClose} />}
+            {isDialogOpen && <ConfirmDialog itemType='message' actionType="delete" onDialogClose={onDialogClose} />}
         </div>
     );
 };

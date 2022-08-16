@@ -15,18 +15,23 @@ import { SocketContext } from '../../../store/socketContext';
 
 import styles from './EventsTab.module.css';
 import Loader from '../../UI/Loader/Loader';
+import ConfirmDialog from '../../Shared/ConfirmDialog/ConfirmDialog';
+import eventService from '../../../services/eventService';
 
 const EventsTab = () => {
 
     const socket = useContext(SocketContext);
-    const [showEventForm, setShowEventForm] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [events, setEvents] = useState<IEventCompact[]>([]);
-    const [currentEvent, setCurrentEvent] = useState<IEventCompact | null>();
+    const dispatch = useMyDispatch();
     const { user } = useMySelector(state => state.auth);
     const userId = user?.id;
 
-    const dispatch = useMyDispatch();
+    const [loading, setLoading] = useState(false);
+    const [showEventForm, setShowEventForm] = useState(false);
+    const [events, setEvents] = useState<IEventCompact[]>([]);
+    const [currentEvent, setCurrentEvent] = useState<IEventCompact | null>();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalAction, setModalAction] = useState('');
+
 
     useEffect(() => {
         getCurrentEvents();
@@ -34,8 +39,18 @@ const EventsTab = () => {
     }, []);
 
     useEffect(() => {
+        const detailsViewOpen = !!currentEvent;
+        const body = document.body;
+        body.style.overflow = detailsViewOpen ? 'hidden' : 'auto';
+    }, [currentEvent])
+
+    useEffect(() => {
         if (!socket) return;
         socket.on('fetch event data', getCurrentEvents);
+
+        return () => {
+            socket.off('fetch event data');
+        }
     }, [socket]);
 
     const getCurrentEvents = () => {
@@ -91,6 +106,75 @@ const EventsTab = () => {
         }
     }
 
+    const onArchiveEvent = (eventId: string) => (ev: any) => {
+        ev.preventDefault();
+        setModalAction('archive');
+        setIsModalOpen(true);
+    }
+
+    const onRestoreEvent = (eventId: string) => (ev: any) => {
+        ev.preventDefault();
+        setModalAction('restore');
+        setIsModalOpen(true);
+    }
+
+    const onDeleteEvent = (eventId: string) => (ev: any) => {
+        ev.preventDefault();
+        setModalAction('delete');
+        setIsModalOpen(true);
+    }
+
+    const handleModalClose = (answer: boolean) => {
+        setIsModalOpen(false);
+        if (answer) {
+            const eventToModifyId = currentEvent?.id;
+            
+            if (eventToModifyId) {
+                if (modalAction === 'archive') {
+                    eventService
+                        .archiveEvent(eventToModifyId)
+                        .then((data) => {
+                            console.log(data);
+                            if (data.success) {
+                                dispatch(setMessage(data.message));
+                                setEvents(oldEents => oldEents.map((event: IEventCompact) => event.id === eventToModifyId ? { ...event, archived: true } : event));
+                                setCurrentEvent({ ...currentEvent, archived: true });
+                            }
+                        })
+                        .catch(err => {
+                            dispatch(setMessage(err.message));
+                        });
+                } else if (modalAction === 'restore') {
+                    eventService
+                        .restoreEvent(eventToModifyId)
+                        .then((data) => {
+                            if (data.success) {
+                                dispatch(setMessage(data.message));
+                                setEvents(oldEvents => oldEvents.map((event: IEventCompact) => event.id === eventToModifyId ? { ...event, archived: false } : event));
+                                setCurrentEvent({ ...currentEvent, archived: false });
+                            }
+                        })
+                        .catch(err => {
+                            dispatch(setMessage(err.message));
+                        });
+                } else if (modalAction === 'delete') {
+                    eventsService
+                        .deleteEvent(eventToModifyId)
+                        .then(() => {
+                            dispatch(setMessage('Event deleted successfully'));
+                            setEvents((oldEvents: IEventCompact[]) => oldEvents.filter((x: IEventCompact) => x.id !== eventToModifyId));
+                            setCurrentEvent(null);
+                        })
+                        .catch(err => {
+                            dispatch(setMessage(err.message));
+                        });
+                }
+            }
+        } else {
+            setModalAction('');
+        }
+    }
+
     return (
         <div className={styles.eventsTabWrapper}>
 
@@ -108,15 +192,29 @@ const EventsTab = () => {
             <div className={styles.divider}></div>
 
             <h2>You have created the following events</h2>
-            <p>Click on active events for details</p>
+            <p>Click on an event for details</p>
             <div className={styles.loadingWrapper}>
+
                 {loading && <Loader />}
+
                 {!loading && !events && <p>You have no events yet.</p>}
-                {!loading && <div className={styles.eventsHolder}>
-                    {events && events.map((event: any) => {
-                        return (<EventCard key={event.id} event={event} onSelectEvent={selectEvent} />)
-                    })}
-                </div>}
+
+                {!loading &&
+                    <div className={styles.eventsHolder}>
+                        <div className={styles.eventsGroupLabel}>Active events</div>
+                        {events && events.filter((event: any) => !event.archived).map((event: any) => {
+                            return (<EventCard key={event.id} event={event} onSelectEvent={selectEvent} />)
+                        })}
+                    </div>}
+
+                    {!loading &&
+                    <div className={styles.eventsHolder}>
+                        <div className={styles.eventsGroupLabel}>Archived events</div>
+                    {events && events.filter((event: any) => event.archived).map((event: any) => {
+                            return (<EventCard key={event.id} event={event} onSelectEvent={selectEvent} />)
+                        })}
+                    </div>}
+
             </div>
 
             {currentEvent &&
@@ -125,7 +223,12 @@ const EventsTab = () => {
                     socket={socket}
                     onDetailsClose={handleDetailViewClose}
                     handleEditUser={handleEditUser}
+                    handleArchiveEvent={onArchiveEvent}
+                    handleRestoreEvent={onRestoreEvent}
+                    handleDeleteEvent={onDeleteEvent}
                 />}
+
+            {isModalOpen && <ConfirmDialog itemType="event" actionType={modalAction} onDialogClose={handleModalClose} />}
 
         </div>
     )

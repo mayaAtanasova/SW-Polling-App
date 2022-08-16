@@ -17,18 +17,30 @@ import { useMySelector, useMyDispatch } from '../../../../hooks/useReduxHooks';
 import { setMessage } from '../../../../store/messageSlice';
 
 import styles from './EventDetails.module.css';
+import SmallButton from '../../../UI/SmallBUtton/SmallButton';
 
 type componentProps = {
     event: IEventCompact;
     socket: Socket | null;
     onDetailsClose: (eventId: string) => (ev: any) => void,
     handleEditUser: (eventId: string) => (user: IUserCompact) => void,
+    handleArchiveEvent: (eventId: string) => (ev: any) => void,
+    handleRestoreEvent: (eventId: string) => (ev: any) => void,
+    handleDeleteEvent: (eventId: string) => (ev: any) => void,
 }
 
-const EventDetails = ({ event, socket, onDetailsClose, handleEditUser }: componentProps) => {
+const EventDetails = ({ 
+    event, 
+    socket, 
+    onDetailsClose, 
+    handleEditUser,
+    handleArchiveEvent,
+    handleRestoreEvent,
+    handleDeleteEvent,
+}: componentProps) => {
 
     const [loading, setLoading] = useState(false);
-    const [eventData, setEventData ] = useState<IEventCompact>(event);
+    const [eventData, setEventData] = useState<IEventCompact>(event);
     const [sliceIndex, setSliceIndex] = useState<number>(0);
     const attendeeSlice = event.attendees.slice(sliceIndex, sliceIndex + 3);
     const lessAvailable = sliceIndex > 0;
@@ -44,9 +56,9 @@ const EventDetails = ({ event, socket, onDetailsClose, handleEditUser }: compone
 
     useEffect(() => {
         if (!socket) return;
-        socket.on('fetch messages', (title:string) => getCurrentMessages(title));                           
-        socket.on('fetch event data', (title:string) => getCurrentAttendees(title));
-        socket.on('fetch polls', (title:string) => getCurrentPolls(title));
+        socket.on('fetch messages', (title: string) => getCurrentMessages(title));
+        socket.on('fetch event data', (title: string) => getCurrentAttendees(title));
+        socket.on('fetch polls', (title: string) => getCurrentPolls(title));
 
         return () => {
             socket.off('fetch messages');
@@ -55,8 +67,8 @@ const EventDetails = ({ event, socket, onDetailsClose, handleEditUser }: compone
         }
     }, [socket]);
 
-    
-    const getCurrentMessages = (title:string) => {
+
+    const getCurrentMessages = (title: string) => {
         console.log('getting messages for current event in events tab')
         setLoading(true);
         console.log(title, event?.title);
@@ -81,38 +93,38 @@ const EventDetails = ({ event, socket, onDetailsClose, handleEditUser }: compone
         }
     }
 
-    const getCurrentAttendees = (title:string) => {
+    const getCurrentAttendees = (title: string) => {
         console.log('getting attendees for current event in events tab')
         setLoading(true);
         console.log(title, event?.title);
         if (title === eventData.title) {
             const eventId = eventData.id;
             eventService
-            .fetchEventAttendees(eventId)
-            .then((data) => {
-                if (data) {
-                    console.log(data.attendees);
-                    setEventData(eventData => Object.assign(eventData, { attendees: data.attendees }));
-                    console.log(eventData);
+                .fetchEventAttendees(eventId)
+                .then((data) => {
+                    if (data) {
+                        console.log(data.attendees);
+                        setEventData(eventData => Object.assign(eventData, { attendees: data.attendees }));
+                        console.log(eventData);
+                        setLoading(false);
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
                     setLoading(false);
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                setLoading(false);
-            });
+                });
         } else {
             setLoading(false);
         }
     }
 
-        const getCurrentPolls = (title:string) => {
-            console.log('getting polls for current event in events tab')
-            setLoading(true);
-            console.log(title, event?.title);
-            if (title === eventData.title) {
-                const eventId = eventData.id;
-                eventService
+    const getCurrentPolls = (title: string) => {
+        console.log('getting polls for current event in events tab')
+        setLoading(true);
+        console.log(title, event?.title);
+        if (title === eventData.title) {
+            const eventId = eventData.id;
+            eventService
                 .fetchEventPolls(eventId)
                 .then((data) => {
                     if (data) {
@@ -126,16 +138,16 @@ const EventDetails = ({ event, socket, onDetailsClose, handleEditUser }: compone
                     console.log(err);
                     setLoading(false);
                 });
-            } else {
-                setLoading(false);
-            }
+        } else {
+            setLoading(false);
         }
+    }
 
-    const handleRestoreMessage =  (messageId: string) => async (ev:any) => {
+    const handleRestoreMessage = (messageId: string) => async (ev: any) => {
         ev.preventDefault();
         console.log('restore clicked with message id ', messageId + ' in event ' + eventData.title);
         const restoredMessage = await messageService.restoreMessage(messageId);
-        if(restoredMessage && restoredMessage.success) {
+        if (restoredMessage && restoredMessage.success) {
             console.log('message restored');
             getCurrentMessages(eventData.title);
             socket?.emit('chat message', userId, eventData.title);
@@ -154,7 +166,7 @@ const EventDetails = ({ event, socket, onDetailsClose, handleEditUser }: compone
 
     return (
         <div className={styles.eventDetailsBkg} >
-            <div className={styles.eventDetailsWrapper}>
+            <div className={`${styles.eventDetailsWrapper} ${event.archived && styles.archivedEvent}`}>
                 <div className={styles.eventDetailsTitle}>
                     <h2>{event.title}</h2>
                 </div>
@@ -216,18 +228,23 @@ const EventDetails = ({ event, socket, onDetailsClose, handleEditUser }: compone
                 {showMessages && <div className={styles.messagesWrapper}>
                     {event.messages.length > 0 && (
                         <>
-                            <EventMessagesTable 
-                            messages={event.messages.filter(messages => !messages.answered)} 
-                            answered={false} 
+                            <EventMessagesTable
+                                messages={event.messages.filter(messages => !messages.answered)}
+                                answered={false}
                             />
-                            <EventMessagesTable 
-                            messages={event.messages.filter(messages => messages.answered)} 
-                            answered={true} 
-                            onRestoreMessage={handleRestoreMessage}
+                            <EventMessagesTable
+                                messages={event.messages.filter(messages => messages.answered)}
+                                answered={true}
+                                onRestoreMessage={handleRestoreMessage}
                             />
                         </>
                     )}
                 </div>}
+                <div className={styles.eventActionsGroup}>
+                    {!event.archived && <SmallButton text="Archive" onClick={handleArchiveEvent(event.id)} />}
+                    {event.archived && <SmallButton text="Restore" onClick={handleRestoreEvent(event.id)} />}
+                    {event.archived && <SmallButton alertBtn text="Delete" onClick={handleDeleteEvent(event.id)} />}
+                </div>
             </div>
         </div>
     )

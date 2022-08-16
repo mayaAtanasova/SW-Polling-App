@@ -35,7 +35,9 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
             if (!events) {
                 return res.status(404).json({ message: 'Events not found' });
             }
-            const modifiedEvents = events.map((event: any) => {
+            const modifiedEvents = events
+            .filter((event: any) => event.deleted === false)
+            .map((event: any) => {
                 const attendees = event.attendees.map((attendee: any) => {
                     return {
                         id: attendee._id,
@@ -269,15 +271,11 @@ const editEvent = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 const archiveEvent = async (req: Request, res: Response, next: NextFunction) => {
-    const { eventId } = req.body;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        console.log(errors);
-        return res.status(401).send({ message: 'Invalid fields sent' });
-    }
+    const evid = req.params.evid;
+    console.log('Event to archive id ' + evid);
     try {
         Event
-            .findById(eventId)
+            .findById(evid)
             .exec(async (err: any, event: any) => {
                 if (err) {
                     return next(new Error('Could not find event: ' + err));
@@ -287,15 +285,32 @@ const archiveEvent = async (req: Request, res: Response, next: NextFunction) => 
                 }
                 event.archived = true;
                 await event.save();
-                res.status(200).json({ message: 'Event deleted successfully' });
+                res.status(200).json({ message: 'Event archived successfully', success: true });
+            });
+    } catch (err) {
+        return next(new Error('Could not archive event: ' + err));
+    }
+}
+
+const restoreEvent = async (req: Request, res: Response, next: NextFunction) => {
+    const evid = req.params.evid;
+    try {
+        Event
+            .findById(evid)
+            .exec(async (err: any, event: any) => {
+                if (err) {
+                    return next(new Error('Could not find event: ' + err));
+                }
+                if (!event) {
+                    return next(new Error('Event not found'));
+                }
+                event.archived = false;
+                await event.save();
+                res.status(200).json({ message: 'Event restored successfully', success: true });
             });
     } catch (err) {
         return next(new Error('Could not delete event: ' + err));
     }
-
-    res.json({
-        message: 'Event deleted successfully',
-    })
 }
 
 const updateVpoints = async (req: Request, res: Response, next: NextFunction) => {
@@ -327,33 +342,28 @@ const updateVpoints = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
-    const { eventId } = req.body;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        console.log('Validation errors ' + errors);
-        return res.status(401).send({ message: 'Invalid fields sent' });
-    }
+    const evid = req.params.evid;
+
     try {
         Event
-            .findById(eventId)
-            .exec(async (err: any, event: any) => {
-                if (err) {
-                    return next(new Error('Could not find event: ' + err));
-                }
-                if (!event) {
-                    return next(new Error('Event not found'));
-                }
-                event.deleted = true;
-                await event.save();
-                res.status(200).json({ message: 'Event deleted successfully' });
-            });
+        .findById(evid)
+        .exec(async (err: any, event: any) => {
+            if (err) {
+                return next(new Error('Could not find event: ' + err));
+            }
+            if (!event) {
+                return next(new Error('Event not found'));
+            }
+            if(!event.archived) {
+                return next(new Error('Cannot delete an active event'));
+            }
+            event.deleted = true;
+            await event.save();
+            res.status(200).json({ message: 'Event deleted successfully', success: true });
+        });
     } catch (err) {
         return next(new Error('Could not delete event: ' + err));
     }
-
-    res.json({
-        message: 'Event deleted successfully',
-    })
 }
 
 export default {
@@ -364,6 +374,7 @@ export default {
     createEvent,
     joinEvent,
     archiveEvent,
+    restoreEvent,
     updateVpoints,
     editEvent,
     deleteEvent,
