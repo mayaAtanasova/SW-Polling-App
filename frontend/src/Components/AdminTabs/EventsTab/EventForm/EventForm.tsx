@@ -1,11 +1,14 @@
-import clsx from 'clsx';
 import { FocusEventHandler, useEffect, useState } from 'react';
+import clsx from 'clsx';
+
+import { IErrors } from '../../../../Interfaces/IError';
+
 import useDebounce from '../../../../hooks/useDebounce';
 import { useLoginFormValidator } from '../../../../hooks/useLoginFormValidators';
-import { IErrors } from '../../../../Interfaces/IError';
-import styles from './EventForm.module.css';
 import { useMySelector } from '../../../../hooks/useReduxHooks';
 import eventsService from '../../../../services/eventService';
+
+import styles from './EventForm.module.css';
 
 type formProps = {
     hideEventForm: (ev?: any) => void,
@@ -17,7 +20,7 @@ const EventForm = ({ hideEventForm }: formProps) => {
     const userId = user?.id;
 
     const [form, setForm] = useState({
-        title: '',
+        eventTitle: '',
         description: '',
     });
     const debouncedFormValue = useDebounce(form, 500);
@@ -77,8 +80,13 @@ const EventForm = ({ hideEventForm }: formProps) => {
 
         setLoading(true);
         if(userId){
+            const formData = {
+                title: form.eventTitle.toLowerCase(),
+                description: form.description,
+                userId,
+            }
             eventsService
-            .createEvent({...form, userId})
+            .createEvent(formData)
             .then((data) => {
                 if (data) {
                     console.log(data);
@@ -113,18 +121,18 @@ const EventForm = ({ hideEventForm }: formProps) => {
                     <input
                         className={clsx(
                             styles.formField,
-                            errors.title.dirty && errors.title.error && styles.formFieldError,
+                            errors.eventTitle.dirty && errors.eventTitle.error && styles.formFieldError,
                         )}
                         type="text"
                         aria-label='Title field'
-                        name='title'
+                        name='eventTitle'
                         placeholder="E.g Our company event"
-                        value={form.title}
+                        value={form.eventTitle}
                         onChange={onUpdateField}
                         onBlur={onBlurField}
                     />
-                    {errors.title.dirty && errors.title.error
-                        ? (<p className={styles.formFieldErrorMessage}>{errors.title.message}</p>)
+                    {errors.eventTitle.dirty && errors.eventTitle.error
+                        ? (<p className={styles.formFieldErrorMessage}>{errors.eventTitle.message}</p>)
                         : null}
                 </div>
 

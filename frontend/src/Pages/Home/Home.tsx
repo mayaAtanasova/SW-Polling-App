@@ -61,7 +61,7 @@ const Home = () => {
 
     const fetchEventData = () => {
         console.log('fetching event data');
-        if(eventId){
+        if (eventId) {
             dispatch(fetchEvent(eventId!));
         }
     }
@@ -69,9 +69,9 @@ const Home = () => {
     const fetchEventMessages = (title: string) => {
         console.log('rcvd order to fetch messages');
         const evid = localStorage.getItem('eventId');
-        if(evid){
+        if (evid) {
             console.log(evid);
-        dispatch(fetchMessages(evid));
+            dispatch(fetchMessages(evid));
         }
     }
 
@@ -85,7 +85,9 @@ const Home = () => {
     const handleJoinEvent = (title: string) => async (event: any) => {
         event.preventDefault();
         event.stopPropagation();
+        if (title === '') return;
         if (userId) {
+            title = title.toLowerCase();
             dispatch(joinEvent({ title, userId }));
         }
     }
@@ -156,7 +158,7 @@ const Home = () => {
                 />}
 
             <div className={styles.homeContainer}>
-                {isAuthenticated && loggedInChat && 
+                {isAuthenticated && loggedInChat &&
                     <div className={styles.chatArea}>
                         <Messages
                             messages={messages}

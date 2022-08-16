@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
     nameValidator,
+    eventTitleValidator,
     emailValidator,
     passwordValidator,
     confrimPasswordValidator,
@@ -41,6 +42,7 @@ export const useLoginFormValidator = (form: IForm) => {
         'password': passwordValidator,
         'confirmPassword': confrimPasswordValidator,
         'title': nameValidator,
+        'eventTitle': eventTitleValidator,
         'description': nameValidator,
         'type': nameValidator,
     });
