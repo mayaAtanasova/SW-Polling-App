@@ -27,6 +27,11 @@ const Profile = () => {
         socket.emit('join event', { userId, displayName, title });
     }
     fetchEventData();
+
+    return () => {
+      socket.off('fetch event data');
+    }
+    
 }, [socket]);
 
   const fetchEventData = () => {

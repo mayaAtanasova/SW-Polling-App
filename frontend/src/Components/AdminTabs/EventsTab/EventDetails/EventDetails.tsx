@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import moment from 'moment';
-import { Socket } from 'socket.io-client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowUpAZ, faClose } from '@fortawesome/free-solid-svg-icons';
 
@@ -10,18 +9,20 @@ import { IEventCompact } from '../../../../Interfaces/IEvent';
 import UsersTable from '../../../Shared/UsersTable/UsersTable';
 import EventPollsTable from '../EventPollsTable/EventPollsTable';
 import EventMessagesTable from '../EventMessagesTable/EventMessagesTable';
+import SmallButton from '../../../UI/SmallBUtton/SmallButton';
+
 import messageService from '../../../../services/messageService';
 import eventService from '../../../../services/eventService';
 
 import { useMySelector, useMyDispatch } from '../../../../hooks/useReduxHooks';
 import { setMessage } from '../../../../store/messageSlice';
+import { SocketContext } from '../../../../store/socketContext';
+
 
 import styles from './EventDetails.module.css';
-import SmallButton from '../../../UI/SmallBUtton/SmallButton';
 
 type componentProps = {
     event: IEventCompact;
-    socket: Socket | null;
     onDetailsClose: (eventId: string) => (ev: any) => void,
     handleEditUser: (eventId: string) => (user: IUserCompact) => void,
     handleArchiveEvent: (eventId: string) => (ev: any) => void,
@@ -31,7 +32,6 @@ type componentProps = {
 
 const EventDetails = ({ 
     event, 
-    socket, 
     onDetailsClose, 
     handleEditUser,
     handleArchiveEvent,
@@ -39,6 +39,7 @@ const EventDetails = ({
     handleDeleteEvent,
 }: componentProps) => {
 
+    const socket = useContext(SocketContext);
     const [loading, setLoading] = useState(false);
     const [eventData, setEventData] = useState<IEventCompact>(event);
     const [sliceIndex, setSliceIndex] = useState<number>(0);

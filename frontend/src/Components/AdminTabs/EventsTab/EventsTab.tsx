@@ -220,7 +220,6 @@ const EventsTab = () => {
             {currentEvent &&
                 <EventDetails
                     event={currentEvent}
-                    socket={socket}
                     onDetailsClose={handleDetailViewClose}
                     handleEditUser={handleEditUser}
                     handleArchiveEvent={onArchiveEvent}
