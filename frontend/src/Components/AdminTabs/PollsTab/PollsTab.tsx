@@ -39,6 +39,8 @@ const PollsTab = () => {
   const [filterType, setFilterType] = useState<U>('activeOnly');
   const [events, setEvents] = useState<IEventCompact[]>([]);
   const [currentPoll, setCurrentPoll] = useState<IPollCompact | null>(null);
+  const [selectedPoll, setSelectedPoll] = useState<IPollCompact | undefined>(undefined);
+  const [mode, setMode] = useState<'create' | 'edit' | 'duplicate'>('create');
   const { user } = useMySelector(state => state.auth);
   const userId = user?.id;
   const { event } = useMySelector(state => state.event);
@@ -130,7 +132,9 @@ const PollsTab = () => {
 
   const hidePollForm = (successfulPublish: boolean, eventId: string) => {
     console.log('i should close the form');
+    setMode('create');
     setShowPollForm(false);
+    setSelectedPoll(undefined);
     if (successfulPublish) {
       const eventTitle = events.find((event: IEventCompact) => event.id === eventId)?.title;
       socket?.emit('new poll published', eventTitle);
@@ -138,11 +142,21 @@ const PollsTab = () => {
     }
   }
 
-  const selectPoll = (pollId: string) => (ev: any) => {
+  const handleSelectPollDetails = (pollId: string) => (ev: any) => {
     ev.preventDefault();
     const selectedPoll = polls.find(poll => poll._id === pollId);
     if (selectedPoll) {
       setCurrentPoll(selectedPoll);
+    }
+  }
+
+  const handleDuplicatePoll = (pollId: string) => (ev: any) => {
+    ev.preventDefault();
+    const selectedPoll = polls.find(poll => poll._id === pollId);
+    if (selectedPoll) {
+      setSelectedPoll(selectedPoll);
+      setMode('duplicate');
+      setShowPollForm(true);
     }
   }
 
@@ -183,7 +197,7 @@ const PollsTab = () => {
         />}
       </div>
 
-      {showPollForm && <PollForm hidePollForm={hidePollForm} events={events} />}
+      {showPollForm && <PollForm hidePollForm={hidePollForm} events={events} mode={mode} poll={selectedPoll}/>}
 
 
       <div className={styles.divider}></div>
@@ -215,7 +229,7 @@ const PollsTab = () => {
                 <button type="button" className={filterType === 'concludedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('concludedOnly')}>Concluded only</button>
                 <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>Show all</button>
                 <select  className={filterType=== 'byEvent' ? styles.sortSelected : ''} >
-                  <option value="" hidden selected>By Event</option>
+                  <option value="" hidden defaultValue='By Event'>By Event</option>
                   {events.map((event: IEventCompact) => <option key={event.id} value={event.title} onClick={handleSelectByEventTitle}>{event.title}</option>)}
                 </select>
               </div>
@@ -226,7 +240,14 @@ const PollsTab = () => {
         {!loading &&
           <div className={styles.pollsHolder}>
             {polls && polls.sort(sortingMethods[sortType].method).filter(filteringMethods[filterType].method).map((poll: any) => {
-              return (<PollCard key={poll._id} poll={poll} onSelectPoll={selectPoll} />)
+              return (
+              <PollCard 
+              key={poll._id} 
+              poll={poll} 
+              onSelectPollDetails={handleSelectPollDetails} 
+              onSelectDuplicatePoll={handleDuplicatePoll}
+              />
+              )
             })}
           </div>}
 

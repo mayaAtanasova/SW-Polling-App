@@ -19,7 +19,7 @@ const PollDetails = ({ poll, onDetailsClose }: componentProps) => {
   const [showPlot, setShowPlot] = useState(false);
 
   return (
-    <div className={styles.pollDetailsBkg} >
+    <div className={`${styles.pollDetailsBkg} ${poll.concluded && styles.concludedPoll}`} >
       <div className={styles.pollDetailsWrapper}>
         <div className={styles.pollDetailsTitle}>
           <h2>{poll.title}</h2>

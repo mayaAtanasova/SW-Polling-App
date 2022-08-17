@@ -1,35 +1,62 @@
 .chartWrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(27, 27, 27, 0.99);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(27, 27, 27, 0.99);
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .chartTypeSelector {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.chartTypeSelector input[type="radio"] {
+  cursor: pointer;
+  margin-left: 0.5rem;
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-accent);
+
+  border: 5px solid var(--color-bkg);
+
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.chartTypeSelector input[type="radio"]:hover {
+  box-shadow: 0 0 0 2px var(--color-accent);
+  border-width: 3px;
+  background-color: var(--color-light-transparent);
+}
+
+.chartTypeSelector input[type="radio"]:checked {
+  box-shadow: 0 0 0 2px var(--color-accent);
+  border-width: 3px;
 }
 
 .wordCloudWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .recharts-wrapper {
-    padding-top: 2rem;
+  padding-top: 2rem;
 }
 
 .recharts-polar-grid-angle {
-    margin: 1rem;
+  margin: 1rem;
 }

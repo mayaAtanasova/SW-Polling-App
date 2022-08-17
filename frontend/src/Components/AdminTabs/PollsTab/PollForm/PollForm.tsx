@@ -1,19 +1,22 @@
-import { FocusEventHandler, useEffect, useState } from 'react';
+import { FocusEventHandler, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { idGenerator } from '../../../../helpers/idGenerator';
 import useDebounce from '../../../../hooks/useDebounce';
 import { useLoginFormValidator } from '../../../../hooks/useLoginFormValidators';
 import { useMySelector } from '../../../../hooks/useReduxHooks';
 import { IErrors } from '../../../../Interfaces/IError';
-import { IPoll } from '../../../../Interfaces/IPoll';
+import { IPollCompact } from '../../../../Interfaces/IPoll';
 import PollOptionInput from './PollOptionInput';
 
 import styles from './PollForm.module.css';
 import { IEventCompact } from '../../../../Interfaces/IEvent';
 import pollsService from '../../../../services/pollsService';
 import { Socket } from 'socket.io-client';
+import { ScriptElementKindModifier } from 'typescript';
 
 type formProps = {
+  mode: 'create' | 'edit' | 'duplicate';
+  poll?: IPollCompact;
   events: IEventCompact[];
   hidePollForm: (successfulPublish: boolean, eventId: string) => void,
 }
@@ -31,14 +34,28 @@ const pollTypes = {
   rating: 'rating',
 }
 
-const PollForm = ({ events, hidePollForm }: formProps) => {
+const PollForm = ({ mode, poll, events, hidePollForm }: formProps) => {
 
-  const [form, setForm] = useState<Form>({ title: '' });
-  const [eventId, setEventId] = useState<string>('');
+  const pollTitleRef = useRef<HTMLInputElement | null>(null);
+
+  const initialFormState = {
+    create: {
+      title: '',
+    },
+    edit: {
+      title: poll?.title || '',
+    },
+    duplicate: {
+      title: poll?.title + '-copy',
+    }
+  }
+
+  const [form, setForm] = useState<Form>(initialFormState[mode]);
+  const [eventId, setEventId] = useState<string>(poll?.event._id || '');
   const debouncedFormValue = useDebounce(form, 500);
 
-  const [pollType, setPollType] = useState('');
-  const [options, setOptions] = useState<Option[]>([]);
+  const [pollType, setPollType] = useState(poll?.type || '');
+  const [options, setOptions] = useState<Option[]>(poll?.options.map((option, i) => ({ id: i.toString(), value: option })) || []);
 
   const [loading, setLoading] = useState(false);
   const { user } = useMySelector(state => state.auth);
@@ -61,6 +78,13 @@ const PollForm = ({ events, hidePollForm }: formProps) => {
   } = useLoginFormValidator(form);
 
   useEffect(() => {
+    console.log(formValid);
+    console.log(eventId)
+    console.log(pollType)
+    console.log(pollMCValid)
+  }, [formValid, eventId, pollType, pollMCValid])
+
+  useEffect(() => {
     const { isFormValid } = validateForm({
       form,
       errors,
@@ -68,6 +92,17 @@ const PollForm = ({ events, hidePollForm }: formProps) => {
     setFormValid(isFormValid);
   }, [form]);
 
+//scrolling
+const scrollToTop = () => {
+  if (pollTitleRef.current) {
+    pollTitleRef.current.scrollIntoView({ behavior: "smooth" });
+  }
+};
+
+useEffect(() => {
+  scrollToTop();
+}, []);
+  //Form handlers
   const manageStateWithNewOptions = (newOptions: Option[]) => {
     setOptions(newOptions);
     const title = form.title;
@@ -198,10 +233,15 @@ const PollForm = ({ events, hidePollForm }: formProps) => {
     setEventId(value);
   }
 
+  const handleFormClose = (ev: any) => {
+    ev.preventDefault();
+    hidePollForm(false, eventId);
+  }
+
   return (
     <>
       <div className={styles.formTitle}>
-        <h2>Create a poll</h2>
+        <h2 ref={pollTitleRef}>{mode === 'edit' ? 'Edit poll' : 'Create a poll'}</h2>
         <p>Choose heading and type for your event.
           A multiple choice poll allows you to add more possible answers
           When you are finished click <b>"Create event"</b> to publish it.</p>
@@ -294,7 +334,7 @@ const PollForm = ({ events, hidePollForm }: formProps) => {
           </button>
           <button
             className={styles.formCancelBtn}
-            onClick={() => hidePollForm(false, eventId)}
+            onClick={handleFormClose}
           >
             Cancel
           </button>

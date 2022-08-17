@@ -131,7 +131,6 @@ const PlotComponent = ({ poll }: componentProps) => {
 
       {plotTypes.bar &&
         <BarChart width={1200} height={700} data={plotData}>
-          <CartesianGrid strokeDasharray="5 1 2" />
           <XAxis dataKey="text" tick={{ fill: "white", fontSize: "1.5rem" }} />
           <YAxis />
           <Tooltip
