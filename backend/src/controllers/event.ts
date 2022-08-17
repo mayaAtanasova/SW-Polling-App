@@ -285,14 +285,14 @@ const archiveEvent = async (req: Request, res: Response, next: NextFunction) => 
                     return next(new Error('Event not found'));
                 }
                 try {
-                    const session = await mongoose.startSession();
-                    session.startTransaction();
+                    // const session = await mongoose.startSession();
+                    // session.startTransaction();
                     event.archived = true;
                     event.polls.forEach(async (poll: any) => {
-                        await Poll.findByIdAndUpdate(poll._id, { concluded: true }, { session });
+                        await Poll.findByIdAndUpdate(poll._id, { concluded: true });
                     });
-                    await event.save({ session });
-                    await session.commitTransaction();
+                    await event.save();
+                    // await session.commitTransaction();
                     res.status(200).json({ message: 'Event archived successfully', success: true });
                 } catch (err) {
                     return next(new Error('Could not archive event: ' + err));
@@ -317,14 +317,11 @@ const restoreEvent = async (req: Request, res: Response, next: NextFunction) => 
                     return next(new Error('Event not found'));
                 }
                 try {
-                    const session = await mongoose.startSession();
-                    session.startTransaction();
                     event.archived = false;
                     event.polls.forEach(async (poll: any) => {
-                        await Poll.findByIdAndUpdate(poll._id, { concluded: false }, { session });
+                        await Poll.findByIdAndUpdate(poll._id, { concluded: false });
                     });
-                    await event.save({ session });
-                    await session.commitTransaction();
+                    await event.save();
                     res.status(200).json({ message: 'Event restored successfully', success: true });
                 } catch (err) {
                     return next(new Error('Could not archive event: ' + err));
@@ -380,14 +377,11 @@ const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
                 return next(new Error('Cannot delete an active event'));
             }
             try{
-                const session = await mongoose.startSession();
-                session.startTransaction();
                 event.deleted = true;
                 event.polls.forEach(async (poll: any) => {
-                    await Poll.findByIdAndUpdate(poll._id, { deleted: true }, { session });
+                    await Poll.findByIdAndUpdate(poll._id, { deleted: true });
                 });
-                await event.save({ session });
-                await session.commitTransaction();
+                await event.save();
                 res.status(200).json({ message: 'Event deleted successfully', success: true });
             } catch {
                 return next(new Error('Could not delete event: ' + err));

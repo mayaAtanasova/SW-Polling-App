@@ -52,6 +52,10 @@ const PollsTab = () => {
   useEffect(() => {
     if (!socket) return;
     socket.on('fetch polls', (title: string, pollId: string) => updatePolls(title, pollId));
+
+    return () => {
+      socket.off('fetch polls');
+    }
   }, [socket]);
 
   useEffect(() => {
@@ -61,6 +65,9 @@ const PollsTab = () => {
 
   useEffect(() => {
     console.log(currentPoll);
+    const detailsViewOpen = !!currentPoll;
+    const body = document.body;
+    body.style.overflow = detailsViewOpen ? 'hidden' : 'auto';
   }, [currentPoll]);
 
   const getAdminUserPolls = () => {
