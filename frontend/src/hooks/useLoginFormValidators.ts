@@ -21,16 +21,18 @@ const touchErrors = (errors: IErrors): IErrors => {
 
 export const useLoginFormValidator = (form: IForm) => {
 
-    const fieldNames = Object.keys(form);
+    const fields = Object.entries(form);
 
-    const initialState: IErrors = fieldNames.reduce((acc, fieldName) => ({
+    const initialState: IErrors = fields.reduce((acc, field) => ({
         ...acc,
-        [fieldName]: {
-            dirty: false,
+        [field[0]]: {
+            dirty: !!field[1],
             error: false,
             message: '',
         },
     }), {});
+    console.log(initialState);
+    
     const [errors, setErrors] = useState(initialState);
 
     const validatorsDict: {
@@ -58,8 +60,9 @@ export const useLoginFormValidator = (form: IForm) => {
             nextErrors = touchErrors(errors);
         }
 
-        fieldNames.forEach(fieldName => {
-            const fieldValue = form[fieldName];
+        fields.forEach(field => {
+            const fieldValue = field[1];
+            const fieldName = field[0];
             if (nextErrors[fieldName].dirty) {
                 let error;
                 if (fieldName in validatorsDict) {
@@ -67,8 +70,8 @@ export const useLoginFormValidator = (form: IForm) => {
                 } else {
                     error = nameValidator(fieldValue);
                 }
-                    nextErrors[fieldName].error = !!error;
-                    nextErrors[fieldName].message = error;
+                nextErrors[fieldName].error = !!error;
+                nextErrors[fieldName].message = error;
             }
         });
         const formErrors = Object.values(nextErrors);

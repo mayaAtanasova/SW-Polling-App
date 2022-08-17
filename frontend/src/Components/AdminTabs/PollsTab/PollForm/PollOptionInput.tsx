@@ -31,7 +31,7 @@ const PollOptionInput = ({
     useEffect(() => {
         console.log(name);
     }, [])
-    const [option, setOption] = React.useState('');
+    
     return (
         <div className={styles.formOptionGroup}>
 

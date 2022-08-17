@@ -38,24 +38,27 @@ const PollForm = ({ mode, poll, events, hidePollForm }: formProps) => {
 
   const pollTitleRef = useRef<HTMLInputElement | null>(null);
 
+  const [options, setOptions] = useState<Option[]>(poll?.options.map((option) => ({ id: idGenerator(), value: option })) || []);
+  const initialFormOptions = options.reduce((acc, option) => ({ ...acc, [`option${option.id}`]: option.value }), {});
+  
   const initialFormState = {
     create: {
       title: '',
     },
     edit: {
       title: poll?.title || '',
+      ...initialFormOptions,
     },
     duplicate: {
       title: poll?.title + '-copy',
+      ...initialFormOptions,
     }
   }
-
   const [form, setForm] = useState<Form>(initialFormState[mode]);
   const [eventId, setEventId] = useState<string>(poll?.event._id || '');
   const debouncedFormValue = useDebounce(form, 500);
 
   const [pollType, setPollType] = useState(poll?.type || '');
-  const [options, setOptions] = useState<Option[]>(poll?.options.map((option, i) => ({ id: i.toString(), value: option })) || []);
 
   const [loading, setLoading] = useState(false);
   const { user } = useMySelector(state => state.auth);
@@ -78,11 +81,8 @@ const PollForm = ({ mode, poll, events, hidePollForm }: formProps) => {
   } = useLoginFormValidator(form);
 
   useEffect(() => {
-    console.log(formValid);
-    console.log(eventId)
-    console.log(pollType)
-    console.log(pollMCValid)
-  }, [formValid, eventId, pollType, pollMCValid])
+    console.log(errors);
+  }, [form, formValid, eventId, pollType, pollMCValid])
 
   useEffect(() => {
     const { isFormValid } = validateForm({
