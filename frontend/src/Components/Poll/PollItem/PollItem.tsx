@@ -12,16 +12,19 @@ const Poll = ({ poll, onPollClicked }: componentProps) => {
     const { _id, title, votes } = poll;
     const { user: { id } } = useMySelector(state => state.auth);
     const voted = votes && votes.some(vote => vote.user._id === id);
+    const concluded = poll.concluded;
 
     if (!_id) return <p>Loading...</p>
     return (
         <div
-            className={`${styles.pollItem} ${voted && styles.voted}`}
+            className={`${styles.pollItem} ${voted && styles.voted} ${concluded && styles.voted}`}
             onClick={onPollClicked(_id, voted)}
             >
             <h3>{title}</h3>
             <div className={styles.pollActions}>
-                {voted && <p>You have voted</p> }
+                {!concluded && voted && <p>You have voted</p> }
+                {!concluded && !voted && <p>Vote now</p>}
+                {concluded && <p>Concluded</p>}
             </div>
         </div>
     )

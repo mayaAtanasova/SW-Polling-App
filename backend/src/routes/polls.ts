@@ -13,9 +13,9 @@ body('pollId').isLength({ min: 1 }).withMessage('PollId is required'),
 body('userId').isLength({ min: 1 }).withMessage('UserId is required'),
 polls.voteInPoll);
 
-pollsRouter.post('/lock', 
+pollsRouter.post('/conclude', 
 body('pollId').isLength({ min: 1 }).withMessage('PollId is required'),
-polls.lockPoll);
+polls.concludePoll);
 
 pollsRouter.post('/:pollId', 
 body('type').isLength({ min: 1 }).withMessage('Type is required'),

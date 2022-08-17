@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator';
 import { Event, User, Poll } from '../models';
 import Message from '../interfaces/messageInterface'
 import PollInterface from '../interfaces/pollInterface'
+import mongoose from 'mongoose';
 
 const getEventsByCreator = async (req: Request, res: Response, next: NextFunction) => {
     const createdBy = req.params.createdBy;
@@ -13,7 +14,7 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
         .populate([
             {
                 path: 'polls',
-                select: '_id title type votes',
+                select: '_id title type votes concluded deleted',
                 populate: {
                     path: 'votes',
                     select: 'option user createdAt',
@@ -131,7 +132,7 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
         .populate([
             {
                 path: 'polls',
-                select: '_id title type votes',
+                select: '_id title type votes concluded deleted',
                 populate: {
                     path: 'votes',
                     select: 'option user createdAt',
@@ -193,7 +194,7 @@ const fetchEventPolls = async (req: Request, res: Response, next: NextFunction) 
             .populate([
                 {
                     path: 'polls',
-                    select: '_id title type votes',
+                    select: '_id title type votes concluded deleted',
                     populate: {
                         path: 'votes',
                         select: '_id option user createdAt',
@@ -283,13 +284,24 @@ const archiveEvent = async (req: Request, res: Response, next: NextFunction) => 
                 if (!event) {
                     return next(new Error('Event not found'));
                 }
-                event.archived = true;
-                await event.save();
-                res.status(200).json({ message: 'Event archived successfully', success: true });
+                try {
+                    const session = await mongoose.startSession();
+                    session.startTransaction();
+                    event.archived = true;
+                    event.polls.forEach(async (poll: any) => {
+                        await Poll.findByIdAndUpdate(poll._id, { concluded: true }, { session });
+                    });
+                    await event.save({ session });
+                    await session.commitTransaction();
+                    res.status(200).json({ message: 'Event archived successfully', success: true });
+                } catch (err) {
+                    return next(new Error('Could not archive event: ' + err));
+                }
             });
-    } catch (err) {
-        return next(new Error('Could not archive event: ' + err));
-    }
+        } catch (err) {
+            return next(new Error('Could not archive event: ' + err));
+        }
+
 }
 
 const restoreEvent = async (req: Request, res: Response, next: NextFunction) => {
@@ -304,9 +316,19 @@ const restoreEvent = async (req: Request, res: Response, next: NextFunction) => 
                 if (!event) {
                     return next(new Error('Event not found'));
                 }
-                event.archived = false;
-                await event.save();
-                res.status(200).json({ message: 'Event restored successfully', success: true });
+                try {
+                    const session = await mongoose.startSession();
+                    session.startTransaction();
+                    event.archived = false;
+                    event.polls.forEach(async (poll: any) => {
+                        await Poll.findByIdAndUpdate(poll._id, { concluded: false }, { session });
+                    });
+                    await event.save({ session });
+                    await session.commitTransaction();
+                    res.status(200).json({ message: 'Event restored successfully', success: true });
+                } catch (err) {
+                    return next(new Error('Could not archive event: ' + err));
+                }
             });
     } catch (err) {
         return next(new Error('Could not delete event: ' + err));
@@ -357,9 +379,19 @@ const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
             if(!event.archived) {
                 return next(new Error('Cannot delete an active event'));
             }
-            event.deleted = true;
-            await event.save();
-            res.status(200).json({ message: 'Event deleted successfully', success: true });
+            try{
+                const session = await mongoose.startSession();
+                session.startTransaction();
+                event.deleted = true;
+                event.polls.forEach(async (poll: any) => {
+                    await Poll.findByIdAndUpdate(poll._id, { deleted: true }, { session });
+                });
+                await event.save({ session });
+                await session.commitTransaction();
+                res.status(200).json({ message: 'Event deleted successfully', success: true });
+            } catch {
+                return next(new Error('Could not delete event: ' + err));
+            }
         });
     } catch (err) {
         return next(new Error('Could not delete event: ' + err));

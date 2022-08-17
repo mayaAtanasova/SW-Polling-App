@@ -13,7 +13,7 @@ export interface IPoll {
     editedAt: string;
     options: string[];
     votes: IVote[];
-    locked: boolean;
+    deleted: boolean;
     concluded: boolean;
 }
 
@@ -27,6 +27,6 @@ export interface IPollCompact {
         editedAt: string,
         options: string[],
         votes: IVote[],
-        locked: boolean,
+        deleted: boolean,
         concluded: boolean,
 }

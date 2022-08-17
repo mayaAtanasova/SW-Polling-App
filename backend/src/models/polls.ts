@@ -36,7 +36,7 @@ const pollSchema = new mongoose.Schema({
         required: true,
         ref: 'Vote'
     }],
-    locked: {
+    deleted: {
         type: Boolean,
         default: false,
     },

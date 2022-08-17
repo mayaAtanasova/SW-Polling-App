@@ -81,14 +81,20 @@ const Polls = ({ polls, onVoteComplete }: componentProps) => {
                             <>
                                 <p>Click an active poll to vote</p>
 
-                                {polls.filter(poll => !poll.votes.some(vote => vote.user._id === userId)).map(poll => (
+                                {polls
+                                .filter(poll => !poll.concluded)
+                                .filter(poll => !poll.votes.some(vote => vote.user._id === userId))
+                                .map(poll => (
                                     <Poll
                                         key={poll._id}
                                         poll={poll}
                                         onPollClicked={handlePollSelect}
                                     />
                                 ))}
-                                {polls.filter(poll => poll.votes.some(vote => vote.user._id === userId)).map(poll => (
+                                {polls
+                                .filter(poll => !poll.concluded)
+                                .filter(poll => poll.votes.some(vote => vote.user._id === userId))
+                                .map(poll => (
                                     <Poll
                                         key={poll._id}
                                         poll={poll}

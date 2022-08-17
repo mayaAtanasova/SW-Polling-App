@@ -81,18 +81,16 @@ const editPoll = async (req: Request, res: Response, next: NextFunction) => {
 const deletePoll = async (req: Request, res: Response, next: NextFunction) => {
     const pollId = req.params.pollId;
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        console.log(errors);
-        return res.status(401).send({ message: 'Invalid fields sent' });
-    }
-    Poll.findById(pollId, (err: any, poll: any) => {
+
+    Poll.findById(pollId, async (err: any, poll: any) => {
         if (err) {
             return next(new Error('Could not find poll: ' + err));
         }
         if (!poll) {
             return next(new Error('Poll not found'));
         }
-        poll.remove();
+        poll.deleted = true;
+        await poll.save();
         return res.status(200).json({ message: 'Poll deleted successfully' });
     })
         .catch((err: any) => {
@@ -100,7 +98,7 @@ const deletePoll = async (req: Request, res: Response, next: NextFunction) => {
         });
 }
 
-const lockPoll = async (req: Request, res: Response, next: NextFunction) => {
+const concludePoll = async (req: Request, res: Response, next: NextFunction) => {
     const { pollId } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -114,9 +112,9 @@ const lockPoll = async (req: Request, res: Response, next: NextFunction) => {
         if (!poll) {
             return next(new Error('Poll not found'));
         }
-        poll.locked = true;
+        poll.concluded = true;
         await poll.save();
-        return res.status(200).json({ message: 'Poll locked successfully' });
+        return res.status(200).json({ message: 'Poll concluded successfully' });
     })
         .catch((err: any) => {
             return next(new Error('Could not lock poll: ' + err));
@@ -282,7 +280,7 @@ export default {
     createPoll,
     editPoll,
     deletePoll,
-    lockPoll,
+    concludePoll,
     getPollById,
     voteInPoll,
     getPollsByCreator,

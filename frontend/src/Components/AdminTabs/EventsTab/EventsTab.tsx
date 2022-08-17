@@ -139,6 +139,7 @@ const EventsTab = () => {
                                 dispatch(setMessage(data.message));
                                 setEvents(oldEents => oldEents.map((event: IEventCompact) => event.id === eventToModifyId ? { ...event, archived: true } : event));
                                 setCurrentEvent({ ...currentEvent, archived: true });
+                                socket?.emit('new poll published', currentEvent.title);
                             }
                         })
                         .catch(err => {
@@ -152,6 +153,7 @@ const EventsTab = () => {
                                 dispatch(setMessage(data.message));
                                 setEvents(oldEvents => oldEvents.map((event: IEventCompact) => event.id === eventToModifyId ? { ...event, archived: false } : event));
                                 setCurrentEvent({ ...currentEvent, archived: false });
+                                socket?.emit('new poll published', currentEvent.title);
                             }
                         })
                         .catch(err => {
@@ -164,6 +166,7 @@ const EventsTab = () => {
                             dispatch(setMessage('Event deleted successfully'));
                             setEvents((oldEvents: IEventCompact[]) => oldEvents.filter((x: IEventCompact) => x.id !== eventToModifyId));
                             setCurrentEvent(null);
+                            socket?.emit('new poll published', currentEvent.title);
                         })
                         .catch(err => {
                             dispatch(setMessage(err.message));

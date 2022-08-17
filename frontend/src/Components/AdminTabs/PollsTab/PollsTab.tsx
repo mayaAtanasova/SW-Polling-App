@@ -25,8 +25,8 @@ const sortingMethods = {
 }
 
 const filteringMethods = {
-  activeOnly: { method: (poll: IPollCompact) => !poll.locked },
-  lockedOnly: { method: (poll: IPollCompact) => poll.locked },
+  activeOnly: { method: (poll: IPollCompact) => !poll.concluded },
+  concludedOnly: { method: (poll: IPollCompact) => poll.concluded },
   all: { method: (poll: IPollCompact) => true },
 }
 
@@ -183,7 +183,7 @@ const PollsTab = () => {
           <div className={styles.buttonsContainer}>
             <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>Show all polls</button>
             <button type="button" className={filterType === 'activeOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('activeOnly')}>Show active only</button>
-            <button type="button" className={filterType === 'lockedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('lockedOnly')}>Show inactive only</button>
+            <button type="button" className={filterType === 'concludedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('concludedOnly')}>Show inactive only</button>
           </div>
         </div>
       </div>
