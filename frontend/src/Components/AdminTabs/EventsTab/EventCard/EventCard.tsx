@@ -1,18 +1,11 @@
-import { IUser } from '../../../../Interfaces/IUser';
 import moment from 'moment';
+
+import { IEventCompact } from '../../../../Interfaces/IEvent';
+
 import styles from './EventCard.module.css';
 
 type componentProps = {
-    event: {
-        id: string,
-        title: string,
-        description: string,
-        host: string,
-        polls: string[],
-        attendees: IUser[],
-        archived: boolean,
-        date: string,
-    },
+    event: IEventCompact,
     onSelectEvent: (eventId: string) => (ev:any) => void,
 }
 

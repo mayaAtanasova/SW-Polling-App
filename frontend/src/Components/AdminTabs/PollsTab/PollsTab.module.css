@@ -25,6 +25,10 @@
   text-align: center;
 }
 
+.loadingWrapper {
+  position: relative;
+}
+
 .sortActionsHolder {
   margin: 2rem;
 
@@ -54,7 +58,8 @@
   gap: 10px;
 }
 
-.buttonsContainer button {
+.buttonsContainer button,
+.buttonsContainer select {
   flex: 1;
   background-color: var(--color-light-transparent);
   border: none;
@@ -71,7 +76,8 @@
   cursor: pointer;
 }
 
-button.sortSelected {
+button.sortSelected,
+select.sortSelected {
   background-color: var(--color-accent);
 }
 

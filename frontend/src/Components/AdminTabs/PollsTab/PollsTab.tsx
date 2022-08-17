@@ -16,22 +16,18 @@ import PollDetails from './PollDetails/PollDetails';
 import PollForm from './PollForm/PollForm';
 
 import styles from './PollsTab.module.css';
+import Loader from '../../UI/Loader/Loader';
 
-const sortingMethods = {
-  titleAsc: { method: (a: IPollCompact, b: IPollCompact) => a.event.title.localeCompare(b.event.title) },
-  titleDesc: { method: (a: IPollCompact, b: IPollCompact) => b.event.title.localeCompare(a.event.title) },
-  dateAsc: { method: (a: IPollCompact, b: IPollCompact) => Date.parse(b.createdAt) - Date.parse(a.createdAt) },
-  dateDesc: { method: (a: IPollCompact, b: IPollCompact) => Date.parse(a.createdAt) - Date.parse(b.createdAt) },
+type SortingMethods = {
+  [key: string]: { method: (a: IPollCompact, b: IPollCompact) => number }
 }
 
-const filteringMethods = {
-  activeOnly: { method: (poll: IPollCompact) => !poll.concluded },
-  concludedOnly: { method: (poll: IPollCompact) => poll.concluded },
-  all: { method: (poll: IPollCompact) => true },
+type FilteringMethods = {
+  [key: string]: { method: (poll: IPollCompact) => boolean }
 }
 
-type T = keyof typeof sortingMethods;
-type U = keyof typeof filteringMethods;
+type T = keyof SortingMethods;
+type U = keyof FilteringMethods;
 
 const PollsTab = () => {
 
@@ -39,13 +35,14 @@ const PollsTab = () => {
   const [showPollForm, setShowPollForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [polls, setPolls] = useState<IPollCompact[]>([]);
-  const [sortType, setSortType] = useState<T>('titleAsc');
-  const [filterType, setFilterType] = useState<U>('all');
+  const [sortType, setSortType] = useState<T>('dateAsc');
+  const [filterType, setFilterType] = useState<U>('activeOnly');
   const [events, setEvents] = useState<IEventCompact[]>([]);
   const [currentPoll, setCurrentPoll] = useState<IPollCompact | null>(null);
   const { user } = useMySelector(state => state.auth);
   const userId = user?.id;
   const { event } = useMySelector(state => state.event);
+  const [selectedEventTitle, setSelectedEventTitle] = useState(event.title || '');
 
   const dispatch = useMyDispatch();
 
@@ -153,7 +150,25 @@ const PollsTab = () => {
     setCurrentPoll(null);
   }
 
+  const sortingMethods: SortingMethods = {
+    titleAsc: { method: (a: IPollCompact, b: IPollCompact) => a.event.title.localeCompare(b.event.title) },
+    titleDesc: { method: (a: IPollCompact, b: IPollCompact) => b.event.title.localeCompare(a.event.title) },
+    dateAsc: { method: (a: IPollCompact, b: IPollCompact) => Date.parse(b.createdAt) - Date.parse(a.createdAt) },
+    dateDesc: { method: (a: IPollCompact, b: IPollCompact) => Date.parse(a.createdAt) - Date.parse(b.createdAt) },
+  }
 
+  const filteringMethods: FilteringMethods = {
+    activeOnly: { method: (poll: IPollCompact) => !poll.concluded },
+    concludedOnly: { method: (poll: IPollCompact) => poll.concluded },
+    byEvent: { method: (poll: IPollCompact) => poll.event.title === selectedEventTitle },
+    all: { method: (poll: IPollCompact) => true },
+  }
+
+  const handleSelectByEventTitle = (ev: any) => {
+    ev.preventDefault();
+    setSelectedEventTitle(ev.target.value);
+    setFilterType('byEvent');
+  }
 
   return (
     <div className={styles.pollsTabWrapper}>
@@ -173,33 +188,48 @@ const PollsTab = () => {
 
       <div className={styles.divider}></div>
 
-      {!polls && <p>You have not created any polls yet.</p>}
-      <h2>You have created the following polls</h2>
-      <div className={styles.sortActionsHolder}>
-        <div className={styles.sortActionGroup}>
-          <h4>Sort polls by event and date: </h4>
-          <div className={styles.buttonsContainer}>
-            <button type="button" className={sortType === 'titleAsc' ? styles.sortSelected : ''} onClick={() => setSortType('titleAsc')}>Sort by Event Asc</button>
-            <button type="button" className={sortType === 'titleDesc' ? styles.sortSelected : ''} onClick={() => setSortType('titleDesc')}>Sort by Event Desc</button>
-            <button type="button" className={sortType === 'dateAsc' ? styles.sortSelected : ''} onClick={() => setSortType('dateAsc')}>Sort newest first</button>
-            <button type="button" className={sortType === 'dateDesc' ? styles.sortSelected : ''} onClick={() => setSortType('dateDesc')}>Sort oldest first</button>
-          </div>
-        </div>
-        <div className={styles.sortActionGroup}>
-          <h4>Filter polls by status: </h4>
-          <div className={styles.buttonsContainer}>
-            <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>Show all polls</button>
-            <button type="button" className={filterType === 'activeOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('activeOnly')}>Show active only</button>
-            <button type="button" className={filterType === 'concludedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('concludedOnly')}>Show inactive only</button>
-          </div>
-        </div>
-      </div>
-      <p>Click on a poll for details</p>
+      <h2>YOUR POLLS</h2>
 
-      <div className={styles.pollsHolder}>
-        {polls && polls.sort(sortingMethods[sortType].method).filter(filteringMethods[filterType].method).map((poll: any) => {
-          return (<PollCard key={poll._id} poll={poll} onSelectPoll={selectPoll} />)
-        })}
+
+      <div className={styles.loadingWrapper}>
+
+        {loading && <Loader />}
+
+        {!loading && !polls && <p>You have not created any polls yet.</p>}
+
+        {!loading && polls &&
+          <div className={styles.sortActionsHolder}>
+            <div className={styles.sortActionGroup}>
+              <h4>Sort polls: </h4>
+              <div className={styles.buttonsContainer}>
+                <button type="button" className={sortType === 'dateAsc' ? styles.sortSelected : ''} onClick={() => setSortType('dateAsc')}>Latest first</button>
+                <button type="button" className={sortType === 'dateDesc' ? styles.sortSelected : ''} onClick={() => setSortType('dateDesc')}>Oldest first</button>
+                <button type="button" className={sortType === 'titleAsc' ? styles.sortSelected : ''} onClick={() => setSortType('titleAsc')}>By Event Asc</button>
+                <button type="button" className={sortType === 'titleDesc' ? styles.sortSelected : ''} onClick={() => setSortType('titleDesc')}>By Event Desc</button>
+              </div>
+            </div>
+            <div className={styles.sortActionGroup}>
+              <h4>Filter polls: </h4>
+              <div className={styles.buttonsContainer}>
+                <button type="button" className={filterType === 'activeOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('activeOnly')}>Active only</button>
+                <button type="button" className={filterType === 'concludedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('concludedOnly')}>Concluded only</button>
+                <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>Show all</button>
+                <select  className={filterType=== 'byEvent' ? styles.sortSelected : ''} >
+                  <option value="" hidden selected>By Event</option>
+                  {events.map((event: IEventCompact) => <option key={event.id} value={event.title} onClick={handleSelectByEventTitle}>{event.title}</option>)}
+                </select>
+              </div>
+            </div>
+            <p>Click on a poll for details</p>
+          </div>}
+
+        {!loading &&
+          <div className={styles.pollsHolder}>
+            {polls && polls.sort(sortingMethods[sortType].method).filter(filteringMethods[filterType].method).map((poll: any) => {
+              return (<PollCard key={poll._id} poll={poll} onSelectPoll={selectPoll} />)
+            })}
+          </div>}
+
       </div>
 
       {currentPoll &&

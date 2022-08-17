@@ -12,7 +12,7 @@ type componentProps = {
 const PollCard = ({ poll, onSelectPoll }: componentProps) => {
     return (
         <div 
-        className={styles.pollCard}
+        className={`${styles.pollCard} ${poll.concluded ? styles.concludedPoll : ''}`}
         onClick={onSelectPoll(poll._id)}>
             <div className={styles.titleHolder}>
                 <h2>{poll.title}</h2>

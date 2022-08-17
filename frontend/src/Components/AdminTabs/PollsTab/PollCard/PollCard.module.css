@@ -12,10 +12,19 @@
   .pollCard * {
     margin: 0 0 0.5rem 0;
   }
+
+  .concludedPoll{
+    background-color: var(--color-grey-transparent);
+    border: 2px solid grey;
+  }
   
   .pollCard:hover {
     background-color: var(--color-light-transparent);
     cursor: pointer;
+  }
+
+  .concludedPoll:hover {
+    background-color: rgba(107, 107, 107, 0.5);
   }
   
   .titleHolder {
@@ -23,6 +32,11 @@
     text-align: center;
     background-color: var(--color-dark-transparent);
     border-bottom: 1px solid var(--color-light-transparent);
+  }
+
+  .concludedPoll .titleHolder {
+    background-color: var(--color-grey-transparent);
+    border-bottom: 1px solid grey;
   }
   
   .titleHolder h2 {
@@ -32,6 +46,10 @@
     display: inline-block;
     font-size: 1.5rem;
     vertical-align: bottom;
+  }
+
+  .concludedPoll h2{
+    border-bottom: 4px solid var(--color-text-secondary);
   }
   
   .eventCard p:first-of-type,

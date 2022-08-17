@@ -194,7 +194,7 @@ const EventsTab = () => {
 
             <div className={styles.divider}></div>
 
-            <h2>You have created the following events</h2>
+            <h2>YOUR EVENTS</h2>
             <p>Click on an event for details</p>
             <div className={styles.loadingWrapper}>
 
