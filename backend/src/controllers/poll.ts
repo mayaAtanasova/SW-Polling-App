@@ -53,49 +53,36 @@ const createPoll = async (req: Request, res: Response, next: NextFunction) => {
 
 const editPoll = async (req: Request, res: Response, next: NextFunction) => {
     const pollId = req.params.pollId;
-    const { type, title, options } = req.body;
+    const { type, title, eventId, options } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
-        return res.status(401).send({ message: 'Invalid fields sent' });
+        return next(new Error('Invalid fields sent' + errors));
     }
-    Poll.findById(pollId, async (err: any, poll: any) => {
-        if (err) {
-            return next(new Error('Could not find poll: ' + err));
-        }
-        if (!poll) {
-            return next(new Error('Poll not found'));
-        }
-        poll.type = type;
-        poll.title = title;
-        poll.options = options;
-        poll.editedAt = new Date().toISOString();
-        await poll.save();
-        return res.status(200).json({ message: 'Poll edited successfully', poll });
-    })
-        .catch((err: any) => {
-            return next(new Error('Could not edit poll: ' + err));
-        });
+
+    try {
+        const updatedPoll = await Poll.findByIdAndUpdate(pollId, {
+            type,
+            title,
+            event: eventId,
+            options,
+            editedAt: Date.now(),
+        }, { new: true });
+        res.status(200).json({ message: 'Poll updated successfully', poll: updatedPoll });
+    } catch (err: any) {
+        return next(new Error('Could not edit poll: ' + err));
+    };
 }
 
 const deletePoll = async (req: Request, res: Response, next: NextFunction) => {
     const pollId = req.params.pollId;
-    const errors = validationResult(req);
 
-    Poll.findById(pollId, async (err: any, poll: any) => {
-        if (err) {
-            return next(new Error('Could not find poll: ' + err));
-        }
-        if (!poll) {
-            return next(new Error('Poll not found'));
-        }
-        poll.deleted = true;
-        await poll.save();
-        return res.status(200).json({ message: 'Poll deleted successfully' });
-    })
-        .catch((err: any) => {
-            return next(new Error('Could not delete poll: ' + err));
-        });
+    try {
+        const deletedPoll = await Poll.findByIdAndUpdate(pollId, {deleted: true }, { new: true });
+        res.status(200).json({ message: 'Poll updated successfully', success: true, poll: deletedPoll });
+    } catch (err: any) {
+        return next(new Error('Could not edit poll: ' + err));
+    };
 }
 
 const concludePoll = async (req: Request, res: Response, next: NextFunction) => {
@@ -105,20 +92,28 @@ const concludePoll = async (req: Request, res: Response, next: NextFunction) => 
         console.log(errors);
         return res.status(401).send({ message: 'Invalid fields sent' });
     }
-    Poll.findById(pollId, async (err: any, poll: any) => {
-        if (err) {
-            return next(new Error('Could not find poll: ' + err));
-        }
-        if (!poll) {
-            return next(new Error('Poll not found'));
-        }
-        poll.concluded = true;
-        await poll.save();
-        return res.status(200).json({ message: 'Poll concluded successfully' });
-    })
-        .catch((err: any) => {
-            return next(new Error('Could not lock poll: ' + err));
-        });
+    try {
+        const updatedPoll = await Poll.findByIdAndUpdate(pollId, {concluded: true }, { new: true });
+        res.status(200).json({ message: 'Poll updated successfully', success: true, poll: updatedPoll });
+    } catch (err: any) {
+        return next(new Error('Could not edit poll: ' + err));
+    };
+}
+
+const reactivatePoll = async (req: Request, res: Response, next: NextFunction) => {
+    console.log('reactivating poll');
+    const { pollId } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
+        return res.status(401).send({ message: 'Invalid fields sent' });
+    }
+    try {
+        const updatedPoll = await Poll.findByIdAndUpdate(pollId, {concluded: false }, { new: true });
+        res.status(200).json({ message: 'Poll updated successfully', success: true, poll: updatedPoll });
+    } catch (err: any) {
+        return next(new Error('Could not edit poll: ' + err));
+    };
 }
 
 const getPollById = async (req: Request, res: Response, next: NextFunction) => {
@@ -131,7 +126,7 @@ const getPollById = async (req: Request, res: Response, next: NextFunction) => {
                     path: 'createdBy',
                     select: '_id displayName',
                 },
-                                {
+                {
                     path: 'event',
                     select: '_id title',
                 },
@@ -189,7 +184,11 @@ const getPollsByCreator = async (req: Request, res: Response, next: NextFunction
                 if (!polls) {
                     return next(new Error('Poll not found'));
                 }
-                return res.status(200).json({ polls });
+
+                const filteredPolls = polls.filter((poll: any) => {
+                    return poll.deleted === false;
+                })
+                return res.status(200).json({ polls: filteredPolls });
             })
     } catch (err) {
         return next(new Error('Could not fetch poll: ' + err));
@@ -281,6 +280,7 @@ export default {
     editPoll,
     deletePoll,
     concludePoll,
+    reactivatePoll,
     getPollById,
     voteInPoll,
     getPollsByCreator,

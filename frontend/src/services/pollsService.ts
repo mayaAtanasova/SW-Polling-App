@@ -93,10 +93,94 @@ const createPoll = async (poll: { type: string, title: string, userId: string, e
     }
 }
 
+const editPoll = async (poll: { type: string, title: string, userId: string, eventId: string, options: string[] }, pollId: string) => {
+    try {
+        const response = await fetch(`${pollsUrl}/${pollId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(poll)
+        })
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.log(message);
+    }
+}
+
+const concludePoll = async (pollId: string) => {
+    try {
+        const response = await fetch(`${pollsUrl}/conclude`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                pollId,
+            })
+        })
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.log(message);
+    }
+}
+
+const reactivatePoll = async (pollId: string) => {
+    try {
+        const response = await fetch(`${pollsUrl}/reactivate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                pollId,
+            })
+        })
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.log(message);
+    }
+}
+
+const deletePoll = async (pollId: string) => {
+    try {
+        const response = await fetch(`${pollsUrl}/${pollId}`, {
+            method: 'DELETE',
+        })
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        const message =
+            (error.response && error.response.data && error.response.data.message)
+            || error.message
+            || error.toString();
+        console.log(message);
+    }
+}
+
 export default {
     getPollById,
     getPollsByCreator,
     getPollsByEvent,
     voteInPoll,
     createPoll,
+    editPoll,
+    concludePoll,
+    reactivatePoll,
+    deletePoll,
 }

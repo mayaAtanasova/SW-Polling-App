@@ -61,19 +61,47 @@
 .buttonsContainer button,
 .buttonsContainer select {
   flex: 1;
-  background-color: var(--color-light-transparent);
+  min-width: 150px;
+  background-color: var(--color-darkbkg);
   border: none;
   border-radius: 0.5rem;
-  padding: 0.25rem;
+  padding: 0.25rem 1rem;
   color: white;
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.3s ease-in-out;
 }
 
-.buttonsContainer button:hover {
+.sortActionGroup button {
+  min-width: 150px;
+  background-color: var(--color-darkbkg);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.25rem 1rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.buttonsContainer button:hover,
+.sortActionGroup button:hover {
   background-color: var(--color-accent);
   cursor: pointer;
+}
+
+.sortActionGroup input {
+  width: 50%;
+  min-width: 200px;
+  background-color: var(--color-light-transparent);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.25rem 1rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+
 }
 
 button.sortSelected,

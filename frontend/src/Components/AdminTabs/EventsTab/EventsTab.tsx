@@ -29,6 +29,7 @@ const EventsTab = () => {
     const [showEventForm, setShowEventForm] = useState(false);
     const [events, setEvents] = useState<IEventCompact[]>([]);
     const [currentEvent, setCurrentEvent] = useState<IEventCompact | null>();
+    
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalAction, setModalAction] = useState('');
 

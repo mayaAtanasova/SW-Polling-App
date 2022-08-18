@@ -35,12 +35,23 @@ const pollTypes = {
 }
 
 const PollForm = ({ mode, poll, events, hidePollForm }: formProps) => {
+  
+  const [options, setOptions] = useState<Option[]>(poll?.options.map((option) => ({ id: idGenerator(), value: option })) || []);
+  const initialFormOptions = options.reduce((acc, option) => ({ ...acc, [`option${option.id}`]: option.value }), {});
+  useEffect(() => {
+    if (poll) {
+      setPollType(poll.type);
+      setEventId(poll.event._id);
+      // setOptions(poll.options.map(option => ({ id: idGenerator(), value: option })));
+      setForm(initialFormState[mode]);
+      console.log(initialFormOptions);
+      console.log(options);
+    }
+  }, [])
 
   const pollTitleRef = useRef<HTMLInputElement | null>(null);
 
-  const [options, setOptions] = useState<Option[]>(poll?.options.map((option) => ({ id: idGenerator(), value: option })) || []);
-  const initialFormOptions = options.reduce((acc, option) => ({ ...acc, [`option${option.id}`]: option.value }), {});
-  
+
   const initialFormState = {
     create: {
       title: '',
@@ -70,6 +81,8 @@ const PollForm = ({ mode, poll, events, hidePollForm }: formProps) => {
 
   const pollValid = formValid && eventId !== '' && pollType !== '' && pollMCValid;
 
+
+
   let {
     errors,
     validateForm,
@@ -90,18 +103,19 @@ const PollForm = ({ mode, poll, events, hidePollForm }: formProps) => {
       errors,
     });
     setFormValid(isFormValid);
-  }, [form]);
+  }, [form, poll]);
 
-//scrolling
-const scrollToTop = () => {
-  if (pollTitleRef.current) {
-    pollTitleRef.current.scrollIntoView({ behavior: "smooth" });
-  }
-};
+  //scrolling
+  const scrollToTop = () => {
+    if (pollTitleRef.current) {
+      pollTitleRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
-useEffect(() => {
-  scrollToTop();
-}, []);
+  useEffect(() => {
+    scrollToTop();
+  }, [mode, poll]);
+
   //Form handlers
   const manageStateWithNewOptions = (newOptions: Option[]) => {
     setOptions(newOptions);
@@ -165,16 +179,28 @@ useEffect(() => {
 
     setLoading(true);
     if (userId && pollValid) {
-      const poll = {
+      const pollForPublishing = {
         title: form.title,
         type: pollType,
         options: options.map(option => option.value),
         eventId,
         userId,
       };
-      console.log(poll);
+      console.log(pollForPublishing);
+      if (mode === 'edit') {
+        pollsService
+          .editPoll(pollForPublishing, poll!._id)
+          .then((data) => {
+            console.log(data);
+            hidePollForm(true, eventId);
+          })
+          .catch((err) => {
+            console.log(err);
+            hidePollForm(false, eventId);
+          })
+      } else {
       pollsService
-        .createPoll(poll)
+        .createPoll(pollForPublishing)
         .then((data) => {
           console.log(data);
           hidePollForm(true, eventId);
@@ -184,6 +210,7 @@ useEffect(() => {
           console.log(err);
           setLoading(false);
         });
+      }
     }
     // hidePollForm(false);
     setLoading(false);
@@ -194,6 +221,7 @@ useEffect(() => {
   const handleSetMCPoll = (ev: any) => {
     ev.preventDefault();
     setPollType(pollTypes.mc);
+    if (options.length !==0) return;
     const newId = idGenerator();
     setOptions(options => [...options, { id: newId, value: '' }]);
 
@@ -329,7 +357,8 @@ useEffect(() => {
             type="submit"
             disabled={!pollValid || loading}
           >
-            {!loading && <p>Create poll</p>}
+            {!loading && mode !== 'edit' && <p>Create poll</p>}
+            {!loading && mode === 'edit' && <p>Edit poll</p>}
             {loading && <p>...Loading</p>}
           </button>
           <button

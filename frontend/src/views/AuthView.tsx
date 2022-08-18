@@ -50,6 +50,7 @@ const AuthView = () => {
         }
         if (!response.access) {
             localStorage.clear();
+            dispatch(setUser(null));
             return;
         }
         const user = jwtDecoder(token)

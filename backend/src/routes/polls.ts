@@ -17,6 +17,10 @@ pollsRouter.post('/conclude',
 body('pollId').isLength({ min: 1 }).withMessage('PollId is required'),
 polls.concludePoll);
 
+pollsRouter.post('/reactivate', 
+body('pollId').isLength({ min: 1 }).withMessage('PollId is required'),
+polls.reactivatePoll);
+
 pollsRouter.post('/:pollId', 
 body('type').isLength({ min: 1 }).withMessage('Type is required'),
 body('title').isLength({ min: 1 }).withMessage('Title is required'),

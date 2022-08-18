@@ -17,6 +17,7 @@ import PollForm from './PollForm/PollForm';
 
 import styles from './PollsTab.module.css';
 import Loader from '../../UI/Loader/Loader';
+import ConfirmDialog from '../../Shared/ConfirmDialog/ConfirmDialog';
 
 type SortingMethods = {
   [key: string]: { method: (a: IPollCompact, b: IPollCompact) => number }
@@ -32,8 +33,12 @@ type U = keyof FilteringMethods;
 const PollsTab = () => {
 
   const socket = useContext(SocketContext);
-  const [showPollForm, setShowPollForm] = useState(false);
+  const dispatch = useMyDispatch();
+  const { user } = useMySelector(state => state.auth);
+  const userId = user?.id;
+
   const [loading, setLoading] = useState(false);
+  const [showPollForm, setShowPollForm] = useState(false);
   const [polls, setPolls] = useState<IPollCompact[]>([]);
   const [sortType, setSortType] = useState<T>('dateAsc');
   const [filterType, setFilterType] = useState<U>('activeOnly');
@@ -41,12 +46,13 @@ const PollsTab = () => {
   const [currentPoll, setCurrentPoll] = useState<IPollCompact | null>(null);
   const [selectedPoll, setSelectedPoll] = useState<IPollCompact | undefined>(undefined);
   const [mode, setMode] = useState<'create' | 'edit' | 'duplicate'>('create');
-  const { user } = useMySelector(state => state.auth);
-  const userId = user?.id;
+  const [searchString, setSearchString] = useState('');
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState('');
+
   const { event } = useMySelector(state => state.event);
   const [selectedEventTitle, setSelectedEventTitle] = useState(event.title || '');
-
-  const dispatch = useMyDispatch();
 
   useEffect(() => {
     if (!socket) return;
@@ -130,7 +136,9 @@ const PollsTab = () => {
     setShowPollForm(true);
   }
 
-  const hidePollForm = (successfulPublish: boolean, eventId: string) => {
+
+  //Poll Form Action Handlers
+  const hidePollForm = (successfulPublish: boolean, eventId?: string) => {
     console.log('i should close the form');
     setMode('create');
     setShowPollForm(false);
@@ -152,11 +160,107 @@ const PollsTab = () => {
 
   const handleDuplicatePoll = (pollId: string) => (ev: any) => {
     ev.preventDefault();
+    hidePollForm(false);
+    const newSelectedPoll = polls.find(poll => poll._id === pollId);
+    if (newSelectedPoll) {
+      console.log(newSelectedPoll, selectedPoll);
+      setSelectedPoll(newSelectedPoll);
+      setMode('duplicate');
+      setShowPollForm(true);
+    }
+  }
+
+  const handleEditPoll = (pollId: string) => (ev: any) => {
+    ev.preventDefault();
     const selectedPoll = polls.find(poll => poll._id === pollId);
     if (selectedPoll) {
       setSelectedPoll(selectedPoll);
-      setMode('duplicate');
+      setMode('edit');
       setShowPollForm(true);
+    }
+  }
+
+  const handleConcludePoll = (pollId: string) => (ev: any) => {
+    ev.preventDefault();
+    setModalAction('conclude');
+    setIsModalOpen(true);
+    const selectedPoll = polls.find(poll => poll._id === pollId);
+    if (selectedPoll) {
+      setSelectedPoll(selectedPoll);
+    }
+  }
+
+  const handleReactivatePoll = (pollId: string) => (ev: any) => {
+    ev.preventDefault();
+    setModalAction('reactivate');
+    setIsModalOpen(true);
+    const selectedPoll = polls.find(poll => poll._id === pollId);
+    if (selectedPoll) {
+      setSelectedPoll(selectedPoll);
+    }
+  }
+
+  const handleDeletePoll = (pollId: string) => (ev: any) => {
+    ev.preventDefault();
+    setModalAction('delete');
+    setIsModalOpen(true);
+    const selectedPoll = polls.find(poll => poll._id === pollId);
+    if (selectedPoll) {
+      setSelectedPoll(selectedPoll);
+    }
+  }
+
+  const handleModalClose = (answer: boolean) => {
+    setIsModalOpen(false);
+    if (answer) {
+      const pollToModifyId = selectedPoll?._id;
+
+      if (pollToModifyId) {
+        if (modalAction === 'conclude') {
+          pollsService
+            .concludePoll(pollToModifyId)
+            .then((data) => {
+              console.log(data);
+              if (data.success) {
+                dispatch(setMessage(data.message));
+                socket?.emit('new poll published', selectedPoll.event.title);
+                getAdminUserPolls();
+              }
+            })
+            .catch(err => {
+              dispatch(setMessage(err.message));
+            });
+        } else if (modalAction === 'reactivate') {
+          pollsService
+            .reactivatePoll(pollToModifyId)
+            .then((data) => {
+              console.log(data);
+              if (data.success) {
+                dispatch(setMessage(data.message));
+                socket?.emit('new poll published', selectedPoll.event.title);
+                getAdminUserPolls();
+              }
+            })
+            .catch(err => {
+              dispatch(setMessage(err.message));
+            });
+        } else if (modalAction === 'delete') {
+          pollsService
+            .deletePoll(pollToModifyId)
+            .then((data) => {
+              if (data.success) {
+                dispatch(setMessage(data.message));
+                socket?.emit('new poll published', selectedPoll.event.title);
+                getAdminUserPolls();
+              }
+            })
+            .catch(err => {
+              dispatch(setMessage(err.message));
+            });
+        }
+      }
+    } else {
+      setModalAction('');
     }
   }
 
@@ -197,7 +301,7 @@ const PollsTab = () => {
         />}
       </div>
 
-      {showPollForm && <PollForm hidePollForm={hidePollForm} events={events} mode={mode} poll={selectedPoll}/>}
+      {showPollForm && <PollForm hidePollForm={hidePollForm} events={events} mode={mode} poll={selectedPoll} />}
 
 
       <div className={styles.divider}></div>
@@ -214,41 +318,54 @@ const PollsTab = () => {
         {!loading && polls &&
           <div className={styles.sortActionsHolder}>
             <div className={styles.sortActionGroup}>
-              <h4>Sort polls: </h4>
+              <h4>Sort by: </h4>
               <div className={styles.buttonsContainer}>
                 <button type="button" className={sortType === 'dateAsc' ? styles.sortSelected : ''} onClick={() => setSortType('dateAsc')}>Latest first</button>
                 <button type="button" className={sortType === 'dateDesc' ? styles.sortSelected : ''} onClick={() => setSortType('dateDesc')}>Oldest first</button>
-                <button type="button" className={sortType === 'titleAsc' ? styles.sortSelected : ''} onClick={() => setSortType('titleAsc')}>By Event Asc</button>
-                <button type="button" className={sortType === 'titleDesc' ? styles.sortSelected : ''} onClick={() => setSortType('titleDesc')}>By Event Desc</button>
+                <button type="button" className={sortType === 'titleAsc' ? styles.sortSelected : ''} onClick={() => setSortType('titleAsc')}>Event Asc</button>
+                <button type="button" className={sortType === 'titleDesc' ? styles.sortSelected : ''} onClick={() => setSortType('titleDesc')}>Event Desc</button>
               </div>
             </div>
             <div className={styles.sortActionGroup}>
-              <h4>Filter polls: </h4>
+              <h4>Filter by: </h4>
               <div className={styles.buttonsContainer}>
-                <button type="button" className={filterType === 'activeOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('activeOnly')}>Active only</button>
-                <button type="button" className={filterType === 'concludedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('concludedOnly')}>Concluded only</button>
-                <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>Show all</button>
-                <select  className={filterType=== 'byEvent' ? styles.sortSelected : ''} >
-                  <option value="" hidden defaultValue='By Event'>By Event</option>
+                <button type="button" className={filterType === 'activeOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('activeOnly')}>Active</button>
+                <button type="button" className={filterType === 'concludedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('concludedOnly')}>Concluded</button>
+                <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>All</button>
+                <select className={filterType === 'byEvent' ? styles.sortSelected : ''} >
+                  <option value="" hidden defaultValue='By Event'>Event</option>
                   {events.map((event: IEventCompact) => <option key={event.id} value={event.title} onClick={handleSelectByEventTitle}>{event.title}</option>)}
                 </select>
               </div>
             </div>
-            <p>Click on a poll for details</p>
+            <div className={styles.sortActionGroup}>
+              <h4>Search by poll title: </h4>
+              <input type="search" value={searchString} onChange={(ev) => setSearchString(ev.target.value)} />
+              <button onClick={() => setSearchString('')}>Reset</button>
+            </div>
+            <p>Hover over poll for actios</p>
           </div>}
 
         {!loading &&
           <div className={styles.pollsHolder}>
-            {polls && polls.sort(sortingMethods[sortType].method).filter(filteringMethods[filterType].method).map((poll: any) => {
-              return (
-              <PollCard 
-              key={poll._id} 
-              poll={poll} 
-              onSelectPollDetails={handleSelectPollDetails} 
-              onSelectDuplicatePoll={handleDuplicatePoll}
-              />
-              )
-            })}
+            {polls && polls
+              .sort(sortingMethods[sortType].method)
+              .filter(filteringMethods[filterType].method)
+              .filter(poll => poll.title.toLowerCase().includes(searchString.toLowerCase()))
+              .map((poll: any) => {
+                return (
+                  <PollCard
+                    key={poll._id}
+                    poll={poll}
+                    onSelectPollDetails={handleSelectPollDetails}
+                    onSelectDuplicatePoll={handleDuplicatePoll}
+                    onSelectEditPoll={handleEditPoll}
+                    onSelectConcludePoll={handleConcludePoll}
+                    onSelectDeletePoll={handleDeletePoll}
+                    onSelectReactivatePoll={handleReactivatePoll}
+                  />
+                )
+              })}
           </div>}
 
       </div>
@@ -259,6 +376,8 @@ const PollsTab = () => {
           onDetailsClose={handleDetailViewClose}
         // handleEditUser={handleEditUser}
         />}
+
+      {isModalOpen && <ConfirmDialog itemType="poll" actionType={modalAction} onDialogClose={handleModalClose} />}
 
     </div>
   )

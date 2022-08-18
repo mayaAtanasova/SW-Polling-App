@@ -31,7 +31,6 @@ export const useLoginFormValidator = (form: IForm) => {
             message: '',
         },
     }), {});
-    console.log(initialState);
     
     const [errors, setErrors] = useState(initialState);
 

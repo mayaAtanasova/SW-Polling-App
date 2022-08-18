@@ -10,26 +10,30 @@ type componentProps = {
     poll: IPollCompact,
     onSelectPollDetails: (pollId: string) => (ev: any) => void,
     onSelectDuplicatePoll: (pollId: string) => (ev: any) => void,
+    onSelectEditPoll: (pollId: string) => (ev: any) => void,
+    onSelectConcludePoll: (pollId: string) => (ev: any) => void,
+    onSelectDeletePoll: (pollId: string) => (ev: any) => void,
+    onSelectReactivatePoll: (pollId: string) => (ev: any) => void,
 }
 
-const PollCard = ({ 
-    poll, 
+const PollCard = ({
+    poll,
     onSelectPollDetails,
     onSelectDuplicatePoll,
- }: componentProps) => {
+    onSelectEditPoll,
+    onSelectConcludePoll,
+    onSelectDeletePoll,
+    onSelectReactivatePoll,
+}: componentProps) => {
 
-const [hovering, setHovering] = useState(false);
-
-useEffect(() => {
-    console.log(hovering);
-}, [hovering]);
+    const [hovering, setHovering] = useState(false);
 
     return (
         <div
             className={`${styles.pollCard} ${poll.concluded ? styles.concludedPoll : ''}`}
             onMouseEnter={e => setHovering(true)}
             onMouseLeave={e => setHovering(false)}
-            >
+        >
             <div className={styles.titleHolder}>
                 <h2>{poll.title}</h2>
             </div>
@@ -45,10 +49,19 @@ useEffect(() => {
             <div
                 className={hovering ? styles.cardActionsGroup : styles.cardActionsGroupHidden}
             >
-                {poll.votes.length === 0 && <button className={styles.editBtn}>Edit</button>}
-                {poll.concluded && <button className={styles.deleteBtn}>Delete</button>}
+                {!poll.concluded && <button onClick={onSelectConcludePoll(poll._id)}>Conclude</button>}
+                {poll.concluded && <button onClick={onSelectReactivatePoll(poll._id)}>Reactivate</button>}
                 <button onClick={onSelectPollDetails(poll._id)}>Details</button>
                 <button onClick={onSelectDuplicatePoll(poll._id)}>Duplicate</button>
+                {poll.votes.length === 0 && !poll.concluded &&
+                    <button
+                        className={styles.editBtn}
+                        onClick={onSelectEditPoll(poll._id)}
+                    >
+                        Edit
+                    </button>
+                }
+                {poll.concluded && <button onClick={onSelectDeletePoll(poll._id)}>Delete</button>}
             </div>
         </div>
 
