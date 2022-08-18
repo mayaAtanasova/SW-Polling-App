@@ -52,7 +52,7 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
                     title: event.title,
                     description: event.description,
                     attendees,
-                    polls: event.polls,
+                    polls: event.polls.filter((poll: any) => poll.deleted === false),
                     messages: event.messages,
                     host: event.createdBy.displayName,
                     date: event.createdAt,
@@ -152,6 +152,7 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
             if (!event) {
                 return res.status(404).json({ message: 'Event not found' });
             }
+            const polls = event.polls.filter((poll: any) => poll.deleted === false);
             const attendees = event.attendees.map((attendee: any) => {
                 return {
                     id: attendee._id,
@@ -178,7 +179,7 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
                 description: event.description,
                 attendees,
                 messages,
-                polls: event.polls,
+                polls,
                 host: event.createdBy.displayName
             }
             return res.status(200).json({ message: 'Event data fetched', event: modifiedEvent });
@@ -212,7 +213,9 @@ const fetchEventPolls = async (req: Request, res: Response, next: NextFunction) 
                 if (!event) {
                     return next(new Error('No event found'));
                 }
-                return res.status(200).json({ polls: event.polls })
+
+                const polls = event.polls.filter((poll: any) => poll.deleted === false);
+                return res.status(200).json({ polls })
             })
     } catch (err) {
         return next(new Error('Could not fetch polls: ' + err));

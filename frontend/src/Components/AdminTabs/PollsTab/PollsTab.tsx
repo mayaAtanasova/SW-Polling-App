@@ -118,8 +118,8 @@ const PollsTab = () => {
     if (title === event?.title) {
       console.log('updating polls for ' + title);
       await getCurrentPollStatus(pollId);
-      getAdminUserPolls();
     }
+    getAdminUserPolls();
   }
 
   const getCurrentPollStatus = async (pollId: string) => {
