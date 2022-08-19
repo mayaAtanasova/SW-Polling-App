@@ -23,6 +23,7 @@ event.joinEvent);
 
 eventRouter.post('/archive/:evid', event.archiveEvent);
 eventRouter.post('/restore/:evid', event.restoreEvent);
+eventRouter.post('/edit/:evid', event.editEvent);
 
 eventRouter.post('/vpoints', event.updateVpoints);
 

@@ -17,6 +17,8 @@ const emptyEvent: IEvent = {
     attendees: [],
     messages: [],
     polls: [],
+    chatHidden: false,
+    pollsHidden: false,
 }
 const event: IEvent = emptyEvent;
 
@@ -115,6 +117,12 @@ const eventSlice = createSlice({
             state.eventId = null;
             state.loggedInChat = false;
         },
+        setChatStatus: (state, action) => {
+            state.event.chatHidden = action.payload;
+        },
+        setPollsStatus: (state, action) => {
+            state.event.pollsHidden = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -158,5 +166,5 @@ const eventSlice = createSlice({
 });
 
 const { reducer, actions } = eventSlice;
-export const { setEventId, setUserVPoints, clearEventData } = actions;
+export const { setEventId, setUserVPoints, clearEventData, setChatStatus, setPollsStatus } = actions;
 export default reducer;

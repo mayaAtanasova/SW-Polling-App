@@ -7,6 +7,9 @@ import { SocketContext } from '../../store/socketContext';
 import UsersTable from '../../Components/Shared/UsersTable/UsersTable';
 
 import styles from './Profile.module.css';
+import Loader from '../../Components/UI/Loader/Loader';
+import { eventTitleValidator } from '../../helpers/validators';
+import { IUser } from '../../Interfaces/IUser';
 
 const Profile = () => {
 
@@ -41,7 +44,7 @@ const Profile = () => {
   }
 
   if (loading) {
-    return <div>Loading...</div>
+    return <Loader />
   }
 
   return (
@@ -61,7 +64,7 @@ const Profile = () => {
           <p>
             you are attending as <span>{user.displayName}</span>
           </p>
-          <p>Your voting points: <span>{user.vpoints}</span></p>
+          <p>Your voting points: <span>{event.attendees.find((attendee:IUser) => attendee.id === user.id).vpoints}</span></p>
         </div>
         <div className={styles.attendeeList}>
           <div className={styles.attendeeHeading}>

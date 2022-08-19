@@ -52,7 +52,7 @@ const PollsTab = () => {
   const [modalAction, setModalAction] = useState('');
 
   const { event } = useMySelector(state => state.event);
-  const [selectedEventTitle, setSelectedEventTitle] = useState(event.title || '');
+  const [selectedEventTitle, setSelectedEventTitle] = useState('');
 
   useEffect(() => {
     if (!socket) return;
@@ -278,14 +278,14 @@ const PollsTab = () => {
   const filteringMethods: FilteringMethods = {
     activeOnly: { method: (poll: IPollCompact) => !poll.concluded },
     concludedOnly: { method: (poll: IPollCompact) => poll.concluded },
-    byEvent: { method: (poll: IPollCompact) => poll.event.title === selectedEventTitle },
+    byEvent: { method: (poll: IPollCompact) => poll.event.title.includes(selectedEventTitle) },
     all: { method: (poll: IPollCompact) => true },
   }
 
   const handleSelectByEventTitle = (ev: any) => {
     ev.preventDefault();
     setSelectedEventTitle(ev.target.value);
-    setFilterType('byEvent');
+    // setFilterType('byEvent');
   }
 
   return (
@@ -330,11 +330,15 @@ const PollsTab = () => {
               <h4>Filter by: </h4>
               <div className={styles.buttonsContainer}>
                 <button type="button" className={filterType === 'activeOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('activeOnly')}>Active</button>
-                <button type="button" className={filterType === 'concludedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('concludedOnly')}>Concluded</button>
-                <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>All</button>
-                <select className={filterType === 'byEvent' ? styles.sortSelected : ''} >
-                  <option value="" hidden defaultValue='By Event'>Event</option>
-                  {events.map((event: IEventCompact) => <option key={event.id} value={event.title} onClick={handleSelectByEventTitle}>{event.title}</option>)}
+                <button type="button" className={filterType === 'concludedOnly' ? styles.sortSelected : ''} onClick={() => setFilterType('concludedOnly')}>Inactive</button>
+                <button type="button" className={filterType === 'all' ? styles.sortSelected : ''} onClick={() => setFilterType('all')}>Active&Inactive</button>
+                <select 
+                className={styles.sortSelected}
+                value={selectedEventTitle}
+                onClick={handleSelectByEventTitle}
+                >
+                  <option value="">All events</option>
+                  {events.map((event: IEventCompact) => <option key={event.id} value={event.title}>{event.title}</option>)}
                 </select>
               </div>
             </div>
@@ -350,6 +354,7 @@ const PollsTab = () => {
           <div className={styles.pollsHolder}>
             {polls && polls
               .sort(sortingMethods[sortType].method)
+              .filter(filteringMethods['byEvent'].method)
               .filter(filteringMethods[filterType].method)
               .filter(poll => poll.title.toLowerCase().includes(searchString.toLowerCase()))
               .map((poll: any) => {

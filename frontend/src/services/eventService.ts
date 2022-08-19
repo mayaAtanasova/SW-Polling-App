@@ -128,20 +128,17 @@ const getEventsByCreator = async (userId: string) => {
     }
 }
 
-const editEvent = async (eventId: string, title: string, description: string) => {
+const editEvent = async (pollsHidden: boolean, chatHidden: boolean, eventId:string) => {
     try {
-        const response = await fetch(`${eventUrl}/${eventId}`, {
-            method: 'PUT',
+        const response = await fetch(`${eventUrl}/edit/${eventId}`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ title, description })
+            body: JSON.stringify({ pollsHidden, chatHidden })
         });
         const data = await response.json();
-        return {
-            message: data.message,
-            event: data.event
-        };
+        return data;
     } catch (error: any) {
         const message =
             (error.response && error.response.data && error.response.data.message)

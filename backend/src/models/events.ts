@@ -42,6 +42,14 @@ const eventSchema = new mongoose.Schema({
         type: Date,
         default: new Date().toISOString(),
     },
+    chatHidden: {
+        type: Boolean,
+        default: false,
+    },
+    pollsHidden: {
+        type: Boolean,
+        default: false,
+    },
     archived: {
         type: Boolean,
         default: false,

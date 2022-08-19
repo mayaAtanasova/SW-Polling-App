@@ -57,6 +57,8 @@ const getEventsByCreator = async (req: Request, res: Response, next: NextFunctio
                     host: event.createdBy.displayName,
                     date: event.createdAt,
                     archived: event.archived,
+                    chatHidden: event.chatHidden,
+                    pollsHidden: event.pollsHidden,
                 }
             });
             res.status(200).json({ events: modifiedEvents });
@@ -180,7 +182,9 @@ const fetchEventData = async (req: Request, res: Response, next: NextFunction) =
                 attendees,
                 messages,
                 polls,
-                host: event.createdBy.displayName
+                host: event.createdBy.displayName,
+                chatHidden: event.chatHidden,
+                pollsHidden: event.pollsHidden,
             }
             return res.status(200).json({ message: 'Event data fetched', event: modifiedEvent });
         });
@@ -256,18 +260,22 @@ const fetchEventAttendees = async (req: Request, res: Response, next: NextFuncti
     }
 }
 const editEvent = async (req: Request, res: Response, next: NextFunction) => {
-    const eventId = req.params.eventId;
-    const { title, description } = req.body;
+    const evid = req.params.evid;
+    console.log('Event id when editing' + evid);
+    const { chatHidden, pollsHidden } = req.body;
+    console.log(chatHidden, pollsHidden);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log('Validation errors ' + errors);
         return res.status(401).send({ message: 'Invalid fields sent' });
     }
     try {
-        const event = await Event.findByIdAndUpdate(eventId, { title, description }, { returnDocument: 'after', lean: true });
+        const event = await Event.findByIdAndUpdate(evid, { chatHidden, pollsHidden }, { new: true });
         res.status(200).json({
             message: 'Event edited successfully',
-            event
+            success: true,
+            pollsHidden: event.pollsHidden,
+            chatHidden: event.chatHidden,
         })
     } catch (err) {
         return next(new Error('Could not edit event: ' + err));
@@ -288,14 +296,11 @@ const archiveEvent = async (req: Request, res: Response, next: NextFunction) => 
                     return next(new Error('Event not found'));
                 }
                 try {
-                    // const session = await mongoose.startSession();
-                    // session.startTransaction();
                     event.archived = true;
                     event.polls.forEach(async (poll: any) => {
                         await Poll.findByIdAndUpdate(poll._id, { concluded: true });
                     });
                     await event.save();
-                    // await session.commitTransaction();
                     res.status(200).json({ message: 'Event archived successfully', success: true });
                 } catch (err) {
                     return next(new Error('Could not archive event: ' + err));

@@ -92,8 +92,8 @@ io.sockets.on('connect', socket => {
         console.log('current users are: ', users);
 
         //Broadcast to room to get data
-            console.log('broadcasting order to fetch messages')
-            io.to(title).emit('fetch messages', title);
+        console.log('broadcasting order to fetch messages')
+        io.to(title).emit('fetch messages', title);
     });
 
     //Listen for new polls
@@ -103,8 +103,8 @@ io.sockets.on('connect', socket => {
         console.log('current users are: ', users);
 
         //Broadcast to room to get data
-            console.log('broadcasting order to fetch polls')
-            io.to(title).emit('fetch polls', title);
+        console.log('broadcasting order to fetch polls')
+        io.to(title).emit('fetch polls', title);
     })
 
     //when user votes
@@ -114,10 +114,31 @@ io.sockets.on('connect', socket => {
         console.log('current users are: ', users);
 
         //Broadcast to room to get data
-            console.log('broadcasting order to fetch polls')
-            io.to(title).emit('fetch polls', title, pollId);
+        console.log('broadcasting order to fetch polls')
+        io.to(title).emit('fetch polls', title, pollId);
     })
 
+    //when poll area is toggled on/off
+    socket.on('toggle polls area', (title) => {
+        console.log(`polls area toggled for event ${title}`);
+        const users = getEventUsers(title);
+        console.log('current users are: ', users);
+
+        //Broadcast to room to get data
+        console.log('broadcasting order to toggle polls area')
+        io.to(title).emit('should toggle polls', title);
+    });
+
+    //when chat area is toggled on/off
+    socket.on('toggle chat area', (title) => {
+        console.log(`chat area toggled for event ${title}`);
+        const users = getEventUsers(title);
+        console.log('current users are: ', users);
+
+        //Broadcast to room to get data
+        console.log('broadcasting order to toggle chat area')
+        io.to(title).emit('should toggle chat', title);
+    });
 
     //When user leaves event
     socket.on('leave event', (userId, title) => {

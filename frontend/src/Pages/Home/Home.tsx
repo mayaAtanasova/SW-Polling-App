@@ -4,7 +4,7 @@ import { SocketContext } from '../../store/socketContext';
 import styles from './Home.module.css';
 
 import { useMySelector, useMyDispatch } from '../../hooks/useReduxHooks';
-import { joinEvent, fetchEvent, fetchMessages, fetchPolls } from '../../store/eventSlice';
+import { joinEvent, fetchEvent, fetchMessages, fetchPolls, setPollsStatus, setChatStatus } from '../../store/eventSlice';
 import Welcome from '../../Components/Welcome/Welcome';
 import { Navigate } from 'react-router-dom';
 import Messages from '../../Components/Chat/Messages';
@@ -31,11 +31,21 @@ const Home = () => {
     const [idToDetele, setIdToDelete] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+    const [isChatHidden, setIsChatHidden] = useState(event.chatHidden);
+    const [isPollsHidden, setIsPollsHidden] = useState(event.pollsHidden);
+
+    useEffect(() => {
+        console.log('chat area is closed? ', isChatHidden);
+        console.log('polls area is closed? ', isPollsHidden);
+    }, [isChatHidden, isPollsHidden]);
+
     useEffect(() => {
         if (!socket) return;
         socket.on('fetch messages', (title: string) => fetchEventMessages(title));
         socket.on('fetch event data', fetchEventData);
         socket.on('fetch polls', (title: string) => fetchEventPolls(title));
+        socket.on('should toggle polls', (title: string) => togglePolls(title));
+        socket.on('should toggle chat', (title: string) => toggleChat(title));
 
         if (loggedInChat && !eventTitle) {
             const title = localStorage.getItem('eventTitle');
@@ -46,6 +56,8 @@ const Home = () => {
             socket.off('fetch messages');
             socket.off('fetch event data');
             socket.off('fetch polls');
+            socket.off('should toggle polls');
+            socket.off('should toggle chat');
         }
     }, [socket]);
 
@@ -65,6 +77,23 @@ const Home = () => {
             dispatch(fetchEvent(eventId!));
         }
     }
+
+    const togglePolls = (title: string) => {
+        console.log('rcvd order to toggle polls');
+        if (title === eventTitle) {
+            setIsPollsHidden(status => !status);
+            dispatch(setPollsStatus(isPollsHidden));
+        }
+    }
+
+    const toggleChat = (title: string) => {
+        console.log('rcvd order to toggle chat');
+        if (title === eventTitle) {
+            setIsChatHidden(status => !status);
+            dispatch(setChatStatus(isChatHidden));
+        }
+    }
+
     //Look into this scenario!
     const fetchEventMessages = (title: string) => {
         console.log('rcvd order to fetch messages');
@@ -158,7 +187,7 @@ const Home = () => {
                 />}
 
             <div className={styles.homeContainer}>
-                {isAuthenticated && loggedInChat &&
+                {isAuthenticated && loggedInChat && !isChatHidden &&
                     <div className={styles.chatArea}>
                         <Messages
                             messages={messages}
@@ -169,7 +198,7 @@ const Home = () => {
                     </div>
                 }
 
-                {isAuthenticated && loggedInChat &&
+                {isAuthenticated && loggedInChat && !isPollsHidden &&
                     <div className={styles.pollsArea}>
                         <Polls polls={polls}
                             onVoteComplete={userVoted} />

@@ -50,7 +50,7 @@ const PollCard = ({
                 className={hovering ? styles.cardActionsGroup : styles.cardActionsGroupHidden}
             >
                 {!poll.concluded && <button onClick={onSelectConcludePoll(poll._id)}>Conclude</button>}
-                {poll.concluded && <button onClick={onSelectReactivatePoll(poll._id)}>Reactivate</button>}
+                {poll.concluded && <button onClick={onSelectReactivatePoll(poll._id)}>Activate</button>}
                 <button onClick={onSelectPollDetails(poll._id)}>Details</button>
                 <button onClick={onSelectDuplicatePoll(poll._id)}>Duplicate</button>
                 {poll.votes.length === 0 && !poll.concluded &&

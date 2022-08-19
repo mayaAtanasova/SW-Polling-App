@@ -6,20 +6,24 @@ export interface IEvent {
     id?: string;
     title: string;
     description: string;
-    host: string;
-    polls: IPoll[];
     attendees: IUser[];
+    polls: IPoll[];
     messages: IMessage[];
+    host: string;
+    chatHidden: boolean;
+    pollsHidden: boolean;
 }
 
 export interface IEventCompact {
-id: string;
-title: string;
-description: string;
-attendees: IUserCompact[];
-polls: IPoll[];
-messages: IMessage[];
-host: string;
-date: string;
-archived: boolean;
+    id: string;
+    title: string;
+    description: string;
+    attendees: IUserCompact[];
+    polls: IPoll[];
+    messages: IMessage[];
+    host: string;
+    date: string;
+    archived: boolean;
+    chatHidden: boolean;
+    pollsHidden: boolean;
 }
